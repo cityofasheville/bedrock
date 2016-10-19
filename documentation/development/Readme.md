@@ -11,7 +11,7 @@ The specifications here combine our own standardization work and the [Building &
 
 ### Specifications
 
-* [Permits](Core-Permits-Dataset-Requirements)
+* [Permits](permits)
 * [TBD - Permit Status History ](Optional-Permit-Status-Change-Dataset-Requirements)
 * [TBD - Tasks](Optional-Inspections-Dataset-Requirements) - These include inspections as well as other activities
 * [TBD- Contractors](Optional-Contractor-Dataset-Requirements)

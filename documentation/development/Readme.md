@@ -12,7 +12,7 @@ The specifications here combine our own standardization work and the [Building &
 ### Specifications
 
 * [Permits](Core-Permits-Dataset-Requirements)
-* [Optional Permit Status Change Dataset Requirements](Optional-Permit-Status-Change-Dataset-Requirements)
-* [Optional Contractor Dataset Requirements](Optional-Contractor-Dataset-Requirements)
-* [Optional Inspections Dataset Requirements](Optional-Inspections-Dataset-Requirements)
-* [Appendix A](Appendix-A) - List of values for <code>InspTypeMapped</code>
+* [TBD - Permit Status Change ](Optional-Permit-Status-Change-Dataset-Requirements)
+* [TBD - Tasks](Optional-Inspections-Dataset-Requirements) - These include inspections as well as other activities
+* [TBD- Contractors](Optional-Contractor-Dataset-Requirements)
+* [Appendix A from BLDS](Appendix-A) - List of values for <code>InspTypeMapped</code>

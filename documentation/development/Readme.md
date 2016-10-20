@@ -12,6 +12,6 @@ The specifications here combine our own standardization work and the [Building &
 ### Specifications
 
 * [Permits](./permits.md)
-* [Permit Status History ](./permit-status-change.md)
+* [Permit Status History ](./permit-status-history.md)
 * [Tasks](./tasks.md) - These include inspections as well as other activities
 * [Contractors - TBD](contractors.md)

@@ -1,7 +1,6 @@
 The following is a first attempt to define the fields we want on a permit. It builds on the [BLDS standard](https://github.com/open-data-standards/permitdata.org/wiki).
 
 In addition to defining the fields we want, we'll need to divide them between data that can be open and data that needs to be kept private.
-### Required
 
 |Field|DataType|Description|BLDS Status|
 |:---- |:---- |:------ |:------ |:------|

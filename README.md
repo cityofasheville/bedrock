@@ -1,6 +1,3 @@
-# coa-managed-data
-Repository for managed data assets standards and manifests
+# City of Asheville Managed Data Assets
+Repository for managed data asset definitions and manifests
 
-The code portion of this repository contains manifests for all of the data assets being managed.
-
-The wiki contains documentation on each of the datasets.

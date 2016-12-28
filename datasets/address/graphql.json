@@ -1,0 +1,22 @@
+{
+  "description": "Configuration for generating the GraphQL schema.",
+  "name": "MDA_Address",
+  "parameters": [
+    "id: ID!",
+    "name: String"
+  ],
+  "columns": {
+    "civicaddress_id": {
+      "type": "ID!"
+    },
+    "address_full": {
+      "type": "String!"
+    },
+    "property_pin": {
+      "type": "ID!"
+    },
+    "owner_name": {   
+      "type": "String"
+    }
+  }
+}

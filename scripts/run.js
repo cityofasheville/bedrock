@@ -1,7 +1,11 @@
 
 const fs = require('fs');
 const pg = require('pg');
+const bunyan = require('bunyan');
 
+const logger = bunyan.createLogger({
+  name: 'Base',
+});
 const validator = require('./processors/validator');
 const graphql = require('./processors/graphql');
 
@@ -16,6 +20,8 @@ const stripPath = function stripPath(path) {
   if (index >= 0) filename = path.substring(index + 1);
   return filename;
 };
+
+logger.info('Hello there!');
 
 const usage = function usage() {
   const usageString = `Usage: ${stripPath(process.argv[1])} [validate | graphql]`
@@ -52,7 +58,7 @@ if (args.length < 1) {
 }
 
 let processor = null;
-const config = { indent: 2 };
+const config = { indent: 2, pool, db: dbCredentials.database };
 
 let startDirectory = '.';
 if ('source' in options) startDirectory = options.source;
@@ -65,14 +71,13 @@ console.log(`Running the ${command} processor.`);
 switch (command) {
   case 'validate':
     processor = validator;
-    config.pool = pool;
-    config.db = dbCredentials.database;
     break;
   case 'graphql':
     processor = graphql;
     config.destDirectory = destDirectory;
-    config.pool = pool;
-    config.db = dbCredentials.database;
+    break;
+  case 'etl':
+    console.error('ETL processing not yet implemented');
     break;
   default:
     console.error(`${command} processor not found.`);
@@ -105,6 +110,7 @@ const processDirectory = function processDirectory(path, dest, processFunction) 
   return;
 };
 
+// Walk the directory hierarchy and run the processor on each dataset directory
 if (processor) {
   if (!fs.existsSync(startDirectory)) {
     console.log(`Source directory ${startDirectory} not found.`);

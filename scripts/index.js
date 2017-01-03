@@ -3,13 +3,23 @@ const fs = require('fs');
 const pg = require('pg');
 const bunyan = require('bunyan');
 
+require('dotenv').config();
+
 const logger = bunyan.createLogger({
   name: 'Base',
 });
 const validator = require('./processors/validator');
 const graphql = require('./processors/graphql');
 
-const dbCredentials = require('./db_credentials');
+// const dbCredentials = require('./db_credentials');
+const dbCredentials = {
+  host: process.env.dbhost,
+  user: process.env.dbuser,
+  password: process.env.dbpassword,
+  database: process.env.database,
+  ssl: true,
+};
+
 const Pool = pg.Pool;
 
 const pool = new Pool(dbCredentials);

@@ -1,13 +1,11 @@
 
 const fs = require('fs');
 const pg = require('pg');
-const bunyan = require('bunyan');
+const logging = require('coa-node-logging');
 
 require('dotenv').config();
 
-const logger = bunyan.createLogger({
-  name: 'Base',
-});
+const logger = logging.createLogger('MDA', null);
 const validator = require('./processors/validator');
 const graphql = require('./processors/graphql');
 

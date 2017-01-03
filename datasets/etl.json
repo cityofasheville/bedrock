@@ -1,0 +1,21 @@
+{
+  "name": "global",
+  "description": "Defines a set of standard job groups that can be used as dependencies. Null jobs are just sequencers.",
+  "depends": [],
+  "jobs": [
+    {
+      "name": "group1",
+      "type": null      
+    },
+    {
+      "name": "group2",
+      "depends": "group1",
+      "type": null      
+    },
+    {
+      "name": "group3",
+      "depends": "group2",
+      "type": null      
+    }
+  ]
+}

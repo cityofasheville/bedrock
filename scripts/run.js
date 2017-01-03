@@ -78,6 +78,8 @@ switch (command) {
     break;
   case 'etl':
     console.error('ETL processing not yet implemented');
+    // Need to do an init version where we build a tree and do the topological
+    // sort. Then another where we actually run.
     break;
   default:
     console.error(`${command} processor not found.`);
@@ -90,12 +92,25 @@ const registerError = function registerError(error) {
   console.log(`We have an error: ${error}`);
 };
 
+// This routine walks the directory structure. When it identifies a dataset directory
+// (by the existence of a 'dataset.json' file), it calls the processor function
+// on it.
+
+/*
+ * Need to rethink. The processor routine should take the current path, a configuration object,
+ * and a logger. The processor is called on each subdirectory and then one final time at the end.
+ * This will do the right thing to figure out the ETL tree, but what about running it. Maybe
+ * We have an etl --init and then etl --run calls.
+ *
+ * Note that the graphql run at the moment is wrong. It won't work if there is more than one
+ * dataset. - need that extra call at the end to do the dump.
+ */
 const processDirectory = function processDirectory(path, dest, processFunction) {
   const files = fs.readdirSync(path);
   const defIndex = files.indexOf('dataset.json');
 
   if (defIndex >= 0) {
-    console.log(`Processing a dataset in ${path}`);
+    logger.info(`Processing dataset directory ${path}`);
     const lconfig = Object.assign({}, config, { files });
     const p = processFunction(path, dest, lconfig, registerError);
     Promise.resolve(p);

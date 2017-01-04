@@ -8,6 +8,7 @@ require('dotenv').config();
 const logger = logging.createLogger('MDA', null);
 const validator = require('./processors/validator');
 const graphql = require('./processors/graphql');
+const etl = require('./processors/etl');
 
 // const dbCredentials = require('./db_credentials');
 const dbCredentials = {
@@ -28,8 +29,6 @@ const stripPath = function stripPath(path) {
   if (index >= 0) filename = path.substring(index + 1);
   return filename;
 };
-
-logger.info('Hello there!');
 
 const usage = function usage() {
   const usageString = `Usage: ${stripPath(process.argv[1])} [validate | graphql]`
@@ -66,6 +65,8 @@ if (args.length < 1) {
 }
 
 let processor = null;
+let triggerFile = 'dataset.json';
+
 const config = { indent: 2, pool, db: dbCredentials.database };
 
 let startDirectory = '.';
@@ -85,6 +86,8 @@ switch (command) {
     config.destDirectory = destDirectory;
     break;
   case 'etl':
+    processor = etl;
+    triggerFile = 'etl.json';
     console.error('ETL processing not yet implemented');
     // Need to do an init version where we build a tree and do the topological
     // sort. Then another where we actually run.
@@ -115,12 +118,12 @@ const registerError = function registerError(error) {
  */
 const processDirectory = function processDirectory(path, dest, processFunction) {
   const files = fs.readdirSync(path);
-  const defIndex = files.indexOf('dataset.json');
+  const defIndex = files.indexOf(triggerFile);
 
   if (defIndex >= 0) {
-    logger.info(`Processing dataset directory ${path}`);
+    console.log(`Processing dataset directory ${path}`);
     const lconfig = Object.assign({}, config, { files });
-    const p = processFunction(path, dest, lconfig, registerError);
+    const p = processFunction('run', path, dest, lconfig, registerError);
     Promise.resolve(p);
   }
   files.forEach((fileName) => {
@@ -142,7 +145,12 @@ if (processor) {
   if (!fs.existsSync(destDirectory)) {
     console.log(`Destination directory ${destDirectory} not found`);
   }
+
+  processor('init', null, destDirectory, config, registerError);
+
   processDirectory(startDirectory, destDirectory, processor);
+  processor('finish', null, destDirectory, config, registerError);
+
   pool.end((err, value) => {
     if (err) {
       console.log('There was an error releasing the pool');

@@ -49,6 +49,10 @@ function addToGraph(config) {
   }
 }
 
+// This generates a JSON file with two sets of jobs.
+// In the sequenced set any dependencies of a job are guaranteed to be listed
+// before it. The freeJobs array contains jobs with no dependencies.
+
 function process(stage, path, dest, config, logger) {
   let fd;
   let result;
@@ -69,7 +73,7 @@ function process(stage, path, dest, config, logger) {
       });
       // Remaining nodes have no dependencies
       Object.keys(graph.nodes).forEach((jName) => { result.freeJobs.push(graph.nodes[jName]); });
-      fd = fs.openSync('./output.json', 'w');
+      fd = fs.openSync(`${dest}/etl_jobs.json`, 'w');
       fs.writeFileSync(fd, JSON.stringify(result), { encoding: 'utf8' });
       break;
 

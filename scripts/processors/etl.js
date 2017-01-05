@@ -18,10 +18,11 @@ function readEtlConfig(path, logger) {
 
 let graph = {};
 
-function createNode(config) {
+function createNode(config, commonDepends) {
   let job = null;
   if (config.type) {
     job = Object.assign({}, config); // Just copy everything in & let the job runner sort it
+    job.depends = job.depends.concat(commonDepends);
   }
   const node = { name: config.name, job };
   return node;
@@ -39,7 +40,7 @@ function createEdge(name1, name2) {
 function addToGraph(config) {
   if (config) {
     config.jobs.forEach((job) => {
-      addNode(createNode(job));
+      addNode(createNode(job, config.depends));
       // Add common dependencies
       config.depends.forEach((name) => {graph.edges.push(createEdge(job.name, name));});
       // Add dependencies for just this job
@@ -50,18 +51,28 @@ function addToGraph(config) {
 
 function process(stage, path, dest, config, logger) {
   let fd;
+  let result;
   switch (stage) {
     case 'init':
       graph = { nodes: {}, edges: [] };
       break;
+
     case 'run':
       addToGraph(readEtlConfig(path, logger));
       break;
+
     case 'finish':
-      graph.edges = toposort(graph.edges).reverse();
+      result = { sequencedJobs: [], freeJobs: [] };
+      toposort(graph.edges).reverse().forEach((jobName) => {
+        result.sequencedJobs.push(graph.nodes[jobName]);
+        delete graph.nodes[jobName];
+      });
+      // Remaining nodes have no dependencies
+      Object.keys(graph.nodes).forEach((jName) => { result.freeJobs.push(graph.nodes[jName]); });
       fd = fs.openSync('./output.json', 'w');
-      fs.writeFileSync(fd, JSON.stringify(graph), { encoding: 'utf8' });
+      fs.writeFileSync(fd, JSON.stringify(result), { encoding: 'utf8' });
       break;
+
     default:
       break;
   }

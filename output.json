@@ -1,0 +1,1 @@
+{"sequencedJobs":[[{"name":"group1","job":null}],[{"name":"address_first","job":{"name":"address_first","depends":["group1"],"type":"fme","path":"x/y/z"}}],[{"name":"nothing","job":{"name":"nothing","depends":[],"type":"fme","path":"x/y/z"}}],[{"name":"group2","job":null}],[{"name":"group3","job":null}]],"freeJobs":[]}

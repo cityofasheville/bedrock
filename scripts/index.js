@@ -99,10 +99,6 @@ switch (command) {
     break;
 }
 
-const registerError = function registerError(error) {
-  console.log(`We have an error: ${error}`);
-};
-
 // This routine walks the directory structure. When it identifies a dataset directory
 // (by the existence of a 'dataset.json' file), it calls the processor function
 // on it.
@@ -123,7 +119,7 @@ const processDirectory = function processDirectory(path, dest, processFunction) 
   if (defIndex >= 0) {
     console.log(`Processing dataset directory ${path}`);
     const lconfig = Object.assign({}, config, { files });
-    const p = processFunction('run', path, dest, lconfig, registerError);
+    const p = processFunction('run', path, dest, lconfig, logger);
     Promise.resolve(p);
   }
   files.forEach((fileName) => {
@@ -146,10 +142,10 @@ if (processor) {
     console.log(`Destination directory ${destDirectory} not found`);
   }
 
-  processor('init', null, destDirectory, config, registerError);
+  processor('init', null, destDirectory, config, logger);
 
   processDirectory(startDirectory, destDirectory, processor);
-  processor('finish', null, destDirectory, config, registerError);
+  processor('finish', null, destDirectory, config, logger);
 
   pool.end((err, value) => {
     if (err) {

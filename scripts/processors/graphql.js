@@ -1,9 +1,5 @@
 const fs = require('fs');
 
-function handler(result) {
-  console.log(`RESULT: ${JSON.stringify(result)}`);
-}
-
 const context = { initialized: false, types: '', endpoints: '' };
 
 function normalizeName(name, useSpaces = false) {
@@ -78,7 +74,7 @@ function appendGraphQlType(dataDef, config, graphQlConfig) {
   return typeDef;
 }
 
-function doGeneration(path, dest, config, registerError) { // eslint-disable-line no-unused-vars
+function doGeneration(path, dest, config, logger) { // eslint-disable-line no-unused-vars
   let fd = fs.openSync(`${path}/dataset.json`, 'r');
   const ddef = JSON.parse(fs.readFileSync(fd, { encoding: 'utf8' }));
   let graphqlConfig = { columns: {} };
@@ -91,11 +87,11 @@ function doGeneration(path, dest, config, registerError) { // eslint-disable-lin
   context.endpoints += appendGraphQlEndpoint(ddef, config, graphqlConfig);
 }
 
-function generate(path, dest, config, registerError) {
+function generate(path, dest, config, logger) {
   if (!context.initialized) {
     context.initialized = true;
   }
-  doGeneration(path, dest, config, registerError);
+  doGeneration(path, dest, config, logger);
   let output = `const types = \`\n${context.types}\`;\nexport default types;\n`;
   let fd = fs.openSync(`${dest}/mda_types.js`, 'w');
   fs.writeFileSync(fd, output, { encoding: 'utf8' });

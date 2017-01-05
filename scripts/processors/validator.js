@@ -43,7 +43,7 @@ function verifyType(def, actual) {
   return error;
 }
 
-function doValidation(pool, path, config, registerError) {
+function doValidation(pool, path, config, logger) {
   return pool.connect((err, client, release) => {
     if (err) {
       console.log('Unable to connect');
@@ -67,19 +67,19 @@ function doValidation(pool, path, config, registerError) {
 
       ddef.columns.forEach((cDef) => {
         if (!(cDef.column in columns)) {
-          registerError(`Required column ${cDef.column} not found in table ${ddef.table}`);
+          logger.error(`Required column ${cDef.column} not found in table ${ddef.table}`);
         } else {
           checkColumns[cDef.column] = true;
           const typeErr = verifyType(cDef, columns[cDef.column]);
           if (typeErr) {
-            registerError(`Type error in column ${cDef.column} of table ${ddef.table}: ${typeErr}`);
+            logger.error(`Type error in column ${cDef.column} of table ${ddef.table}: ${typeErr}`);
           }
         }
       });
 
       Object.getOwnPropertyNames(checkColumns).forEach(colName => {
         if (!checkColumns[colName]) {
-          registerError(`Column ${colName}, table ${ddef.table} is missing from definition`);
+          logger.error(`Column ${colName}, table ${ddef.table} is missing from definition`);
         }
       });
       return metadata;
@@ -87,9 +87,9 @@ function doValidation(pool, path, config, registerError) {
   });
 }
 
-const validate = function validate(path, dest, config, registerError) {
+const validate = function validate(path, dest, config, logger) {
   const pool = config.pool;
-  return doValidation(pool, path, config, registerError);
+  return doValidation(pool, path, config, logger);
 };
 
 module.exports = validate;

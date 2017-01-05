@@ -1,19 +1,15 @@
 {
-  "name": "address",
   "depends": ["group1"],
   "jobs": [
     {
       "name": "address_first",
+      "depends": [],
       "type": "fme",
       "path": "x/y/z"
     },
     {
-      "depends": "address_first",
-      "type": "fme",
-      "path": "x/y/z"
-    },
-    {
-      "depends": "address_first",
+      "name": "nothing",
+      "depends": ["address_first"],
       "type": "fme",
       "path": "x/y/z"
     }

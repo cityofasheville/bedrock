@@ -1,7 +1,5 @@
 const fs = require('fs');
 
-const context = { initialized: false, types: '', endpoints: '' };
-
 function normalizeName(name, useSpaces = false) {
   let newName = name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   if (!useSpaces) newName = newName.replace(/ /g, '');
@@ -74,6 +72,8 @@ function appendGraphQlType(dataDef, config, graphQlConfig) {
   return typeDef;
 }
 
+let context;
+
 function doGeneration(path, dest, config, logger) { // eslint-disable-line no-unused-vars
   let fd = fs.openSync(`${path}/dataset.json`, 'r');
   const ddef = JSON.parse(fs.readFileSync(fd, { encoding: 'utf8' }));
@@ -87,17 +87,27 @@ function doGeneration(path, dest, config, logger) { // eslint-disable-line no-un
   context.endpoints += appendGraphQlEndpoint(ddef, config, graphqlConfig);
 }
 
-function generate(path, dest, config, logger) {
-  if (!context.initialized) {
-    context.initialized = true;
+function process(stage, path, dest, config, logger) {
+  let fd;
+  let output;
+  switch (stage) {
+    case 'init':
+      context = { initialized: false, types: '', endpoints: '' };
+      break;
+    case 'run':
+      doGeneration(path, dest, config, logger);
+      break;
+    case 'finish':
+      output = `const types = \`\n${context.types}\`;\nexport default types;\n`;
+      fd = fs.openSync(`${dest}/mda_types.js`, 'w');
+      fs.writeFileSync(fd, output, { encoding: 'utf8' });
+      output = `const endpoints = \`\n${context.endpoints}\`;\nexport default endpoints;\n`;
+      fd = fs.openSync(`${dest}/mda_endpoints.js`, 'w');
+      fs.writeFileSync(fd, output, { encoding: 'utf8' });
+      break;
+    default:
+      break;
   }
-  doGeneration(path, dest, config, logger);
-  let output = `const types = \`\n${context.types}\`;\nexport default types;\n`;
-  let fd = fs.openSync(`${dest}/mda_types.js`, 'w');
-  fs.writeFileSync(fd, output, { encoding: 'utf8' });
-  output = `const endpoints = \`\n${context.endpoints}\`;\nexport default endpoints;\n`;
-  fd = fs.openSync(`${dest}/mda_endpoints.js`, 'w');
-  fs.writeFileSync(fd, output, { encoding: 'utf8' });
 }
 
-module.exports = generate;
+module.exports = process;

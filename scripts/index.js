@@ -30,7 +30,7 @@ const stripPath = function stripPath(path) {
 };
 
 const usage = function usage() {
-  const usageString = `Usage: ${stripPath(process.argv[1])} [validate | graphql]`
+  const usageString = `Usage: ${stripPath(process.argv[1])} [validate | graphql | etl]`
                     + ' [--source=sourceDir] [--dest=destDir]'
                     + ' [--indent=numberOfSpaces]';
   console.log(usageString);

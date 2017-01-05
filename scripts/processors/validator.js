@@ -1,10 +1,6 @@
 const fs = require('fs');
 const pgMetadata = require('pg-metadata');
 
-function handler(result) {
-  console.log(`RESULT: ${JSON.stringify(result)}`);
-}
-
 function verifyType(def, actual) {
   let error = null;
   switch (actual.type) {
@@ -46,7 +42,7 @@ function verifyType(def, actual) {
 function doValidation(pool, path, config, logger) {
   return pool.connect((err, client, release) => {
     if (err) {
-      console.log('Unable to connect');
+      logger.error({ err }, 'Unable to connect');
       return;
     }
     const fd = fs.openSync(`${path}/dataset.json`, 'r');
@@ -55,9 +51,8 @@ function doValidation(pool, path, config, logger) {
     pgMetadata(client, { table: ddef.table }, (qerr, metadata) => {
       if (qerr) {
         release();
-        console.log(`Error reading metadata: ${JSON.stringify(qerr)}`);
+        logger.error({ err: qerr }, 'Error reading metadata');
       }
-      handler(metadata);
       release();
       const columns = metadata[config.db][ddef.schema][ddef.table];
       const checkColumns = {};
@@ -92,4 +87,21 @@ const validate = function validate(path, dest, config, logger) {
   return doValidation(pool, path, config, logger);
 };
 
-module.exports = validate;
+
+function process(stage, path, dest, config, logger) {
+  const pool = config.pool;
+  switch (stage) {
+    case 'init':
+      // Nothing
+      break;
+    case 'run':
+      doValidation(pool, path, config, logger);
+      break;
+    case 'finish':
+      // Nothing
+      break;
+    default:
+      break;
+  }
+}
+module.exports = process;

@@ -10,7 +10,6 @@ const validator = require('./processors/validator');
 const graphql = require('./processors/graphql');
 const etl = require('./processors/etl');
 
-// const dbCredentials = require('./db_credentials');
 const dbCredentials = {
   host: process.env.dbhost,
   user: process.env.dbuser,

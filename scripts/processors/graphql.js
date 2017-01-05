@@ -19,15 +19,15 @@ function dataSetName(dataDef, graphQlConfig) {
 function appendGraphQlEndpoint(dataDef, config, graphQlConfig) {
   const name = dataSetName(dataDef, graphQlConfig);
   //   address ( id: ID! ): Address
-  let parameters = '';
+  let params = '';
   let indent = '  ';
   if (graphQlConfig.parameters) {
-    parameters = `( ${graphQlConfig.parameters.join(', ')} )`;
+    params = `( ${graphQlConfig.parameters.join(', ')} )`;
   }
   if (config.indent) {
     indent = ' '.repeat(config.indent);
   }
-  return `${indent}# ${dataDef.description}\n${indent}${name.toLowerCase()}${parameters}: ${name}\n`;
+  return `${indent}# ${dataDef.description}\n${indent}${name.toLowerCase()}${params}: ${name}\n`;
 }
 
 function translateType(rawType) {

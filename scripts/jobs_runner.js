@@ -63,8 +63,17 @@ jobTracker.running = jobTracker.running.filter((job) => {
 });
 
 // If there are open slots, start new jobs and add to running
-const currentLoad = jobTracker.running.reduce(countPoints, 0);
-if (currentLoad < loadPoints) {
+const freeLoad = loadPoints - jobTracker.running.reduce(countPoints, 0);
+let done = ((freeLoad) &&
+(jobTracker.sequencedToDo.length > 0 || jobTracker.freeToDo.length > 0));
+while (!done) {
+  let job;
+  if (jobTracker.sequencedToDo.length > 0) {
+    job = getNextSequencedJob();
+    if (job) {
+
+    }
+  }
   // add some new jobs
   console.log('We have room for ' + (loadPoints - currentLoad) + ' jobs');
 }

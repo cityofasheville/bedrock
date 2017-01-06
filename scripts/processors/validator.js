@@ -56,7 +56,7 @@ function doValidation(pool, path, config, logger) {
       release();
       const columns = metadata[config.db][ddef.schema][ddef.table];
       const checkColumns = {};
-      Object.getOwnPropertyNames(columns).forEach(colName => {
+      Object.getOwnPropertyNames(columns).forEach((colName) => {
         checkColumns[colName] = false;
       });
 
@@ -72,7 +72,7 @@ function doValidation(pool, path, config, logger) {
         }
       });
 
-      Object.getOwnPropertyNames(checkColumns).forEach(colName => {
+      Object.getOwnPropertyNames(checkColumns).forEach((colName) => {
         if (!checkColumns[colName]) {
           logger.error(`Column ${colName}, table ${ddef.table} is missing from definition`);
         }
@@ -81,12 +81,6 @@ function doValidation(pool, path, config, logger) {
     });
   });
 }
-
-const validate = function validate(path, dest, config, logger) {
-  const pool = config.pool;
-  return doValidation(pool, path, config, logger);
-};
-
 
 function process(stage, path, dest, config, logger) {
   const pool = config.pool;

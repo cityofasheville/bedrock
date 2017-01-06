@@ -28,19 +28,21 @@ function createNode(config, commonDepends) {
   return node;
 }
 
-function addNode(node) {
-  if (!(node.name in graph.nodes)) graph.nodes[node.name] = [node];
-  else graph.nodes[node.name].push(node);
+function addNode(node, logger) {
+  if (!(node.name in graph.nodes)) graph.nodes[node.name] = node;
+  else {
+    logger.error(`Duplicate job name ${node.name}`);
+  }
 }
 
 function createEdge(name1, name2) {
   return [name1, name2];
 }
 
-function addToGraph(config) {
+function addToGraph(config, logger) {
   if (config) {
     config.jobs.forEach((job) => {
-      addNode(createNode(job, config.depends));
+      addNode(createNode(job, config.depends), logger);
       // Add common dependencies
       config.depends.forEach((name) => { graph.edges.push(createEdge(job.name, name)); });
       // Add dependencies for just this job
@@ -62,7 +64,7 @@ function process(stage, path, dest, config, logger) {
       break;
 
     case 'run':
-      addToGraph(readEtlConfig(path, logger));
+      addToGraph(readEtlConfig(path, logger), logger);
       break;
 
     case 'finish':

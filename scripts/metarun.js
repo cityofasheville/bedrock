@@ -2,6 +2,7 @@
 const fs = require('fs');
 const pg = require('pg');
 const logging = require('coa-node-logging');
+const commandLine = require('coa-command-line-args');
 
 require('dotenv').config();
 
@@ -22,43 +23,15 @@ const Pool = pg.Pool;
 
 const pool = new Pool(dbCredentials);
 
-const stripPath = function stripPath(path) {
-  let filename = path;
-  const index = path.lastIndexOf('/');
-  if (index >= 0) filename = path.substring(index + 1);
-  return filename;
-};
-
 const usage = function usage() {
-  const usageString = `Usage: ${stripPath(process.argv[1])} [validate | graphql | etl]`
+  const usageString = `Usage: ${commandLine.stripPath(process.argv[1])} [validate | graphql | etl]`
                     + ' [--source=sourceDir] [--dest=destDir]'
                     + ' [--indent=numberOfSpaces]';
   console.log(usageString);
 };
 
-const options = {};
-const extractOptions = function extractOptions(args) {
-  const newArgs = [];
-  args.forEach((arg) => {
-    if (arg.startsWith('--')) {
-      const eqIndex = arg.indexOf('=');
-      if (eqIndex >= 0) {
-        const optName = arg.substring(2, eqIndex);
-        const optValue = arg.substring(eqIndex + 1);
-        options[optName] = optValue;
-      } else {
-        const optName = arg.substring(2);
-        options[optName] = true;
-      }
-    } else {
-      newArgs.push(arg);
-    }
-  });
-  return newArgs;
-};
-
-const args = extractOptions(process.argv.slice(2));
-if (args.length < 1) {
+const args = commandLine.extractOptions(process.argv.slice(2));
+if (args.args.length < 1) {
   usage();
   process.exit(1);
 }
@@ -69,12 +42,12 @@ let triggerFile = 'dataset.json';
 const config = { indent: 2, pool, db: dbCredentials.database };
 
 let startDirectory = '.';
-if ('source' in options) startDirectory = options.source;
+if ('source' in args.options) startDirectory = args.options.source;
 let destDirectory = '.';
-if ('dest' in options) destDirectory = options.dest;
-if ('indent' in options) config.indent = options.indent;
+if ('dest' in args.options) destDirectory = args.options.dest;
+if ('indent' in args.options) config.indent = args.options.indent;
 
-const command = args[0];
+const command = args.args[0];
 console.log(`Running the ${command} processor.`);
 switch (command) {
   case 'validate':

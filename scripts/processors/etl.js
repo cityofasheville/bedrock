@@ -42,9 +42,9 @@ function addToGraph(config) {
     config.jobs.forEach((job) => {
       addNode(createNode(job, config.depends));
       // Add common dependencies
-      config.depends.forEach((name) => {graph.edges.push(createEdge(job.name, name));});
+      config.depends.forEach((name) => { graph.edges.push(createEdge(job.name, name)); });
       // Add dependencies for just this job
-      job.depends.forEach((name) => {graph.edges.push(createEdge(job.name, name));});
+      job.depends.forEach((name) => { graph.edges.push(createEdge(job.name, name)); });
     });
   }
 }

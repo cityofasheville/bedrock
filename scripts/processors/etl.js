@@ -20,10 +20,8 @@ let graph = {};
 
 function createNode(config, commonDepends) {
   let job = null;
-  if (config.type) {
-    job = Object.assign({}, config); // Just copy everything in & let the job runner sort it
-    job.depends = job.depends.concat(commonDepends);
-  }
+  job = Object.assign({}, config); // Just copy everything in & let the job runner sort it
+  job.depends = job.depends.concat(commonDepends);
   const node = { name: config.name, job };
   return node;
 }

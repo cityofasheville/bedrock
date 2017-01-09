@@ -1,9 +1,10 @@
+/* eslint-disable no-console */
 const fs = require('fs');
+const spawn = require('child_process').spawn;
 const logging = require('coa-node-logging');
 require('dotenv').config();
 const logger = logging.createLogger('JobRunner', null);
 const commandLine = require('coa-command-line-args');
-const Exception = require('./exceptions');
 const initializeJobTracker = require('./jobs_tracker/initialize');
 const countPoints = require('./jobs_tracker/count_points');
 
@@ -63,19 +64,90 @@ jobTracker.running = jobTracker.running.filter((job) => {
 });
 
 // If there are open slots, start new jobs and add to running
-const freeLoad = loadPoints - jobTracker.running.reduce(countPoints, 0);
-let done = ((freeLoad) &&
+let freeLoad = loadPoints - jobTracker.running.reduce(countPoints, 0);
+console.log(`Freeload is ${freeLoad}`);
+console.log(`seq: ${jobTracker.sequencedToDo.length}, free: ${jobTracker.freeToDo.length}`);
+let jobsTodo = ((freeLoad > 0) &&
 (jobTracker.sequencedToDo.length > 0 || jobTracker.freeToDo.length > 0));
-while (!done) {
+while (jobsTodo) {
   let job;
+  console.log(`Current sequencedToDo length: ${jobTracker.sequencedToDo.length}`);
   if (jobTracker.sequencedToDo.length > 0) {
-    job = getNextSequencedJob();
+    job = getNextSequencedJob(freeLoad);
     if (job) {
+      if (job.job.type === null) { // just a sequencing dependency
+        jobTracker.jobStatus[job.name] = 'Done';
+        console.log(`Marking the job ${job.name} done.`);
+      } else { // Start the job
+        startJob(job);
+        freeLoad -= getJobPoints(job);
+      }
+    } else jobsTodo = false;
+  } else jobsTodo = false;
+  console.log(`Bottom of the loop, jobsTodo = ${jobsTodo}, freeLoad = ${freeLoad}`);
+  // Test points count
+}
 
+process.exit(0);
+
+function startJob(job) {
+  console.log(`Starting the job: ${JSON.stringify(job)}`);
+  let runArgs = [];
+  const options = { detached: true, stdio: ['ignore', fs.openSync('./out.log', 'a'), fs.openSync('./err.log', 'a')] };
+  if (job.job.type === 'ps1') {
+    runArgs = [job.job.path].concat(job.job.args);
+  }
+  const run = spawn('powershell.exe', runArgs, options);
+  // run.stdout.on('data', (data) => {
+  //   const fd = fs.openSync('./hi.log', 'w');
+  //   fs.writeFileSync(fd, `stdout for ${job.name}: ${data}`, { encoding: 'utf8' });
+  //   fs.close(fd);
+  // });
+
+  run.unref();
+  jobTracker.running.push(job);
+}
+
+function seqDepends(accum, currentDepend) {
+  let ok = true;
+  if (jobTracker.jobStatus[currentDepend] !== 'Done') ok = false;
+  if (currentDepend in jobTracker.refCount) {
+    if (jobTracker.refCount[currentDepend] > 1) { // 1 because tester is one.
+      ok = false;
     }
   }
-  // add some new jobs
-  console.log('We have room for ' + (loadPoints - currentLoad) + ' jobs');
+  return ok && accum;
+}
+
+function regDepends(accum, currentDepend) {
+  let ok = true;
+  if (jobTracker.jobStatus[currentDepend] !== 'Done') ok = false;
+  return ok && accum;
+}
+
+function getJobPoints(job) {
+  return ('points' in job) ? job.points : 1;
+}
+
+function getNextSequencedJob(maxPts) {
+  let jobToRun = null;
+  console.log(`In getnextseq with points = ${maxPts}`);
+  if (jobTracker.sequencedToDo.length > 0) {
+    const job = jobTracker.sequencedToDo[0];
+    const jpoints = getJobPoints(job);
+    if (jpoints <= maxPts) {
+      console.log(`Here is the job we are testing: ${job.name}`);
+      if (job.job.type == null) { // Sequencing job
+        // Only kick off when depends are both done and have refcount = 1 (me)
+        if (job.job.depends.reduce(seqDepends, true)) {
+          jobToRun = jobTracker.sequencedToDo.shift();
+        }
+      } else if (job.job.depends.reduce(regDepends, true)) {
+        jobToRun = jobTracker.sequencedToDo.shift();
+      }
+    }
+  }
+  return jobToRun;
 }
 
 console.log(`The job file: ${JSON.stringify(jobTracker)}`);

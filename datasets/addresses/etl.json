@@ -4,14 +4,16 @@
     {
       "name": "address_first",
       "depends": ["group1"],
-      "type": "fme",
-      "path": "x/y/z"
+      "type": "ps1",
+      "path": "C:\\Users\\ericjackson\\dev\\coa-managed-data\\sleeptest.ps1",
+      "args": ["3"]
     },
     {
       "name": "nothing",
       "depends": [],
-      "type": "fme",
-      "path": "x/y/z"
+      "type": "ps1",
+      "path": "C:\\Users\\ericjackson\\dev\\coa-managed-data\\sleeptest.ps1",
+      "args": ["5"]
     }
   ]
 }

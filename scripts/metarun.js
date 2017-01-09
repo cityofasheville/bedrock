@@ -1,4 +1,4 @@
-
+/* eslint-disable no-console */
 const fs = require('fs');
 const pg = require('pg');
 const logging = require('coa-node-logging');

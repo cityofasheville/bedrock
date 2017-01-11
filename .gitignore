@@ -2,7 +2,6 @@ db_credentials.js
 node_modules
 mda_endpoints.js
 mda_types.js
-etl_jobs.json
 .env
 
 

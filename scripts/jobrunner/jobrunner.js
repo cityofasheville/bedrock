@@ -71,7 +71,7 @@ class JobRunner {
           }
         } else {
           haveSequencedJobs = false;
-          console.log('No more sequenced jobs to do');
+          console.log('No more sequenced jobs to do.');
         }
       }
       if (!haveSequencedJobs) { // Can't run any more sequenced, get some free ones.

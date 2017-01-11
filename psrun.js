@@ -17,7 +17,7 @@ const bat = require.resolve(path);
 const options = { detached: false, shell: false };
 
 console.log(new Date());
-const run = spawn(bat, [10, process.argv[2]], options);
+const run = spawn(bat, [5, process.argv[2]], options);
 
 run.on('close', (code) => {
   console.log(`The child process ended with code ${code}`);

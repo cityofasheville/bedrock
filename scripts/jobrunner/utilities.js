@@ -15,6 +15,11 @@ function recursivelyDeletePath(path) {
   }
 }
 
+function getJobPoints(job) {
+  return ('points' in job) ? job.points : 1;
+}
+
 module.exports = {
   recursivelyDeletePath,
+  getJobPoints,
 };

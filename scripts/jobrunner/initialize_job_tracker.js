@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-function initializeJobTracker(workingDirectory, files, jobFileName, init, logger) {
+function initializeJobTracker(workingDirectory, jobFileName, init, logger) {
   let jobTracker = {
     startDate: new Date(),
     currentDate: new Date(),
@@ -11,6 +11,12 @@ function initializeJobTracker(workingDirectory, files, jobFileName, init, logger
     running: [],
     completed: [],
   };
+  const files = fs.readdirSync(workingDirectory);
+
+  if (files.indexOf(jobFileName) < 0) {
+    logger.error(`Unable to find job file ${jobFileName} in jobs directory ${workingDirectory}`);
+    process.exit(1);
+  }
   if (init) {
     let fd = fs.openSync(`${workingDirectory}/${jobFileName}`, 'r');
     const jobsDef = JSON.parse(fs.readFileSync(fd, { encoding: 'utf8' }));

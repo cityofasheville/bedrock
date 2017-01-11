@@ -9,6 +9,7 @@ function initializeJobTracker(workingDirectory, files, jobFileName, init, logger
     sequencedToDo: [],
     freeToDo: [],
     running: [],
+    completed: [],
   };
   if (init) {
     let fd = fs.openSync(`${workingDirectory}/${jobFileName}`, 'r');

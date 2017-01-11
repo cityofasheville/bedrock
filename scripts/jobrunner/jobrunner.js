@@ -145,7 +145,7 @@ class JobRunner {
     fs.closeSync(fd);
 
     // Now fork a script that will run that job and write out the result at the end.
-    const path = require.resolve('C:\\Users\\ericjackson\\dev\\coa-managed-data\\psrun.js');
+    const path = require.resolve('./run_job.js');
     const out = fs.openSync(`${this.workingDirectory}/jobs/${job.name}/out.log`, 'a');
     const err = fs.openSync(`${this.workingDirectory}/jobs/${job.name}/err.log`, 'a');
     const options = { detached: true, shell: false, stdio: ['ignore', out, err, 'ipc'] };

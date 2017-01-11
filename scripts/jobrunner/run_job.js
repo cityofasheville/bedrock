@@ -11,11 +11,10 @@ fs.writeFileSync(fd, JSON.stringify(status), { encoding: 'utf8' });
 fs.closeSync(fd);
 
 
-let path = './sleeper.bat';
-path = '.\\sleeper.bat';
+let path =  './sleeper.bat';
 const bat = require.resolve(path);
 const options = { detached: false, shell: false };
-console.log(`The path I will run is ${bat}`);
+
 console.log(new Date());
 const run = spawn(bat, [5, process.argv[2]], options);
 

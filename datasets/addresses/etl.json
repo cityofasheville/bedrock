@@ -4,8 +4,8 @@
     {
       "name": "address_first",
       "depends": ["group1"],
-      "type": "ps1",
-      "path": "C:\\Users\\ericjackson\\dev\\coa-managed-data\\sleeper.bat",
+      "type": "fme",
+      "path": "C:\\Users\\mssqlgisadmin\\Documents\\GitHub\\fme-jobs\\mda-stuff\\address.tcl",
       "args": ["10"]
     },
     {

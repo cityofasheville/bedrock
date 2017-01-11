@@ -96,6 +96,7 @@ class JobRunner {
         this.saveState();
       }
     }
+    return;
   }
 
   // Sequencing-only dependencies are special.

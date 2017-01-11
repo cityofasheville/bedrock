@@ -34,5 +34,3 @@ run.on('close', (code) => {
   fs.closeSync(fd);
   console.log(new Date());
 });
-
-console.log('Bi');

@@ -25,5 +25,10 @@ const workingDirectory = args.args[0];
 // Now do the runs
 const runner = new JobRunner(workingDirectory, jobFileName, args.options.init, logger);
 runner.initializeRun();
+console.log('Harvest');
 runner.harvestRunningJobs();
+console.log('Fill the queue');
 runner.fillJobQueue(loadPoints);
+console.log('Done - now exit');
+process.exit(0);
+

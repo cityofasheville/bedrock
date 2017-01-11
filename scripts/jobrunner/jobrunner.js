@@ -4,7 +4,7 @@ const fork = require('child_process').fork;
 const { getJobPoints, recursivelyDeletePath, countPoints } = require('./utilities');
 const initializeJobTracker = require('./initialize_job_tracker');
 
-class JobTracker {
+class JobRunner {
   constructor(workingDirectory, jobFileName, reset, logger) {
     this.logger = logger;
     this.workingDirectory = workingDirectory;
@@ -57,6 +57,7 @@ class JobTracker {
     while (jobsTodo) {
       let job;
       let haveSequencedJobs = this.jTracker.sequencedToDo.length > 0;
+      // We prefer to run jobs that others may depend on
       if (haveSequencedJobs) {
         job = this.getNextSequencedJob(freeLoad);
         if (job) {
@@ -157,5 +158,5 @@ class JobTracker {
   }
 }
 
-module.exports = JobTracker;
+module.exports = JobRunner;
 

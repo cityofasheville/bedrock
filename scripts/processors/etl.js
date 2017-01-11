@@ -71,7 +71,7 @@ function process(stage, path, dest, config, logger) {
         result.sequencedJobs.push(graph.nodes[jobName]);
         delete graph.nodes[jobName];
       });
-      // Remaining nodes have no dependencies
+      // Remaining nodes have no dependencies, nor nodes that depend on them.
       Object.keys(graph.nodes).forEach((jName) => { result.freeJobs.push(graph.nodes[jName]); });
       fd = fs.openSync(`${dest}/etl_jobs.json`, 'w');
       fs.writeFileSync(fd, JSON.stringify(result), { encoding: 'utf8' });

@@ -1,11 +1,11 @@
 {
   "description": "Technical and subject-expert owners.",
-  "technical_owner": {
-    "name": "Cameron Carlyle",
-    "email": "ccarlyle@ashevillenc.gov"
-  },
-  "subject_expert": {
+  "technical_owner": [{
     "name": "Eric Jackson",
     "email": "ejackson@ashevillenc.gov"
-  }
+  }],
+  "subject_expert": [{
+    "name": "Eric Jackson",
+    "email": "ejackson@ashevillenc.gov"
+  }]
 }

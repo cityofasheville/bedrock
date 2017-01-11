@@ -4,10 +4,6 @@
     {
       "title": "Data source",
       "note": "This data comes from databases maintained jointly by the City of Asheville and Buncombe County."
-    },
-    {
-      "title": "Missing Data",
-      "note": "Some addresses have been removed just for fun."
     }
   ]
 }

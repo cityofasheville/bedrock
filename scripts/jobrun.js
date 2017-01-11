@@ -22,6 +22,7 @@ const loadPoints = ('parallelLoad' in args.options) ? args.options.parallelLoad 
 const jobFileName = ('jobFile' in args.options) ? args.options.jobFile : 'etl_jobs.json';
 const workingDirectory = args.args[0];
 
+// Now do the runs
 const runner = new JobRunner(workingDirectory, jobFileName, args.options.init, logger);
 runner.initializeRun();
 runner.harvestRunningJobs();

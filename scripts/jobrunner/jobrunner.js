@@ -1,9 +1,8 @@
 /* eslint-disable no-console */
 const fs = require('fs');
 const fork = require('child_process').fork;
-const { getJobPoints, recursivelyDeletePath } = require('./utilities');
+const { getJobPoints, recursivelyDeletePath, countPoints } = require('./utilities');
 const initializeJobTracker = require('./initialize_job_tracker');
-const countPoints = require('./count_points');
 
 class JobTracker {
   constructor(workingDirectory, jobFileName, reset, logger) {

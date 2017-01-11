@@ -19,7 +19,12 @@ function getJobPoints(job) {
   return ('points' in job) ? job.points : 1;
 }
 
+function countPoints(accum, currentJob) {
+  return getJobPoints(currentJob) + accum;
+}
+
 module.exports = {
   recursivelyDeletePath,
   getJobPoints,
+  countPoints,
 };

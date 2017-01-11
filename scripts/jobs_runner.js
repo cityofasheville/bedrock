@@ -81,9 +81,11 @@ fs.closeSync(fd);
 let freeLoad = loadPoints - jTracker.running.reduce(countPoints, 0);
 console.log(`Freeload is ${freeLoad}`);
 let jobsTodo = ((freeLoad > 0) && (jTracker.sequencedToDo.length > 0 || jTracker.freeToDo.length > 0));
+let counter= 0;
 while (jobsTodo) {
   let job;
-  if (jTracker.sequencedToDo.length > 0) {
+  let haveSequencedJobs = jTracker.sequencedToDo.length > 0;
+  if (haveSequencedJobs) {
     job = getNextSequencedJob(freeLoad);
     if (job) {
       console.log(`Got the next sequenced job: ${job.name}`);
@@ -96,8 +98,38 @@ while (jobsTodo) {
         fs.closeSync(ffd);
         freeLoad -= getJobPoints(job);
       }
-    } else jobsTodo = false;
-  } else jobsTodo = false;
+    } else {
+      haveSequencedJobs = false;
+      console.log('No more sequenced jobs to do');
+    }
+  }
+  if (!haveSequencedJobs) { // get the next free job
+    console.log('Try for a free job');
+    const toRun = [];
+    const holdJobs = [];
+    for (let i = 0; i < jTracker.freeToDo.length; i += 1) {
+      const fjob = jTracker.freeToDo[i];
+      if (getJobPoints(fjob) <= freeLoad) {
+        toRun.push(fjob);
+        freeLoad -= getJobPoints(fjob);
+      } else {
+        holdJobs.push(fjob);
+      }
+    }
+    console.log(`Ok, we have ${toRun.length} free jobs!`);
+    jTracker.freeToDo = holdJobs;
+    while (toRun.length > 0) {
+      job = toRun.shift();
+      startJob(job);
+    }
+    jobsTodo = false;
+    const ffd = fs.openSync(`${workingDirectory}/jobstatus.json`, 'w');
+    fs.writeFileSync(ffd, JSON.stringify(jTracker), { encoding: 'utf8' });
+    fs.closeSync(ffd);
+  }
+  counter += 1;
+  if (counter > 10) jobsTodo = false;
+
   console.log(`Bottom of the loop, jobsTodo = ${jobsTodo}, freeLoad = ${freeLoad}`);
   // Test points count
 }

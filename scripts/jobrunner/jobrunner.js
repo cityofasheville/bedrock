@@ -52,7 +52,7 @@ class JobRunner {
   fillJobQueue(loadPoints) {
     // If there are open slots, start new jobs and add to running
     let freeLoad = loadPoints - this.jTracker.running.reduce(countPoints, 0);
-    console.log(`Freeload is ${freeLoad}`);
+    console.log(`Free load is ${freeLoad}.`);
     let jobsTodo = ((freeLoad > 0) && (this.jTracker.sequencedToDo.length > 0 || this.jTracker.freeToDo.length > 0));
     while (jobsTodo) {
       let job;
@@ -61,7 +61,7 @@ class JobRunner {
       if (haveSequencedJobs) {
         job = this.getNextSequencedJob(freeLoad);
         if (job) {
-          console.log(`Got the next sequenced job: ${job.name}`);
+          console.log(`Got the next sequenced job: ${job.name}.`);
           if (job.job.type === null) { // just a sequencing dependency
             this.jTracker.jobStatus[job.name] = 'Done';
           } else { // Start the job

@@ -37,6 +37,7 @@ function translateType(rawType) {
   else if (rawType.startsWith('integer')) type = 'Int';
   else if (rawType.startsWith('bigint')) type = 'Int';
   else if (rawType.startsWith('numeric')) type = 'Float';
+  else if (rawType.startsWith('double')) type = 'Float';
   else if (rawType.startsWith('boolean')) type = 'Boolean';
   else if (rawType.startsWith('geom')) type = 'String'; // for now
   // else if (rawType.startsWith('geom')) type = 'Geometry';

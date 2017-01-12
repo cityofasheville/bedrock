@@ -2,16 +2,16 @@
   "depends": [],
   "jobs": [
     {
-      "name": "address_first",
+      "name": "addresses",
       "depends": ["group1"],
       "type": "fme",
       "path": "C:\\Users\\mssqlgisadmin\\Documents\\GitHub\\fme-jobs\\mda-stuff\\address.tcl",
-      "args": ["10"]
+      "args": []
     },
     {
-      "name": "nothing",
-      "depends": [],
-      "type": "ps1",
+      "name": "test",
+      "depends": ["addresses"],
+      "type": "cmd",
       "path": "C:\\Users\\ericjackson\\dev\\coa-managed-data\\sleeper.bat",
       "args": ["5"]
     }

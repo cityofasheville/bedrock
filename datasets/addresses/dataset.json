@@ -1,8 +1,8 @@
 {
   "description": "Address master table maintained by _Buncombe County_ and _City of Asheville_",
-  "name": "coa_bc_address_master",
-  "table": "coa_bc_address_master",
-  "schema": "public",
+  "name": "bc_address",
+  "table": "bc_address",
+  "schema": "coagis",
   "columns": [
     {
       "column":  "objectid",

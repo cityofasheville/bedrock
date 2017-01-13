@@ -9,14 +9,11 @@
     "civicaddress_id": {
       "type": "ID!"
     },
-    "address_full": {
+    "address": {
       "type": "String!"
     },
-    "property_pin": {
+    "pinnum": {
       "type": "ID!"
-    },
-    "owner_name": {   
-      "type": "String"
     }
   }
 }

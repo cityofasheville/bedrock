@@ -11,71 +11,56 @@
       "description": "Unique integer ID generated for ArcGIS. Don't trust this."
     },
     {
-      "column": "civicaddress_id",
-      "name": "Civic Address Id",
-      "type": "integer",
-      "description": "Primary address ID used by the City."
-    },
-    {
-      "column": "address_x",
+      "column": "x",
       "type": "numeric(38,8)",
       "description": "GPS X coordinate location of the address."
     },
     {
-      "column": "address_y",
+      "column": "y",
       "type": "numeric(38,8)",
       "description": "GPS Y coordinate location of the address."
     },
     {
-      "column": "address_full",
-      "name": "Full Address",
+      "column": "address",
+      "name": "Address",
       "type": "varchar(40)",
       "description": "TBD"
     },
     {
-      "column": "address_number",
+      "column": "number",
       "type": "integer",
       "description": "TBD"
     },
     {
-      "column": "address_apt",
+      "column": "apt",
       "type": "varchar(4)",
       "description": "TBD"
     },
     {
-      "column": "address_street_prefix",
+      "column": "prefix",
       "type": "varchar(2)",
       "description": "TBD"
     },
     {
-      "column": "address_street_name",
+      "column": "street_name",
       "type": "varchar(30)",
       "description": "TBD"
     },
     {
-      "column": "address_street_type",
+      "column": "street_type",
       "type": "varchar(4)",
       "description": "TBD"
     },
     {
-      "column": "address_street_postdirection",
+      "column": "postdirection",
       "type": "varchar(2)",
       "description": "TBD"
     },
     {
-      "column": "address_city",
-      "type": "varchar(28)",
-      "description": "TBD"
-    },  
-    {
-      "column": "address_commcode",
-      "type": "varchar(4)",
-      "description": "TBD"
-    },  
-    {
-      "column": "address_zipcode",
+      "column": "civicaddress_id",
+      "name": "Civic Address Id",
       "type": "integer",
-      "description": "TBD"
+      "description": "Primary address ID used by the City."
     },
     {
       "column": "location_type",
@@ -83,8 +68,18 @@
       "description": "TBD"
     },
     {
-      "column": "address_change_date",
+      "column": "change_date",
       "type": "timestamp-no-tz",
+      "description": "TBD"
+    },
+    {
+      "column": "city",
+      "type": "varchar(28)",
+      "description": "TBD"
+    },
+    {
+      "column": "zipcode",
+      "type": "integer",
       "description": "TBD"
     },
     {
@@ -108,18 +103,13 @@
       "description": "TBD"
     },
     {
-      "column": "water_district",
-      "type": "varchar(8)",
+      "column": "pinnum",
+      "type": "varchar(15)",
       "description": "TBD"
     },
     {
-      "column": "trash_pickup_day",
+      "column": "truckday",
       "type": "varchar(10)",
-      "description": "TBD"
-    },
-    {
-      "column": "jurisdiction_type",
-      "type": "varchar(150)",
       "description": "TBD"
     },
     {
@@ -130,269 +120,17 @@
     {
       "column": "centerline_id",
       "name": "Centerline ID",
-      "type": "bigint",
+      "type": "numeric(38,8)",
       "description": "TBD"
     },
     {
       "column": "location_id",
-      "type": "bigint",
+      "type": "numeric(38,8)",
       "description": "TBD"
     },
     {
       "column": "parent_location_id",
-      "type": "bigint",
-      "description": "TBD"
-    },
-    {
-      "column": "property_pinnum",
-      "type": "varchar(15)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_pin",
-      "name": "Pin",
-      "type": "varchar(15)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_pinext",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_nmptype",
-      "type": "varchar(150)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_oldpinnum",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_update_date",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_update_reason",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_deeddate",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_taxyear",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_deedurl",
-      "type": "varchar(254)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_platurl",
-      "type": "varchar(254)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_propcardurl",
-      "type": "varchar(150)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_acreage",
       "type": "numeric(38,8)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_class",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_improved",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_exempt",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_priced",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_totalmarketvalue",
-      "type": "numeric(38,2)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_appraisedvalue",
-      "type": "numeric(38,2)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_taxvalue",
-      "type": "numeric(38,2)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_landuse",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_neighborhoodcode",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_landvalue",
-      "type": "numeric(38,2)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_buildingvalue",
-      "type": "numeric(38,2)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_improvementvalue",
-      "type": "numeric(38,2)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_appraisalarea",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_condounit",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_condobuilding",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_subname",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_sublot",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_subblock",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_subsect",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_township",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_stamps",
-      "type": "numeric(38,8)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_instrument",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_firedistrict",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "property_schooldistrict",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "owner_name",
-      "name": "Owner",
-      "type": "text",
-      "description": "TBD"
-    },
-    {
-      "column": "owner_house_number",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "owner_number_suffix",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "owner_direction",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "owner_street_name",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "owner_street_type",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "owner_careof",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "owner_address",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "owner_cityname",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "owner_state",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "owner_zipcode",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "owner_account_number",
-      "type": "varchar(50)",
-      "description": "TBD"
-    },
-    {
-      "column": "shape",
-      "type": "geometry",
       "description": "TBD"
     }
   ]

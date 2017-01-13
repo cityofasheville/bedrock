@@ -53,7 +53,7 @@ function appendGraphQlType(dataDef, config, graphQlConfig) {
   let typeDef = '';
 
   typeDef = `${indent}type ${name} {\n`;
-  dataDef.columns.forEach(column => {
+  dataDef.columns.forEach((column) => {
     const cName = column.column;
     let type = translateType(column.type);
     if (column.column in graphQlConfig.columns) {
@@ -69,7 +69,7 @@ function appendGraphQlType(dataDef, config, graphQlConfig) {
 
     typeDef += `${indent}  ${cName}: ${type}\n`;
   });
-  typeDef += `${indent}}`;
+  typeDef += `${indent}}\n`;
   return typeDef;
 }
 

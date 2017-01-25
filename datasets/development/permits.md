@@ -6,13 +6,13 @@ In addition to defining the fields we want, we'll need to divide them between da
 |:---- |:---- |:------ |:------ |:------|
 |PermitNum|TEXT|Permit number|Required|
 |Description|TEXT|Detailed description of work permitted|Required|
-|AppliedDate<sup>1</sup>|TEXT (YYYY-MM-DD)|Date on which the permit was applied|Required|
+|AppliedDate|TEXT (YYYY-MM-DD)|Date on which the permit was applied (see note on IssuedDate)|Required|
 |ApplicantName|TEXT|Name of applicant. May want to add other information as well|-|
-|IssuedDate<sup>1</sup>|TEXT (YYYY-MM-DD)|Date on which the permit was issued|Required|
-|CompletedDate<sup>2</sup>|TEXT (YYYY-MM-DD)|Date on which the permit was completed.|Required|
+|IssuedDate|TEXT (YYYY-MM-DD)|Date on which the permit was issued. NOTE: Either of ```AppliedDate``` or ```IssuedDate``` is required. If both are available, both should be provided.|Required|
+|CompletedDate|TEXT (YYYY-MM-DD)|Date on which the permit was completed. Note: Either of ```CompletedDate``` or ```StatusCurrent``` must be provided. If both are available, both should be provided.|Required|
 |Stage|TEXT|Name of the current stage. Permitted values: <ul> <li>Application</li> <li>Review</li> <li>Issuance</li> <li>...TBD</li> </ul>|-|
 |StageStatus|TEXT|Current status of permit within current stage. Permitted values:<ul><li>Started</li> <li>NotStarted</li> <li>Complete</li> <li>N/A</li></ul>|-|
-|StatusCurrent<sup>2</sup>|TEXT|BLDS-required value indicating current status of permit. This field should use only standardized values defined by BLDS so we don't have to implement the BLDS-recommended StatusCurrentMapped field <ul><li>Application Accepted</li><li>Fees/Payment</li><li>In Review</li><li>Permit Issued</li><li>Inspection Phase</li><li>Permit Finaled</li><li>Permit Finaled with Conditions</li><li>Occupancy</li><li>Appeal</li><li>Permit Cancelled</li></ul>|Required|
+|StatusCurrent|TEXT|BLDS-required value indicating current status of permit. See note on ````CompletedDate````. <ul><li>Application Accepted</li><li>Fees/Payment</li><li>In Review</li><li>Permit Issued</li><li>Inspection Phase</li><li>Permit Finaled</li><li>Permit Finaled with Conditions</li><li>Occupancy</li><li>Appeal</li><li>Permit Cancelled</li></ul>|Required|
 |StatusCurrentMapped|TEXT|StatusCurrent mapped to standardized values:<ul><li>Application Accepted</li><li>Fees/Payment</li><li>In Review</li><li>Permit Issued</li><li>Inspection Phase</li><li>Permit Finaled</li><li>Permit Finaled with Conditions</li><li>Occupancy</li><li>Appeal</li><li>Permit Cancelled</li></ul>|Recommended|
 |CivicAddressId|TEXT|Asheville civic address id| - |
 |OriginalAddress1|TEXT|Original property street address (line 1).|Required|

@@ -7,13 +7,6 @@
       "type": "fme",
       "path": "C:\\Users\\mssqlgisadmin\\Documents\\GitHub\\fme-jobs\\mda-stuff\\address.tcl",
       "args": []
-    },
-    {
-      "name": "test",
-      "depends": ["addresses"],
-      "type": "cmd",
-      "path": "C:\\Users\\ericjackson\\dev\\coa-managed-data\\sleeper.bat",
-      "args": ["5"]
     }
   ]
 }

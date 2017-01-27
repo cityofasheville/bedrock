@@ -1,0 +1,4 @@
+The job info is {"name":"2-crime_base_union","depends":["1-pull-crimes-from-rem-and-cad-dbs"],"type":"fme","path":"C:\\Users\\mssqlgisadmin\\Documents\\GitHub\\fme-jobs\\crime\\2-crime_base_union.fmw","args":[]}
+2017-01-25T20:36:43.669Z
+The child process ended with code 0
+2017-01-25T20:44:04.441Z

@@ -99,10 +99,10 @@ function process(stage, path, dest, config, logger) {
       doGeneration(path, dest, config, logger);
       break;
     case 'finish':
-      output = `const types = \`\n${context.types}\`;\nexport default types;\n`;
+      output = `const types = \`\n${context.types}\`;\nmodule.exports = types;\n`;
       fd = fs.openSync(`${dest}/mda_types.js`, 'w');
       fs.writeFileSync(fd, output, { encoding: 'utf8' });
-      output = `const endpoints = \`\n${context.endpoints}\`;\nexport default endpoints;\n`;
+      output = `const endpoints = \`\n${context.endpoints}\`;\nmodule.exports = endpoints;\n`;
       fd = fs.openSync(`${dest}/mda_endpoints.js`, 'w');
       fs.writeFileSync(fd, output, { encoding: 'utf8' });
       break;

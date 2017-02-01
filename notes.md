@@ -15,13 +15,12 @@ GO
 
 It's a lot nastier here. First, to get the object id of a table:
 
-''''
+````
 select 'coagis.bc_address'::regclass::oid;
-''''
-
+````
 From the wiki (https://wiki.postgresql.org/wiki/Pg_depend_display):
 
-''''
+````
 SELECT classid::regclass AS "depender object class",
     CASE classid
         WHEN 'pg_class'::regclass THEN objid::regclass::text
@@ -47,7 +46,7 @@ SELECT classid::regclass AS "depender object class",
 FROM pg_catalog.pg_depend ;
 If you are interested only in dependencies on user objects only (not system objects), add
 WHERE objid >= 16384 OR refobjid >= 16384 (using the select above);
-''''
+````
 
 Here's the documentation on the pg_depend catalog: https://www.postgresql.org/docs/9.1/static/catalog-pg-depend.html.
 

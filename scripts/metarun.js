@@ -2,6 +2,7 @@
 const fs = require('fs');
 const logging = require('coa-node-logging');
 const commandLine = require('coa-command-line-args');
+const os = require('os');
 
 require('dotenv').config();
 
@@ -22,7 +23,10 @@ if (args.args.length < 1) {
   usage();
   process.exit(1);
 }
-
+const doit = true;
+if (doit) {
+  console.log(`OS Platform is ${os.platform()}`);
+}
 let logFile = null;
 if ('logfile' in args.options) logFile = args.options.logfile;
 

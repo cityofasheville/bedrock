@@ -22,8 +22,10 @@
     "pg-metadata": "^5.0.0",
     "pg-pool": "^1.6.0",
     "toposort": "^1.0.0",
-    "msnodesqlv8": "^0.2.11",
     "mssql": "^3.3.0"
+  },
+  "optionalDependencies": {
+    "msnodesqlv8": "^0.2.11"
   },
   "devDependencies": {
     "eslint": "^3.12.2",

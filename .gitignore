@@ -3,5 +3,7 @@ node_modules
 mda_endpoints.js
 mda_types.js
 .env
+*.log
+
 
 

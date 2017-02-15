@@ -1,31 +1,18 @@
 /* eslint-disable no-console */
 const fs = require('fs');
-const pg = require('pg');
 const logging = require('coa-node-logging');
 const commandLine = require('coa-command-line-args');
 
 require('dotenv').config();
 
-const logger = logging.createLogger('MDA', null);
 const validator = require('./processors/validator');
 const graphql = require('./processors/graphql');
 const etl = require('./processors/etl');
 
-const dbCredentials = {
-  host: process.env.dbhost,
-  user: process.env.dbuser,
-  password: process.env.dbpassword,
-  database: process.env.database,
-  ssl: true,
-};
-
-const Pool = pg.Pool;
-
-const pool = new Pool(dbCredentials);
-
 const usage = function usage() {
   const usageString = `Usage: ${commandLine.stripPath(process.argv[1])} [validate | graphql | etl]`
                     + ' [--source=sourceDir] [--dest=destDir]'
+                    + ' [--logfile=logFilePath]'
                     + ' [--indent=numberOfSpaces]';
   console.log(usageString);
 };
@@ -36,10 +23,15 @@ if (args.args.length < 1) {
   process.exit(1);
 }
 
+let logFile = null;
+if ('logfile' in args.options) logFile = args.options.logfile;
+
+const logger = logging.createLogger('MDA', logFile);
+
 let processor = null;
 let triggerFile = 'dataset.json';
 
-const config = { indent: 2, pool, db: dbCredentials.database };
+const config = { indent: 2, db: 'datastore1' };
 
 let startDirectory = '.';
 if ('source' in args.options) startDirectory = args.options.source;
@@ -48,7 +40,7 @@ if ('dest' in args.options) destDirectory = args.options.dest;
 if ('indent' in args.options) config.indent = args.options.indent;
 
 const command = args.args[0];
-console.log(`Running the ${command} processor.`);
+
 switch (command) {
   case 'validate':
     processor = validator;
@@ -77,11 +69,11 @@ const processDirectory = function processDirectory(path, dest, processFunction) 
   const defIndex = files.indexOf(triggerFile);
 
   if (defIndex >= 0) {
-    console.log(`Processing dataset directory ${path}`);
     const lconfig = Object.assign({}, config, { files });
     const p = processFunction('run', path, dest, lconfig, logger);
     Promise.resolve(p);
   }
+
   files.forEach((fileName) => {
     const fullPath = `${path}/${fileName}`;
     const stat = fs.lstatSync(fullPath);
@@ -102,14 +94,6 @@ if (processor) {
   }
 
   processor('init', null, destDirectory, config, logger);
-
   processDirectory(startDirectory, destDirectory, processor);
   processor('finish', null, destDirectory, config, logger);
-
-  pool.end((err, value) => {
-    if (err) {
-      console.log('There was an error releasing the pool');
-    }
-    return value;
-  });
 }

@@ -13,6 +13,7 @@ const etl = require('./processors/etl');
 const usage = function usage() {
   const usageString = `Usage: ${commandLine.stripPath(process.argv[1])} [validate | graphql | etl]`
                     + ' [--source=sourceDir] [--dest=destDir]'
+                    + ' [--recurse]'
                     + ' [--logfile=logFilePath]'
                     + ' [--indent=numberOfSpaces]';
   console.log(usageString);
@@ -26,6 +27,7 @@ if (args.args.length < 1) {
 const doit = true;
 if (doit) {
   console.log(`OS Platform is ${os.platform()}`);
+  console.log(`OS Type is ${os.type()}`);
 }
 let logFile = null;
 if ('logfile' in args.options) logFile = args.options.logfile;

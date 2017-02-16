@@ -1,5 +1,6 @@
 db_credentials.js
 node_modules
+mda
 mda_endpoints.js
 mda_types.js
 .env

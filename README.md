@@ -14,6 +14,6 @@ Scripts and metadata for City of Asheville reporting and management data infrast
   * Future possibility: answer question "What data is involved in this functionality?
 
 
-The system consists of a set of [metadata directories](./datasets) describing all the datasets in our reporting and management warehouse together with a few [scripts](./scripts/README.md) that use the metadata to create and maintain data infrastructure.
+The system consists of a set of [metadata directories](https://github.com/cityofasheville/mda) (in a different repository now) describing all the datasets in our reporting and management warehouse together with a few [scripts](./src/README.md) that use the metadata to create and maintain data infrastructure.
 
 

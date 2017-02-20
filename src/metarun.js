@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 const fs = require('fs');
-const logging = require('coa-node-logging');
+const Logger = require('coa-node-logging');
 const commandLine = require('coa-command-line-args');
 const os = require('os');
 
@@ -32,10 +32,10 @@ if (doit) {
 let logFile = null;
 if ('logfile' in args.options) logFile = args.options.logfile;
 
-const logger = logging.createLogger('MDA', logFile);
+const logger = new Logger('MDA', logFile);
 
 let processor = null;
-let triggerFile = 'dataset.json';
+let triggerFile = 'mda.json';
 
 const config = { indent: 2, db: 'datastore1' };
 

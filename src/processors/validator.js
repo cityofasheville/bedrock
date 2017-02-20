@@ -75,24 +75,24 @@ function validate(metadata, logger, config, ds, ddef) {
 
     ds.columns.forEach((cDef) => {
       if (!(cDef.column in columns)) {
-        const details = { type: 'table-missing-column', table: ds.table, column: cDef.column };
-        logger.error({ details },
-         `Required column ${cDef.column} not found in table ${ds.table}`);
+        logger.error('table-missing-column',
+         `Required column ${cDef.column} not found in table ${ds.table}`,
+         { table: ds.table, column: cDef.column });
       } else {
         checkColumns[cDef.column] = true;
         const typeErr = verifyType(cDef, columns[cDef.column]);
         if (typeErr) {
-          const details = { type: 'column-type-error', table: ds.table, column: cDef.column, message: typeErr };
-          logger.error({ details },
-          `Types error in column ${cDef.column} of table ${ds.table}: ${typeErr}`);
+          logger.error('column-type-err',
+            `Types error in column ${cDef.column} of table ${ds.table}: ${typeErr}`,
+            { table: ds.table, column: cDef.column, message: typeErr });
         }
       }
     });
     Object.getOwnPropertyNames(checkColumns).forEach((colName) => {
       if (!checkColumns[colName]) {
-        const details = { type: 'definition-missing-column', table: ddef.table, column: colName };
-        logger.error({ details },
-        `Column ${colName}, table ${ddef.table} is missing from definition`);
+        logger.error('definition-missing-column',
+          `Column ${colName}, table ${ddef.table} is missing from definition`,
+          { table: ddef.table, column: colName });
       }
     });
   }
@@ -113,14 +113,18 @@ function run(pool, path, config, logger) {
           const schema = pgMetadata.createMetadataObject(result.rows);
           validate(schema, logger, config, ds, ddef);
         } else {
-          logger.error({ details: { type: 'missing-table', path, table: ds.table } }, `Table  ${ds.table} does not exist`);
+          logger.error('missing-table', `Table  ${ds.table} does not exist`, { path, table: ds.table });
         }
       }).catch((err) => {
         client.release();
-        logger.error({ details: { type: 'query-error', path, table: ds.table, err } }, `Query error on table ${ds.table}: ${err.message}`);
+        logger.error('query-error',
+          `Query error on table ${ds.table}: ${err.message}`,
+          { path, table: ds.table, err });
       });
     }).catch((err) => {
-      logger.error({ details: { type: 'connection-error', path, table: ds.table, err } }, `Connection error on table ${ds.table}: ${err.message}`);
+      logger.error('connection-error',
+        `Connection error on table ${ds.table}: ${err.message}`,
+        { path, table: ds.table, err });
     });
   });
 }

@@ -16,7 +16,7 @@
   "dependencies": {
     "bunyan": "^1.8.5",
     "coa-command-line-args": "^1.0.1",
-    "coa-node-logging": "^1.0.3",
+    "coa-node-logging": "^1.1.0",
     "dotenv": "^2.0.0",
     "pg": "6.1.0",
     "pg-metadata": "^5.0.0",

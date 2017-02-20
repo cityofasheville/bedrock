@@ -175,9 +175,9 @@ coa-command-line-args@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/coa-command-line-args/-/coa-command-line-args-1.0.1.tgz#72de1452de091c276e9b2d71fab626337d3dca93"
 
-coa-node-logging@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/coa-node-logging/-/coa-node-logging-1.0.3.tgz#4fac374a672c0c668ed35e955cc8f07d5ac20f66"
+coa-node-logging@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/coa-node-logging/-/coa-node-logging-1.1.0.tgz#825c899f10ab78d9a9ee3362a0fadb4ea106ed40"
   dependencies:
     bunyan "^1.8.5"
 

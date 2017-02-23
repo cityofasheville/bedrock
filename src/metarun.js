@@ -1,105 +1,75 @@
-/* eslint-disable no-console */
+/* eslint-disable no-console, spaced-comment */
 const fs = require('fs');
 const Logger = require('coa-node-logging');
-const commandLine = require('coa-command-line-args');
-const os = require('os');
-
+const CommandLineArgs = require('./CommandLineArgs');
+const utilities = require('./utilities');
 require('dotenv').config();
-
-const validator = require('./processors/validator');
+const ConnectionManager = require('./db/connection_manager');
+const connectionDefinitions = require('./connection_definitions');
+const validate = require('./processors/validator');
 const graphql = require('./processors/graphql');
 const etl = require('./processors/etl');
+const processors = { validate, graphql, etl };
 
-const usage = function usage() {
-  const usageString = `Usage: ${commandLine.stripPath(process.argv[1])} [validate | graphql | etl]`
-                    + ' [--source=sourceDir] [--dest=destDir]'
-                    + ' [--recurse]'
-                    + ' [--logfile=logFilePath]'
-                    + ' [--indent=numberOfSpaces]';
-  console.log(usageString);
-};
+//////////////////////////////
+// Local functions
+//////////////////////////////
 
-const args = commandLine.extractOptions(process.argv.slice(2));
-if (args.args.length < 1) {
-  usage();
-  process.exit(1);
-}
-const doit = true;
-if (doit) {
-  console.log(`OS Platform is ${os.platform()}`);
-  console.log(`OS Type is ${os.type()}`);
-}
-let logFile = null;
-if ('logfile' in args.options) logFile = args.options.logfile;
-
-const logger = new Logger('MDA', logFile);
-
-let processor = null;
-let triggerFile = 'mda.json';
-
-const config = { indent: 2, db: 'datastore1' };
-
-let startDirectory = '.';
-if ('source' in args.options) startDirectory = args.options.source;
-let destDirectory = '.';
-if ('dest' in args.options) destDirectory = args.options.dest;
-if ('indent' in args.options) config.indent = args.options.indent;
-
-const command = args.args[0];
-
-switch (command) {
-  case 'validate':
-    processor = validator;
-    break;
-  case 'graphql':
-    processor = graphql;
-    config.destDirectory = destDirectory;
-    break;
-  case 'etl':
-    processor = etl;
-    triggerFile = 'etl.json';
-    break;
-  default:
-    console.error(`${command} processor not found.`);
-    usage();
-    process.exit(1);
-    break;
-}
-
-// This routine walks the directory structure. When it identifies a dataset directory
-// (by the existence of a 'dataset.json' file), it calls the processor function
-// on it.
-
-const processDirectory = function processDirectory(path, dest, processFunction) {
+const processDirectory = function processDirectory(path, dest, recurse, handler) {
   const files = fs.readdirSync(path);
-  const defIndex = files.indexOf(triggerFile);
+  const defIndex = files.indexOf('mda.json');
 
   if (defIndex >= 0) {
     const lconfig = Object.assign({}, config, { files });
-    const p = processFunction('run', path, dest, lconfig, logger);
+    const p = handler('run', path, dest, lconfig, logger);
     Promise.resolve(p);
   }
 
   files.forEach((fileName) => {
     const fullPath = `${path}/${fileName}`;
     const stat = fs.lstatSync(fullPath);
-    if (stat.isDirectory()) {
-      processDirectory(fullPath, dest, processFunction);
+    if (stat.isDirectory() && recurse) {
+      processDirectory(fullPath, dest, recurse, handler);
     }
   });
 };
 
-// Walk the directory hierarchy and run the processor on each dataset directory
-if (processor) {
-  if (!fs.existsSync(startDirectory)) {
-    console.log(`Source directory ${startDirectory} not found.`);
-    process.exit(1);
-  }
-  if (!fs.existsSync(destDirectory)) {
-    console.log(`Destination directory ${destDirectory} not found`);
-  }
+const usageAndExit = function usageAndExit(message) {
+  const usageString = `Usage: ${utilities.stripPath(process.argv[1])}`
+                    + ' [validate | graphql | etl]'
+                    + ' [--start=startDir] [--dest=destDir]'
+                    + ' [--recurse]'
+                    + ' [--logfile=logFilePath]'
+                    + ' [--indent=numberOfSpaces]';
+  console.log(message);
+  console.log(usageString);
+  process.exit(1);
+};
 
-  processor('init', null, destDirectory, config, logger);
-  processDirectory(startDirectory, destDirectory, processor);
-  processor('finish', null, destDirectory, config, logger);
-}
+//////////////////////////////
+// Main work
+//////////////////////////////
+
+const args = new CommandLineArgs(process.argv.slice(2));
+if (args.argCount() < 1) usageAndExit('Missing command.');
+const command = args.getArg(0);
+const processor = processors[command];
+if (!processor) usageAndExit(`${command} processor not found.`);
+
+const logger = new Logger('MDA', args.getOption('logfile', null));
+const startDir = args.getOption('start', '.');
+const destDir = args.getOption('dest', '.');
+const config = {
+  indent: args.getOption('indent', 2),
+  destDir,
+  connectionManager: new ConnectionManager(connectionDefinitions, logger),
+};
+
+if (!fs.existsSync(startDir)) usageAndExit(`Start directory ${startDir} not found.`);
+if (!fs.existsSync(config.destDir)) usageAndExit(`Destination directory ${destDir} not found`);
+
+// Walk the directory hierarchy and run the processor on each dataset directory
+processor('init', null, config.destDir, config, logger);
+processDirectory(startDir, config.destDir, args.hasOption('recurse'), processor);
+processor('finish', null, config.destDir, config, logger);
+

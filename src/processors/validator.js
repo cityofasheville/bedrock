@@ -1,6 +1,5 @@
 const fs = require('fs');
 const Pool = require('pg-pool');
-const pgMetadata = require('pg-metadata');
 
 let localPool = null;
 
@@ -104,28 +103,18 @@ function run(pool, path, config, logger) {
   // if (ddef.datasets.length > 0) {
   //   console.log(`Processing ${path}, datasets: ${JSON.stringify(tables)}`);
   // }
+  console.log(`Running validation in ${path}`);
   ddef.datasets.forEach((ds) => {
-    pool.connect().then((client) => {
-      const query = pgMetadata.createQuery({ table: ds.table });
-      client.query(query).then((result) => {
-        client.release();
-        if (result.rows.length > 0) {
-          const schema = pgMetadata.createMetadataObject(result.rows);
-          validate(schema, logger, config, ds, ddef);
-        } else {
-          logger.error('missing-table', `Table  ${ds.table} does not exist`, { path, table: ds.table });
+    // console.log(`Got the dataset: ${JSON.stringify(ds)}`);
+
+    if (ds.target) {
+      const cn = config.connectionManager.getConnection(ds.target.connection);
+      cn.tableInfo(cn.getDatabase(), ds.target.schema, ds.target.table).then((columns) => {
+        if (columns) {
+          validate(columns, logger, config, ds, ddef);
         }
-      }).catch((err) => {
-        client.release();
-        logger.error('query-error',
-          `Query error on table ${ds.table}: ${err.message}`,
-          { path, table: ds.table, err });
       });
-    }).catch((err) => {
-      logger.error('connection-error',
-        `Connection error on table ${ds.table}: ${err.message}`,
-        { path, table: ds.table, err });
-    });
+    }
   });
 }
 

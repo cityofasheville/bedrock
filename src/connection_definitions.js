@@ -15,4 +15,4 @@ const connections = {
     database: process.env.acceladatabase,
   },
 };
-export default connections;
+module.exports = connections;

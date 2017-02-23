@@ -15,14 +15,13 @@
   "homepage": "https://github.com/cityofasheville/managed-dataset-definitions",
   "dependencies": {
     "bunyan": "^1.8.5",
-    "coa-command-line-args": "^1.0.1",
+    "coa-command-line-args": "^1.0.2",
     "coa-node-logging": "^1.1.0",
     "dotenv": "^2.0.0",
+    "mssql": "^3.3.0",
     "pg": "6.1.0",
-    "pg-metadata": "^5.0.0",
     "pg-pool": "^1.6.0",
-    "toposort": "^1.0.0",
-    "mssql": "^3.3.0"
+    "toposort": "^1.0.0"
   },
   "optionalDependencies": {
     "msnodesqlv8": "^0.2.11"

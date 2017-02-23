@@ -12,9 +12,9 @@ function connection(ci) {
       //  ssl: true,
     });
   } else {
-    throw new Error(`${this.connectionInfo.authMethod} authMethod not supported`);
+    throw new Error(`${ci.authMethod} authMethod not supported`);
   }
   return c;
 }
 
-exports.default = connection;
+module.exports = connection;

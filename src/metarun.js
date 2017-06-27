@@ -18,20 +18,21 @@ const processors = { validate, graphql, etl };
 const processDirectory = function processDirectory(path, dest, recurse, handler) {
   const files = fs.readdirSync(path);
   const defIndex = files.indexOf('mda.json');
-
+  console.log(`Directory ${path} with recurse = ${recurse}`);
   if (defIndex >= 0) {
     const lconfig = Object.assign({}, config, { files });
     const p = handler('run', path, dest, lconfig, logger);
     Promise.resolve(p);
   }
-
-  files.forEach((fileName) => {
-    const fullPath = `${path}/${fileName}`;
-    const stat = fs.lstatSync(fullPath);
-    if (stat.isDirectory() && recurse) {
-      processDirectory(fullPath, dest, recurse, handler);
-    }
-  });
+  if (recurse) {
+    files.forEach((fileName) => {
+      const fullPath = `${path}/${fileName}`;
+      const stat = fs.lstatSync(fullPath);
+      if (stat.isDirectory() && recurse) {
+        processDirectory(fullPath, dest, recurse, handler);
+      }
+    });
+  }
 };
 
 const usageAndExit = function usageAndExit(message) {

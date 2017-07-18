@@ -1,5 +1,5 @@
 const connections = {
-  warehouse1: {
+  datastore1: {
     type: 'pg',
     authMethod: 'password',
     host: process.env.db1host,
@@ -7,7 +7,22 @@ const connections = {
     user: process.env.db1user,
     password: process.env.db1password,
   },
-
+  warehouse1: {
+    type: 'pg',
+    authMethod: 'password',
+    host: process.env.wh1host,
+    database: process.env.wh1database,
+    user: process.env.wh1user,
+    password: process.env.wh1password,
+  },
+  edit1: {
+    type: 'pg',
+    authMethod: 'password',
+    host: process.env.edithost,
+    database: process.env.editdatabase,
+    user: process.env.edituser,
+    password: process.env.editpassword,
+  },
   accela: {
     type: 'sqlserver',
     authMethod: 'ad',

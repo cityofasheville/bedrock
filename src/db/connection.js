@@ -70,14 +70,18 @@ class Connection {
   }
 
   query(sql, handler) {
+    console.log(`Here in query with type ${this.info.type}`);
     if (this.info.type === 'sqlserver') {
       this.connection.connect().then(() => {
         new sql.Request(this.connection).query(sql).then(recordSet => handler(recordSet));
       });
     } else if (this.info.type === 'pg') {
       this.connection.connect().then((client) => {
+        console.log('I am connected');
         client.query(sql).then((result) => {
+          console.log('Wow - back from the query!');
           client.release();
+          console.log('Now call the handler');
           return handler(result.rows);
         });
       });

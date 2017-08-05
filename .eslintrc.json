@@ -15,6 +15,10 @@
         2,
         "as-needed"
       ],
+      "arrow-parens": [
+        2,
+        "as-needed"
+      ],
       "comma-dangle": [
         2,
         "always-multiline"

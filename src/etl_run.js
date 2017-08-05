@@ -16,7 +16,7 @@ function run(path, config, logger) {
   const ddef = JSON.parse(fs.readFileSync(fd, { encoding: 'utf8' }));
   console.log(`Running validation in ${path}`);
   console.log(`The mda.json file is:\n\n${JSON.stringify(ddef)}`);
-  if (ddef.hasOwnProperty('etl')) {
+  if (ddef.etl) {
     ddef.etl.forEach(job => {
       console.log(`Run the ${job.type} job using file ${job.file}`);
       if (job.active) {
@@ -62,7 +62,7 @@ const processDirectory = function processDirectory(path, recurse, handler) {
     Promise.resolve(p);
   }
   if (recurse) {
-    files.forEach((fileName) => {
+    files.forEach(fileName => {
       const fullPath = `${path}/${fileName}`;
       const stat = fs.lstatSync(fullPath);
       if (stat.isDirectory() && recurse) {

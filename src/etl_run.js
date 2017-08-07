@@ -17,7 +17,7 @@ function run(path, config, logger) {
   console.log(`Running validation in ${path}`);
   console.log(`The mda.json file is:\n\n${JSON.stringify(ddef)}`);
   if (ddef.etl) {
-    ddef.etl.forEach(job => {
+    ddef.etl.forEach(async job => {
       console.log(`Run the ${job.type} job using file ${job.file}`);
       if (job.active) {
         const fdSql = fs.openSync(`${path}/${job.file}`, 'r');
@@ -26,8 +26,13 @@ function run(path, config, logger) {
         const cn = config.connectionManager.getConnection(job.db);
         console.log(sql);
         console.log('Now do the query');
-        const result = cn.query(sql)
-        .then(xx => { console.log('hi'); console.log(xx); });
+        try {
+          const result = await cn.query(sql);
+          // Do something with result
+          console.log(JSON.stringify(result));
+        } catch (err) {
+          throw new Error(`Error running query: ${err}`);
+        }
       }
     });
   }

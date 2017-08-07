@@ -26,7 +26,8 @@ function run(path, config, logger) {
         const cn = config.connectionManager.getConnection(job.db);
         console.log(sql);
         console.log('Now do the query');
-        const result = cn.query(sql, xx => { console.log('hi'); console.log(xx); });
+        const result = cn.query(sql)
+        .then(xx => { console.log('hi'); console.log(xx); });
       }
     });
   }

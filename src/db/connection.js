@@ -69,20 +69,16 @@ class Connection {
     }
   }
 
-  query(sql, handler) {
-    console.log(`Here in query with type ${this.info.type}`);
+  query(sql) { // Returns a recordset
     if (this.info.type === 'sqlserver') {
       this.connection.connect().then(() => {
-        new sql.Request(this.connection).query(sql).then(recordSet => handler(recordSet));
+        return new sql.Request(this.connection).query(sql);
       });
     } else if (this.info.type === 'pg') {
-      this.connection.connect().then((client) => {
-        console.log('I am connected');
-        client.query(sql).then((result) => {
-          console.log('Wow - back from the query!');
+      this.connection.connect().then(client => {
+        client.query(sql).then(result => {
           client.release();
-          console.log('Now call the handler');
-          return handler(result.rows);
+          return Promise.resolve(result);
         });
       });
     }
@@ -140,7 +136,6 @@ class Connection {
   }
 
   tableInfo(db, schema, table) {
-    console.log('in tableinfo');
     if (this.info.type === 'pg') {
       const sql = `
         SELECT column_name, udt_name, data_type, character_maximum_length, table_schema,
@@ -154,15 +149,17 @@ class Connection {
     // }).catch(function(err) {
     //     // ... query error checks
     // });
-      return this.connection.connect().then((client) => {
-        return client.query(sql).then((result) => {
+      return this.connection.connect().then(client => {
+        return client.query(sql).then(result => {
           client.release();
           let tableMeta = null;
           if (result.rows.length > 0) {
-            const rows = result.rows.filter(r => (r.table_schema === schema));
+            const rows = result.rows.filter(r => {
+              return (r.table_schema === schema);
+            });
             if (rows.length > 0) {
               tableMeta = {};
-              rows.forEach((r) => {
+              rows.forEach(r => {
                 // console.log(`Column - ${r.column_name}`);
                 const column = {
                   name: r.column_name,
@@ -178,7 +175,7 @@ class Connection {
           }
           return Promise.resolve(tableMeta);
         })
-        .catch((err) => {
+        .catch(err => {
           console.log(`Query exception with err = ${JSON.stringify(err)}`);
         });
       });
@@ -198,7 +195,6 @@ class Connection {
   }
 
   sqlTableInfoQuery(schema, table) {
-    console.log('HI');
     const sql = `
       SELECT c.name as 'name', t.name as 'type', c.scale as 'scale', c.precision as 'precision', c.max_length as 'length' c.is_nullable as 'nullable'
       FROM sys.columns c
@@ -207,12 +203,12 @@ class Connection {
       JOIN sys.schemas s ON o.schema_id = s.schema_id
       WHERE o.name = ${table} AND s.name = ${schema}
     `;
-    return new sql.Request(this.connection).query(sql).then((recordSet) => {
+    return new sql.Request(this.connection).query(sql).then(recordSet => {
       console.log('Back from the request');
       let tableMeta = null;
       if (recordSet && recordSet.length > 0) {
         tableMeta = {};
-        recordSet.forEach((r) => {
+        recordSet.forEach(r => {
           tableMeta[r[0]] = Connection.normalizeColumn(r[0],
             { type: r[1], length: r[2], precision: r[3], scale: r[4], is_nullable: r[5] },
             'sqlserver');

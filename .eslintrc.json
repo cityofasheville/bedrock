@@ -13,7 +13,7 @@
     "rules": {
       "arrow-body-style": [
         2,
-        "as-needed"
+        "always"
       ],
       "arrow-parens": [
         2,

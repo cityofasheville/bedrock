@@ -24,7 +24,7 @@
     "toposort": "^1.0.0"
   },
   "optionalDependencies": {
-    "msnodesqlv8": "^0.2.11"
+    "msnodesqlv8": "^0.3.1"
   },
   "devDependencies": {
     "eslint": "^3.12.2",

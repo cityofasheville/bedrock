@@ -2,7 +2,7 @@ class CommandLineArgs {
   constructor(args) {
     this.args = [];
     this.options = {};
-    args.forEach((arg) => {
+    args.forEach(arg => {
       if (arg.startsWith('--')) {
         const eqIndex = arg.indexOf('=');
         if (eqIndex >= 0) {

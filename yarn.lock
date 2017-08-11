@@ -748,9 +748,9 @@ ms@0.7.2:
   version "0.7.2"
   resolved "https://registry.yarnpkg.com/ms/-/ms-0.7.2.tgz#ae25cf2512b3885a1d95d7f037868d8431124765"
 
-msnodesqlv8@^0.2.11:
-  version "0.2.15"
-  resolved "https://registry.yarnpkg.com/msnodesqlv8/-/msnodesqlv8-0.2.15.tgz#24798de970d6e2cef7f9891faf4f6e65b7e633e8"
+msnodesqlv8@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/msnodesqlv8/-/msnodesqlv8-0.3.1.tgz#0dbc5de81e5196cd71de9f6b42c0f055c21f3cb9"
   dependencies:
     "@types/electron" "^1.4.31"
     "@types/node" "^7.0.5"

@@ -23,7 +23,7 @@ function initializeJobTracker(workingDirectory, jobFileName, init, logger) {
     fs.closeSync(fd);
 
     // Let's just set up the dependencies by job name
-    jobsDef.sequencedJobs.forEach((job) => {
+    jobsDef.sequencedJobs.forEach((job => {
       if (!(job.name in jobTracker.jobStatus)) {
         // jobTracker.dependencies[job.name] = [];
         if (!(job.name in jobTracker.refCount)) jobTracker.refCount[job.name] = 0;

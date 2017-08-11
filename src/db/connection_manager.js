@@ -22,7 +22,7 @@ class ConnectionManager {
       c = connection.connection;
       if (!c) {
         console.log(`Initializing it with config ${JSON.stringify(connection.config)}`);
-        c = connection.connection = new Connection(connection.config);
+        c = connection.connection = new Connection(name, connection.config, this.logger);
       }
     } else {
       this.logger.error('unknown-db-connection', `Unknown database connection ${name}`, {});

@@ -18,11 +18,10 @@ function readEtlConfig(path, logger) {
 
 let graph = {};
 
-function createNode(config, commonDepends) {
+function createNode(name, tasks, path, commonDepends) {
   let job = null;
-  job = Object.assign({}, config); // Just copy everything in & let the job runner sort it
-  job.depends = job.depends.concat(commonDepends);
-  const node = { name: config.name, job };
+  job = { depends: commonDepends, tasks };
+  const node = { name, path, job };
   return node;
 }
 
@@ -37,15 +36,11 @@ function createEdge(name1, name2) {
   return [name1, name2];
 }
 
-function addToGraph(config, logger) {
+function addToGraph(config, mainConfig, path, logger) {
   if (config) {
-    config.jobs.forEach((job) => {
-      addNode(createNode(job, config.depends), logger);
-      // Add common dependencies
-      config.depends.forEach((name) => { graph.edges.push(createEdge(job.name, name)); });
-      // Add dependencies for just this job
-      job.depends.forEach((name) => { graph.edges.push(createEdge(job.name, name)); });
-    });
+    addNode(createNode(mainConfig.name, config.tasks, path, config.depends), logger);
+    // Add dependencies
+    config.depends.forEach(name => { graph.edges.push(createEdge(mainConfig.mda.name, name)); });
   }
 }
 
@@ -53,28 +48,34 @@ function addToGraph(config, logger) {
 // In the sequenced set any dependencies of a job are guaranteed to be listed
 // before it. The freeJobs array contains jobs with no dependencies.
 
-function process(stage, path, dest, config, logger) {
+function process(stage, path, dest, mainConfig, logger) {
   let fd;
   let result;
+  let d;
   switch (stage) {
     case 'init':
       graph = { nodes: {}, edges: [] };
       break;
 
     case 'run':
-      addToGraph(readEtlConfig(path, logger), logger);
+      addToGraph(readEtlConfig(path, logger), mainConfig, path, logger);
       break;
 
     case 'finish':
       result = { sequencedJobs: [], freeJobs: [] };
-      toposort(graph.edges).reverse().forEach((jobName) => {
+      toposort(graph.edges).reverse().forEach(jobName => {
         result.sequencedJobs.push(graph.nodes[jobName]);
         delete graph.nodes[jobName];
       });
       // Remaining nodes have no dependencies, nor nodes that depend on them.
-      Object.keys(graph.nodes).forEach((jName) => { result.freeJobs.push(graph.nodes[jName]); });
+      Object.keys(graph.nodes).forEach(jName => { result.freeJobs.push(graph.nodes[jName]); });
       fd = fs.openSync(`${dest}/etl_jobs.json`, 'w');
       fs.writeFileSync(fd, JSON.stringify(result), { encoding: 'utf8' });
+      fs.closeSync(fd);
+      d = Date.now();
+      fd = fs.openSync(`${dest}/etl_jobs_date.json`, 'w');
+      fs.writeFileSync(fd, JSON.stringify({ dateValue: d, dateString: new Date(d).toISOString() }));
+      fs.closeSync(fd);
       break;
 
     default:

@@ -13,6 +13,10 @@
     "rules": {
       "arrow-body-style": [
         2,
+        "always"
+      ],
+      "arrow-parens": [
+        2,
         "as-needed"
       ],
       "comma-dangle": [

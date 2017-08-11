@@ -12,41 +12,6 @@ const etl = require('./processors/etl');
 const processors = { validate, graphql, etl };
 
 //////////////////////////////
-// Local functions
-//////////////////////////////
-
-const processDirectory = function processDirectory(path, dest, recurse, handler) {
-  const files = fs.readdirSync(path);
-  const defIndex = files.indexOf('mda.json');
-
-  if (defIndex >= 0) {
-    const lconfig = Object.assign({}, config, { files });
-    const p = handler('run', path, dest, lconfig, logger);
-    Promise.resolve(p);
-  }
-
-  files.forEach((fileName) => {
-    const fullPath = `${path}/${fileName}`;
-    const stat = fs.lstatSync(fullPath);
-    if (stat.isDirectory() && recurse) {
-      processDirectory(fullPath, dest, recurse, handler);
-    }
-  });
-};
-
-const usageAndExit = function usageAndExit(message) {
-  const usageString = `Usage: ${utilities.stripPath(process.argv[1])}`
-                    + ' [validate | graphql | etl]'
-                    + ' [--start=startDir] [--dest=destDir]'
-                    + ' [--recurse]'
-                    + ' [--logfile=logFilePath]'
-                    + ' [--indent=numberOfSpaces]';
-  console.log(message);
-  console.log(usageString);
-  process.exit(1);
-};
-
-//////////////////////////////
 // Main work
 //////////////////////////////
 
@@ -72,4 +37,40 @@ if (!fs.existsSync(config.destDir)) usageAndExit(`Destination directory ${destDi
 processor('init', null, config.destDir, config, logger);
 processDirectory(startDir, config.destDir, args.hasOption('recurse'), processor);
 processor('finish', null, config.destDir, config, logger);
+
+//////////////////////////////
+// Local functions
+//////////////////////////////
+
+const usageAndExit = function usageAndExit(message) {
+  const usageString = `Usage: ${utilities.stripPath(process.argv[1])}`
+                    + ' [validate | graphql | etl]'
+                    + ' [--start=startDir] [--dest=destDir]'
+                    + ' [--recurse]'
+                    + ' [--logfile=logFilePath]'
+                    + ' [--indent=numberOfSpaces]';
+  console.log(message);
+  console.log(usageString);
+  process.exit(1);
+};
+
+const processDirectory = function processDirectory(path, dest, recurse, handler) {
+  const files = fs.readdirSync(path);
+  const defIndex = files.indexOf('mda.json');
+  console.log(`Directory ${path} with recurse = ${recurse}`);
+  if (defIndex >= 0) {
+    const lconfig = Object.assign({}, config, { files });
+    const p = handler('run', path, dest, lconfig, logger);
+    Promise.resolve(p);
+  }
+  if (recurse) {
+    files.forEach(fileName => {
+      const fullPath = `${path}/${fileName}`;
+      const stat = fs.lstatSync(fullPath);
+      if (stat.isDirectory() && recurse) {
+        processDirectory(fullPath, dest, recurse, handler);
+      }
+    });
+  }
+};
 

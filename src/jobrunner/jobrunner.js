@@ -2,24 +2,22 @@
 const fs = require('fs');
 const fork = require('child_process').fork;
 const { getJobPoints, recursivelyDeletePath, countPoints } = require('./utilities');
-const initializeJobTracker = require('./initialize_job_tracker');
 
 class JobRunner {
-  constructor(workingDirectory, jobFileName, reset, logger) {
+  constructor(workingDirectory, jobFileName, logger) {
     this.logger = logger;
     this.workingDirectory = workingDirectory;
     this.jobFileName = jobFileName;
-    this.reset = reset;
     this.jTracker = {};
     this.runningFiles = fs.readdirSync(`${this.workingDirectory}/jobs`);
   }
 
   initializeRun() {
-    this.jTracker = initializeJobTracker(this.workingDirectory, this.jobFileName, this.reset, this.logger);
+    this.loadJobTracker(this.workingDirectory, this.jobFileName, this.logger);
   }
 
   harvestRunningJobs() {
-    this.jTracker.running = this.jTracker.running.filter((job) => {
+    this.jTracker.running = this.jTracker.running.filter(job => {
       console.log(`Checking the status of running job ${job.name}`);
       if (this.runningFiles.indexOf(job.name) < 0) {
         // Something is seriously wrong.
@@ -32,7 +30,7 @@ class JobRunner {
       if (jobStatus.status === 'Done') {
         console.log(`Job ${job.name} is done!`);
         this.jTracker.jobStatus[job.name] = 'Done';
-        job.job.depends.forEach((depName) => {
+        job.job.depends.forEach(depName => {
           this.jTracker.refCount[depName] -= 1;
         });
         this.jTracker.completed.push(job);
@@ -47,6 +45,83 @@ class JobRunner {
     const fd = fs.openSync(`${this.workingDirectory}/jobstatus.json`, 'w');
     fs.writeFileSync(fd, JSON.stringify(this.jTracker), { encoding: 'utf8' });
     fs.closeSync(fd);
+  }
+
+  loadJobTracker(workingDirectory, jobFileName, logger) {
+    this.jobTracker = {
+      startDate: new Date(),
+      currentDate: new Date(),
+      refCount: {},
+      jobStatus: {},
+      sequencedToDo: [],
+      freeToDo: [],
+      running: [],
+      completed: [],
+    };
+    const files = fs.readdirSync(workingDirectory);
+
+    if (files.indexOf('jobstatus.json') < 0) {
+      logger.error(`Unable to find jobstatus.json in jobs directory ${workingDirectory}`);
+      process.exit(1);
+    }
+    const fd = fs.openSync(`${workingDirectory}/jobstatus.json`, 'r');
+    this.jobTracker = JSON.parse(fs.readFileSync(fd, { encoding: 'utf8' }));
+    fs.closeSync(fd);
+
+    if (files.indexOf('jobs') < 0) {
+      fs.mkdirSync(`${workingDirectory}/jobs`);
+    }
+  }
+
+  static initializeJobTracker(workingDirectory, jobFileName, logger) {
+    const jobTracker = {
+      startDate: new Date(),
+      currentDate: new Date(),
+      refCount: {},
+      jobStatus: {},
+      sequencedToDo: [],
+      freeToDo: [],
+      running: [],
+      completed: [],
+    };
+    const files = fs.readdirSync(workingDirectory);
+
+    if (files.indexOf(jobFileName) < 0) {
+      logger.error(`Unable to find job file ${jobFileName} in jobs directory ${workingDirectory}`);
+      process.exit(1);
+    }
+
+    let fd = fs.openSync(`${workingDirectory}/${jobFileName}`, 'r');
+    const jobsDef = JSON.parse(fs.readFileSync(fd, { encoding: 'utf8' }));
+    fs.closeSync(fd);
+
+    // Let's just set up the dependencies by job name
+    jobsDef.sequencedJobs.forEach(job => {
+      if (!(job.name in jobTracker.jobStatus)) {
+        // jobTracker.dependencies[job.name] = [];
+        if (!(job.name in jobTracker.refCount)) jobTracker.refCount[job.name] = 0;
+        jobTracker.jobStatus[job.name] = 'Not Started';
+        jobTracker.sequencedToDo.push(job);
+        job.job.depends.forEach((dName) => {
+          if (!(dName in jobTracker.refCount)) jobTracker.refCount[dName] = 0;
+          jobTracker.refCount[dName] += 1;
+        });
+      }
+    });
+    jobsDef.freeJobs.forEach(job => {
+      if (!(job.name in jobTracker.jobStatus)) {
+        // jobTracker.dependencies[job.name] = [];
+        jobTracker.jobStatus[job.name] = 'Not Started';
+        jobTracker.freeToDo.push(job);
+      }
+    });
+    fd = fs.openSync(`${workingDirectory}/jobstatus.json`, 'w');
+    fs.writeFileSync(fd, JSON.stringify(jobTracker), { encoding: 'utf8' });
+    fs.closeSync(fd);
+
+    if (files.indexOf('jobs') < 0) {
+      fs.mkdirSync(`${workingDirectory}/jobs`);
+    }
   }
 
   fillJobQueue(loadPoints) {
@@ -96,7 +171,6 @@ class JobRunner {
         this.saveState();
       }
     }
-    return;
   }
 
   // Sequencing-only dependencies are special.

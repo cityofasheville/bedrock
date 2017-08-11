@@ -2,8 +2,8 @@
 require('dotenv').config();
 const fs = require('fs');
 const Logger = require('coa-node-logging');
-const CommandLineArgs = require('./src/CommandLineArgs');
-const utilities = require('./src/utilities');
+const CommandLineArgs = require('./src/utility/CommandLineArgs');
+const utilities = require('./src/utility/utilities');
 const validate = require('./src/processors/validator');
 const graphql = require('./src/processors/graphql');
 const etl = require('./src/processors/etl');

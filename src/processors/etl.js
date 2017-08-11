@@ -22,7 +22,6 @@ function createNode(name, tasks, path, commonDepends) {
   let job = null;
   job = { depends: commonDepends, tasks };
   const node = { name, path, job };
-  console.log(`Creating a node ${name}: ${JSON.stringify(node)}`);
   return node;
 }
 
@@ -31,7 +30,6 @@ function addNode(node, logger) {
   else {
     logger.error(`Duplicate job name ${node.name}`);
   }
-  console.log(`Adding a node ${node.name}: ${JSON.stringify(node)}`);
 }
 
 function createEdge(name1, name2) {
@@ -54,7 +52,6 @@ function process(stage, path, dest, mainConfig, logger) {
   let fd;
   let result;
   let d;
-  console.log(`Phase ${stage} - mainConfig = ${JSON.stringify(mainConfig)}`);
   switch (stage) {
     case 'init':
       graph = { nodes: {}, edges: [] };
@@ -72,7 +69,6 @@ function process(stage, path, dest, mainConfig, logger) {
       });
       // Remaining nodes have no dependencies, nor nodes that depend on them.
       Object.keys(graph.nodes).forEach(jName => {
-        console.log(`Writing a node ${jName}: ${JSON.stringify(graph.nodes[jName])}`);        
         result.freeJobs.push(graph.nodes[jName]);
       });
       fd = fs.openSync(`${dest}/etl_jobs.json`, 'w');

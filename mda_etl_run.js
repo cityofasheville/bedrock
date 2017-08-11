@@ -2,10 +2,9 @@
 require('dotenv').config();
 const fs = require('fs');
 const Logger = require('coa-node-logging');
-const utilities = require('./src/utilities');
-const CommandLineArgs = require('./src/CommandLineArgs');
+const utilities = require('./src/utility/utilities');
+const CommandLineArgs = require('./src/utility/CommandLineArgs');
 const JobRunner = require('./src/jobrunner/jobrunner');
-const initializeJobTracker = require('./src/jobrunner/initialize_job_tracker');
 
 const usage = function usage() {
   const usageString = `Usage:\t${utilities.stripPath(process.argv[1])} working_directory`
@@ -44,7 +43,7 @@ if (files.indexOf('etl_start.json') >= 0) {
 }
 if (init) {
   // TODO: After we have status of run, need to generate error if not done.
-  initializeJobTracker(workingDirectory, jobFileName, true, logger);
+  JobRunner.initializeJobTracker(workingDirectory, jobFileName, logger);
   const d = Date.now();
   const fd = fs.openSync(`${workingDirectory}/etl_start.json`, 'w');
   fs.writeFileSync(fd, JSON.stringify({ dateValue: d, dateString: new Date(d).toISOString() }));
@@ -53,7 +52,7 @@ if (init) {
 process.exit(0);
 
 // Now do the runs
-const runner = new JobRunner(workingDirectory, jobFileName, false, logger);
+const runner = new JobRunner(workingDirectory, jobFileName, logger);
 runner.initializeRun();
 console.log('Harvest');
 runner.harvestRunningJobs();

@@ -11,19 +11,18 @@ fd = fs.openSync(`${process.argv[2]}/status.json`, 'w');
 fs.writeFileSync(fd, JSON.stringify(status), { encoding: 'utf8' });
 fs.closeSync(fd);
 
-
-let path =  './sleeper.bat';
+const path = './sleeper.bat';
 let bat = require.resolve(path);
 const options = { detached: false, shell: false };
 let args = [5, process.argv[2]];
 if (status.job.type === 'fme') {
-  bat = `fme`;
+  bat = 'fme';
   args = [status.job.path];
 }
 console.log(new Date());
 const run = spawn(bat, args, options);
 
-run.on('close', (code) => {
+run.on('close', code => {
   console.log(`The child process ended with code ${code}`);
   fd = fs.openSync(`${process.argv[2]}/status.json`, 'r');
   status = JSON.parse(fs.readFileSync(fd, { encoding: 'utf8' }));

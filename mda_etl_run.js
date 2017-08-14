@@ -36,20 +36,19 @@ if (files.indexOf(jobFileName) < 0 || files.indexOf(jobFileDate) < 0) {
 
 // See if we need to re-initialize
 let init = true;
-if (files.indexOf('etl_start.json') >= 0) {
+if (files.indexOf('jobs_start.json') >= 0) {
   const generatedDate = JSON.parse(fs.readFileSync(`${workingDirectory}/etl_jobs_date.json`, { encoding: 'utf8' }));
-  const startDate = JSON.parse(fs.readFileSync(`${workingDirectory}/etl_start.json`, { encoding: 'utf8' }));
+  const startDate = JSON.parse(fs.readFileSync(`${workingDirectory}/jobs_start.json`, { encoding: 'utf8' }));
   if (Number(generatedDate.dateValue) < Number(startDate.dateValue)) init = false;
 }
 if (init) {
   // TODO: After we have status of run, need to generate error if not done.
   JobRunner.initializeJobTracker(workingDirectory, jobFileName, logger);
   const d = Date.now();
-  const fd = fs.openSync(`${workingDirectory}/etl_start.json`, 'w');
+  const fd = fs.openSync(`${workingDirectory}/jobs_start.json`, 'w');
   fs.writeFileSync(fd, JSON.stringify({ dateValue: d, dateString: new Date(d).toISOString() }));
   fs.closeSync(fd);
 }
-process.exit(0);
 
 // Now do the runs
 const runner = new JobRunner(workingDirectory, jobFileName, logger);

@@ -19,6 +19,9 @@ if (status.job.type === 'fme') {
   bat = 'fme';
   args = [status.job.path];
 }
+else if (status.job.type === 'sql') {
+  
+}
 console.log(new Date());
 const run = spawn(bat, args, options);
 

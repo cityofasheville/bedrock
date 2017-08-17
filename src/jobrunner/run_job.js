@@ -18,8 +18,7 @@ let args = [5, process.argv[2]];
 if (status.job.type === 'fme') {
   bat = 'fme';
   args = [status.job.path];
-}
-else if (status.job.type === 'sql') {
+} else if (status.job.type === 'sql') {
   
 }
 console.log(new Date());

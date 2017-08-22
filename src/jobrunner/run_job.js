@@ -1,65 +1,100 @@
 /* eslint-disable no-console */
 const spawnSync = require('child_process').spawnSync;
 const fs = require('fs');
+const Logger = require('coa-node-logging');
+const ConnectionManager = require('../db/connection_manager');
+const connectionDefinitions = require('../connection_definitions');
 
-/* SAMPLE STATUS.JSON FILE
-{
-  "name":"coa_bc_address_master",
-  "job":{
-    "depends":[],
-    "tasks":[
-      {"type":"sql","file":"0-create-coa_bc_address_master-table.sql","db":"datastore1","active":true},
-      {"type":"sql","file":"1-coa_bc_address_master_base.sql","db":"datastore1","active":false},
-      {"type":"sql","file":"2-add_water_districts.sql","db":"datastore1","active":false},
-      {"type":"sql","file":"3-add_trashday.sql","db":"datastore1","active":false},
-      {"type":"sql","file":"4-update_river_district.sql","db":"datastore1","active":false}
-    ]
-  },
-  "status":"Done"
-}
-*/
+const logger = new Logger('MDA', './mda.log');
+
+const connectionManager = new ConnectionManager(connectionDefinitions, logger);
 
 let fd = fs.openSync(`${process.argv[2]}/status.json`, 'r');
-let status = JSON.parse(fs.readFileSync(fd, { encoding: 'utf8' }));
+const job = JSON.parse(fs.readFileSync(fd, { encoding: 'utf8' }));
 fs.closeSync(fd);
-status.status = 'Running';
-console.log(`The job info is ${JSON.stringify(status.job)}`);
+const jobName = job.name;
+
+job.status = 'Running';
+console.log(`The job info is ${JSON.stringify(job.job)}`);
 fd = fs.openSync(`${process.argv[2]}/status.json`, 'w');
-fs.writeFileSync(fd, JSON.stringify(status), { encoding: 'utf8' });
+fs.writeFileSync(fd, JSON.stringify(job), { encoding: 'utf8' });
 fs.closeSync(fd);
 
-const tasks = status.job.tasks;
-for (let i = 0; i < tasks.length; i += 1) {
-  let run;
-  const task = tasks[i];
-  if (task.type === 'sql') {
-
-  } else if (task.type === 'fme') {
-    run = spawnSync('fme', )
+async function runSql(task) {
+  const filePath = (task.file[0] === '/') ? task.file : `${job.path}/${task.file}`;
+  console.log(` Doing a SQL query from file ${filePath}`);
+  const fdSql = fs.openSync(filePath, 'r');
+  const sql = fs.readFileSync(fdSql, { encoding: 'utf8' });
+  console.log(` Read file ${filePath}, do the query`);
+  const cn = connectionManager.getConnection(task.db);
+  try {
+    const result = await cn.query(sql);
+    console.log(`Done with the query - pass back the result: ${JSON.stringify(result)}`);
+    return result.then(res => {
+      return res;
+    })
+    .catch(err => {
+      return Promise.reject(`Got an error 1: ${JSON.stringify(err)}`);
+    });
+  } catch (err) {
+    return Promise.reject(`Got an error 2: ${JSON.stringify(err)}`);
   }
 }
 
-const path = './sleeper.bat';
-let bat = require.resolve(path);
-const options = { detached: false, shell: false };
-let args = [5, process.argv[2]];
-if (status.job.type === 'fme') {
-  bat = 'fme';
-  args = [status.job.path];
-} else if (status.job.type === 'sql') {
-  bat = 'node';
+async function runTaskSequence(tasks) {
+  let hasError = false;
+  for (let i = 0; i < tasks.length && !hasError; i += 1) {
+    const task = tasks[i];
+    console.log(`${jobName}: Task ${i} - ${task.active ? 'Active' : 'Inactive'}`);
+    if (task.active) {
+      if (task.type === 'sql') {
+        console.log('  Task type = SQL');
+        try {
+          console.log('      Run SQL ...');
+          await runSql(task);
+          console.log('      Done.');
+        } catch (err) {
+          hasError = true;
+          console.log(`Error running ${jobName} SQL job, file ${task.file}: ${err}`);
+          logger.error(`Error running ${jobName} SQL job, file ${task.file}: ${err}`);
+        }
+      } else if (task.type === 'fme') {
+        console.log('  Task type = FME');
+        const bat = require.resolve('fme');
+        const args = [task.file];
+        try {
+          console.log('      Run FME ...');
+          const jobStatus = spawnSync(bat, args, { detached: false, shell: false });
+          if (jobStatus.status !== 0) {
+            throw new Error(jobStatus.error);
+          }
+          console.log('      Done.');
+        } catch (err) {
+          hasError = true;
+          console.log(`Error running ${jobName} FME job, file ${task.file}: ${JSON.stringify(err)}`);
+          logger.error(`Error running ${jobName} FME job, file ${task.file}: ${JSON.stringify(err)}`);
+        }
+      }
+    }
+  }
+  if (hasError) {
+    console.log('We have an error!');
+    console.error('Yup, we have an error');
+    job.status = 'Error';
+    fd = fs.openSync(`${process.argv[2]}/status.json`, 'w');
+    fs.writeFileSync(fd, JSON.stringify(job), { encoding: 'utf8' });
+    fs.closeSync(fd);
+    return Promise.reject(`Error running the job ${job.name}`);
+  }
+  return Promise.resolve(true);
 }
-console.log(new Date());
-const run = spawn(bat, args, options);
 
-run.on('close', code => {
-  console.log(`The child process ended with code ${code}`);
-  fd = fs.openSync(`${process.argv[2]}/status.json`, 'r');
-  status = JSON.parse(fs.readFileSync(fd, { encoding: 'utf8' }));
-  fs.closeSync(fd);
-  status.status = 'Done';
-  fd = fs.openSync(`${process.argv[2]}/status.json`, 'w');
-  fs.writeFileSync(fd, JSON.stringify(status), { encoding: 'utf8' });
-  fs.closeSync(fd);
-  console.log(new Date());
+const tasks = job.job.tasks;
+runTaskSequence(tasks)
+.then(whatever => {
+  console.log(`Done: ${JSON.stringify(whatever)}`);
+})
+.catch(err => {
+  console.log(`WHOA we gotta dam error ${err}`);
 });
+

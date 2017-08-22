@@ -1,4 +1,5 @@
 const fs = require('fs');
+const pathModule = require('path');
 const toposort = require('toposort');
 
 function readEtlConfig(path, logger) {
@@ -52,13 +53,15 @@ function process(stage, path, dest, mainConfig, logger) {
   let fd;
   let result;
   let d;
+  let resolvedPath;
   switch (stage) {
     case 'init':
       graph = { nodes: {}, edges: [] };
       break;
 
     case 'run':
-      addToGraph(readEtlConfig(path, logger), mainConfig, path, logger);
+      resolvedPath = pathModule.resolve(path);
+      addToGraph(readEtlConfig(path, logger), mainConfig, resolvedPath, logger);
       break;
 
     case 'finish':

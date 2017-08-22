@@ -69,7 +69,7 @@ class Connection {
     }
   }
 
-  query(sql) { // Returns a recordset
+  async query(sql) { // Returns a recordset
     if (this.info.type === 'sqlserver') {
       this.connection.connect().then(() => {
         return new sql.Request(this.connection).query(sql);

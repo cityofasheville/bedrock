@@ -208,14 +208,14 @@ class JobRunner {
 
   startJob(job) {
     const jobDir = `${this.workingDirectory}/jobs/${job.name}`;
-    console.log(`Starting the job: ${JSON.stringify(job)}`);
+    console.log(`Starting the job: ${job.name}`);
     if (this.runningFiles.indexOf(job.name) >= 0) {
       console.log(`Delete directory ${this.workingDirectory}/jobs/${job.name}`);
       recursivelyDeletePath(`${this.workingDirectory}/jobs/${job.name}`);
     }
     fs.mkdirSync(jobDir);
     const fd = fs.openSync(`${jobDir}/status.json`, 'w');
-    fs.writeFileSync(fd, JSON.stringify({ name: job.name, job: job.job, status: 'Pending' }));
+    fs.writeFileSync(fd, JSON.stringify({ name: job.name, path: job.path, job: job.job, status: 'Pending' }));
     fs.closeSync(fd);
 
     // Now fork a script that will run that job and write out the result at the end.

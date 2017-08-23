@@ -15,7 +15,6 @@ fs.closeSync(fd);
 const jobName = job.name;
 
 job.status = 'Running';
-console.log(`The job info is ${JSON.stringify(job.job)}`);
 fd = fs.openSync(`${process.argv[2]}/status.json`, 'w');
 fs.writeFileSync(fd, JSON.stringify(job), { encoding: 'utf8' });
 fs.closeSync(fd);
@@ -25,37 +24,31 @@ async function runSql(task) {
   console.log(` Doing a SQL query from file ${filePath}`);
   const fdSql = fs.openSync(filePath, 'r');
   const sql = fs.readFileSync(fdSql, { encoding: 'utf8' });
-  console.log(` Read file ${filePath}, do the query`);
   const cn = connectionManager.getConnection(task.db);
-  try {
-    const result = await cn.query(sql);
-    console.log(`Done with the query - pass back the result: ${JSON.stringify(result)}`);
-    return result.then(res => {
-      return res;
-    })
-    .catch(err => {
-      return Promise.reject(`Got an error 1: ${JSON.stringify(err)}`);
-    });
-  } catch (err) {
-    return Promise.reject(`Got an error 2: ${JSON.stringify(err)}`);
-  }
+
+  return cn.query(sql)
+  .then(res => {
+    console.log(`Query done - result: ${JSON.stringify(res)}`);
+    return res;
+  })
+  .catch(err => {
+    return Promise.reject(`Query error: ${err.message}`);
+  });
 }
 
 async function runTaskSequence(tasks) {
   let hasError = false;
+  let errMessage = '';
   for (let i = 0; i < tasks.length && !hasError; i += 1) {
     const task = tasks[i];
-    console.log(`${jobName}: Task ${i} - ${task.active ? 'Active' : 'Inactive'}`);
+    console.log(`${jobName}: Task ${i}, type ${task.type} - ${task.active ? 'Active' : 'Inactive'}`);
     if (task.active) {
       if (task.type === 'sql') {
-        console.log('  Task type = SQL');
         try {
-          console.log('      Run SQL ...');
           await runSql(task);
-          console.log('      Done.');
         } catch (err) {
           hasError = true;
-          console.log(`Error running ${jobName} SQL job, file ${task.file}: ${err}`);
+          errMessage = err;
           logger.error(`Error running ${jobName} SQL job, file ${task.file}: ${err}`);
         }
       } else if (task.type === 'fme') {
@@ -71,6 +64,7 @@ async function runTaskSequence(tasks) {
           console.log('      Done.');
         } catch (err) {
           hasError = true;
+          errMessage = err.message;
           console.log(`Error running ${jobName} FME job, file ${task.file}: ${JSON.stringify(err)}`);
           logger.error(`Error running ${jobName} FME job, file ${task.file}: ${JSON.stringify(err)}`);
         }
@@ -79,12 +73,11 @@ async function runTaskSequence(tasks) {
   }
   if (hasError) {
     console.log('We have an error!');
-    console.error('Yup, we have an error');
     job.status = 'Error';
     fd = fs.openSync(`${process.argv[2]}/status.json`, 'w');
     fs.writeFileSync(fd, JSON.stringify(job), { encoding: 'utf8' });
     fs.closeSync(fd);
-    return Promise.reject(`Error running the job ${job.name}`);
+    return Promise.reject(`Error running the job ${job.name}. ${errMessage}`);
   }
   return Promise.resolve(true);
 }

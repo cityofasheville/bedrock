@@ -69,19 +69,23 @@ class Connection {
     }
   }
 
-  query(sql) { // Returns a recordset
+  async query(sql) { // Returns a recordset
     if (this.info.type === 'sqlserver') {
-      this.connection.connect().then(() => {
+      return this.connection.connect().then(() => {
         return new sql.Request(this.connection).query(sql);
       });
     } else if (this.info.type === 'pg') {
-      this.connection.connect().then(client => {
-        client.query(sql).then(result => {
+      return this.connection.connect().then(client => {
+        return client.query(sql).then(result => {
           client.release();
           return Promise.resolve(result);
+        })
+        .catch(err => {
+          return Promise.reject(new Error(JSON.stringify(err.message)));
         });
       });
     }
+    return Promise.reject(new Error(`Unknown connection type ${this.info.type}`));
   }
 
   static normalizeColumn(name, obj, dbType) {

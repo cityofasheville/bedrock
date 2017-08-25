@@ -1,4 +1,5 @@
 const fs = require('fs');
+const pathModule = require('path');
 const toposort = require('toposort');
 
 function readEtlConfig(path, logger) {
@@ -38,7 +39,7 @@ function createEdge(name1, name2) {
 
 function addToGraph(config, mainConfig, path, logger) {
   if (config) {
-    addNode(createNode(mainConfig.name, config.tasks, path, config.depends), logger);
+    addNode(createNode(mainConfig.mda.name, config.tasks, path, config.depends), logger);
     // Add dependencies
     config.depends.forEach(name => { graph.edges.push(createEdge(mainConfig.mda.name, name)); });
   }
@@ -52,13 +53,15 @@ function process(stage, path, dest, mainConfig, logger) {
   let fd;
   let result;
   let d;
+  let resolvedPath;
   switch (stage) {
     case 'init':
       graph = { nodes: {}, edges: [] };
       break;
 
     case 'run':
-      addToGraph(readEtlConfig(path, logger), mainConfig, path, logger);
+      resolvedPath = pathModule.resolve(path);
+      addToGraph(readEtlConfig(path, logger), mainConfig, resolvedPath, logger);
       break;
 
     case 'finish':
@@ -68,7 +71,9 @@ function process(stage, path, dest, mainConfig, logger) {
         delete graph.nodes[jobName];
       });
       // Remaining nodes have no dependencies, nor nodes that depend on them.
-      Object.keys(graph.nodes).forEach(jName => { result.freeJobs.push(graph.nodes[jName]); });
+      Object.keys(graph.nodes).forEach(jName => {
+        result.freeJobs.push(graph.nodes[jName]);
+      });
       fd = fs.openSync(`${dest}/etl_jobs.json`, 'w');
       fs.writeFileSync(fd, JSON.stringify(result), { encoding: 'utf8' });
       fs.closeSync(fd);

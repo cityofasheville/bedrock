@@ -70,6 +70,7 @@ async function runTaskSequence(tasks) {
         }
       }
     }
+    console.log('     Done running the task');
   }
   if (hasError) {
     console.log('We have an error!');
@@ -79,13 +80,16 @@ async function runTaskSequence(tasks) {
     fs.closeSync(fd);
     return Promise.reject(`Error running the job ${job.name}. ${errMessage}`);
   }
-  return Promise.resolve(true);
+  return Promise.resolve('Done');
 }
 
 const tasks = job.job.tasks;
 runTaskSequence(tasks)
-.then(whatever => {
-  console.log(`Done: ${JSON.stringify(whatever)}`);
+.then(status => {
+  job.status = status;
+  fd = fs.openSync(`${process.argv[2]}/status.json`, 'w');
+  fs.writeFileSync(fd, JSON.stringify(job), { encoding: 'utf8' });
+  fs.closeSync(fd);
 })
 .catch(err => {
   console.log(`WHOA we gotta dam error ${err}`);

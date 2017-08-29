@@ -36,7 +36,8 @@ async function runSql(task) {
   });
 }
 
-function runFme(fme, task) {
+function runFme(task) {
+  const fme = 'c:\\\\FME\\fme';
   const filePath = (task.file[0] === '/') ? task.file : `${job.path}/${task.file}`;
   console.log(` Doing an FME job from file ${filePath}`);
   const jobStatus = spawnSync(fme, [filePath], { detached: false, shell: false });
@@ -61,9 +62,8 @@ async function runTaskSequence(tasks) {
           logger.error(`Error running ${jobName} SQL job, file ${task.file}: ${err}`);
         }
       } else if (task.type === 'fme') {
-        const fme = require.resolve('fme');
         try {
-          runFme(fme, task);
+          runFme(, task);
         } catch (err) {
           hasError = true;
           errMessage = err.message;

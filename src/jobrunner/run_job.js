@@ -36,6 +36,15 @@ async function runSql(task) {
   });
 }
 
+function runFme(fme, task) {
+  const filePath = (task.file[0] === '/') ? task.file : `${job.path}/${task.file}`;
+  console.log(` Doing an FME job from file ${filePath}`);
+  const jobStatus = spawnSync(fme, [filePath], { detached: false, shell: false });
+  if (jobStatus.status !== 0) {
+    throw new Error(jobStatus.error);
+  }
+}
+
 async function runTaskSequence(tasks) {
   let hasError = false;
   let errMessage = '';
@@ -52,16 +61,9 @@ async function runTaskSequence(tasks) {
           logger.error(`Error running ${jobName} SQL job, file ${task.file}: ${err}`);
         }
       } else if (task.type === 'fme') {
-        console.log('  Task type = FME');
-        const bat = require.resolve('fme');
-        const args = [task.file];
+        const fme = require.resolve('fme');
         try {
-          console.log('      Run FME ...');
-          const jobStatus = spawnSync(bat, args, { detached: false, shell: false });
-          if (jobStatus.status !== 0) {
-            throw new Error(jobStatus.error);
-          }
-          console.log('      Done.');
+          runFme(fme, task);
         } catch (err) {
           hasError = true;
           errMessage = err.message;

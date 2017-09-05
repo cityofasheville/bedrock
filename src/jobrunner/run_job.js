@@ -63,7 +63,7 @@ async function runTaskSequence(tasks) {
         }
       } else if (task.type === 'fme') {
         try {
-          runFme(, task);
+          runFme(task);
         } catch (err) {
           hasError = true;
           errMessage = err.message;

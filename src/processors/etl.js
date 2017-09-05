@@ -19,9 +19,15 @@ function readEtlConfig(path, logger) {
 
 let graph = {};
 
-function createNode(name, tasks, path, commonDepends) {
+function createNode(name, config, path, commonDepends) {
   let job = null;
-  job = { depends: commonDepends, tasks };
+  job = {
+    depends: commonDepends,
+    create: config.create,
+    distribute: config.distribute,
+    tasks: config.tasks,
+  };
+  console.log(`The job is: ${JSON.stringify(job)}`);
   const node = { name, path, job };
   return node;
 }
@@ -39,7 +45,7 @@ function createEdge(name1, name2) {
 
 function addToGraph(config, mainConfig, path, logger) {
   if (config) {
-    addNode(createNode(mainConfig.mda.name, config.tasks, path, config.depends), logger);
+    addNode(createNode(mainConfig.mda.name, config, path, config.depends), logger);
     // Add dependencies
     config.depends.forEach(name => { graph.edges.push(createEdge(mainConfig.mda.name, name)); });
   }

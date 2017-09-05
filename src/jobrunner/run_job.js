@@ -46,12 +46,13 @@ function runFme(task) {
   }
 }
 
-async function runTaskSequence(tasks) {
+async function runTaskSequence(seqName, tasks, endStatus = 'Done') {
   let hasError = false;
   let errMessage = '';
+  console.log(`Running tasks ${seqName}: ${JSON.stringify(tasks)}`);
   for (let i = 0; i < tasks.length && !hasError; i += 1) {
     const task = tasks[i];
-    console.log(`${jobName}: Task ${i}, type ${task.type} - ${task.active ? 'Active' : 'Inactive'}`);
+    console.log(`${seqName}:${jobName}: Task ${i}, type ${task.type} - ${task.active ? 'Active' : 'Inactive'}`);
     if (task.active) {
       if (task.type === 'sql') {
         try {
@@ -59,20 +60,20 @@ async function runTaskSequence(tasks) {
         } catch (err) {
           hasError = true;
           errMessage = err;
-          logger.error(`Error running ${jobName} SQL job, file ${task.file}: ${err}`);
+          logger.error(`Error running ${seqName}:${jobName} SQL job, file ${task.file}: ${err}`);
         }
       } else if (task.type === 'fme') {
         try {
-          runFme(, task);
+          runFme(task);
         } catch (err) {
           hasError = true;
           errMessage = err.message;
-          console.log(`Error running ${jobName} FME job, file ${task.file}: ${JSON.stringify(err)}`);
-          logger.error(`Error running ${jobName} FME job, file ${task.file}: ${JSON.stringify(err)}`);
+          console.log(`Error running ${seqName}:${jobName} FME job, file ${task.file}: ${JSON.stringify(err)}`);
+          logger.error(`Error running ${seqName}:${jobName} FME job, file ${task.file}: ${JSON.stringify(err)}`);
         }
       }
     }
-    console.log('     Done running the task');
+    console.log(`     Done running the ${seqName}:${jobName} task`);
   }
   if (hasError) {
     console.log('We have an error!');
@@ -80,20 +81,48 @@ async function runTaskSequence(tasks) {
     fd = fs.openSync(`${process.argv[2]}/status.json`, 'w');
     fs.writeFileSync(fd, JSON.stringify(job), { encoding: 'utf8' });
     fs.closeSync(fd);
-    return Promise.reject(`Error running the job ${job.name}. ${errMessage}`);
+    return Promise.reject(`Error running the job ${seqName}:${job.name}. ${errMessage}`);
   }
-  return Promise.resolve('Done');
+  return Promise.resolve(endStatus);
 }
 
-const tasks = job.job.tasks;
-runTaskSequence(tasks)
+function recordJobStatus(jobStatus) {
+  fd = fs.openSync(`${process.argv[2]}/status.json`, 'w');
+  fs.writeFileSync(fd, JSON.stringify(jobStatus), { encoding: 'utf8' });
+  fs.closeSync(fd);
+}
+
+console.log(`Here is the job: ${JSON.stringify(job.job)}`);
+runTaskSequence('Create', job.job.create, 'Created')
 .then(status => {
   job.status = status;
-  fd = fs.openSync(`${process.argv[2]}/status.json`, 'w');
-  fs.writeFileSync(fd, JSON.stringify(job), { encoding: 'utf8' });
-  fs.closeSync(fd);
+  recordJobStatus(job);
+  return runTaskSequence('Distribute', job.job.distribute, 'Distributed');
+})
+.then(status => {
+  job.status = status;
+  recordJobStatus(job);
+  return runTaskSequence('Tasks', job.job.tasks, 'Done');
+})
+.then(status => {
+  job.status = status;
+  recordJobStatus(job);
 })
 .catch(err => {
-  console.log(`WHOA we gotta dam error ${err}`);
+  console.log(`Error running ${jobName}: ${err}`);
+  logger.error(`Error running ${jobName}: ${JSON.stringify(err)}`);
+  job.status = 'Error';
+  recordJobStatus(job);
 });
+
+// runTaskSequence('Tasks', job.job.tasks, 'Done')
+// .then(status => {
+//   job.status = status;
+//   fd = fs.openSync(`${process.argv[2]}/status.json`, 'w');
+//   fs.writeFileSync(fd, JSON.stringify(job), { encoding: 'utf8' });
+//   fs.closeSync(fd);
+// })
+// .catch(err => {
+//   console.log(`WHOA we gotta dam error ${err}`);
+// });
 

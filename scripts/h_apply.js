@@ -8,13 +8,14 @@ const processors = {
   validate: require('./h_apply/processors/validator'),
   graphql: require('./h_apply/processors/graphql'),
   etl: require('./h_apply/processors/etl'),
+  list: require('./h_apply/processors/list'),
 };
 const processDirectory = require('./h_apply/processDirectory');
 
 const usageAndExit = function usageAndExit(message = null) {
   const usageString = '\nApply a processor to a hierarchy of data assets.\n\n'
                     + `Usage:\t${stripPath(process.argv[1])}`
-                    + ' [etl | graphql | validate]'
+                    + ' [list | etl | graphql | validate]'
                     + '\n\t\t[--start=startDir] [--dest=destDir]'
                     + '\n\t\t[--recurse]'
                     + '\n\t\t[--logfile=logFilePath]'

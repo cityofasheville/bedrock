@@ -1,3 +1,0 @@
-node ./mda_generate.js etl --recurse --start=../managed-data-assets/ --dest=../etl-jobs/
-node ./mda_etl_run.js ../jobs
-

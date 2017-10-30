@@ -2,14 +2,14 @@
 require('dotenv').config();
 const fs = require('fs');
 const Logger = require('coa-node-logging');
-const utilities = require('./common/utilities');
+const { stripPath } = require('./common/utilities');
 const CommandLineArgs = require('./common/CommandLineArgs');
 
 const JobRunner = require('./etl_run/JobRunner');
 
 const usage = function usage() {
   const usageString = '\nRun ETL jobs until done.\n\n'
-                    + `Usage:\t${utilities.stripPath(process.argv[1])} working_directory`
+                    + `Usage:\t${stripPath(process.argv[1])} working_directory`
                     + '\n\t\t[--parallelLoad=load_points]'
                     + '\n\t\t[--jobFile=job_file_name]'
                     + '\n\t\t[--logfile=logFilePath]';

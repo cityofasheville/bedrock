@@ -66,7 +66,6 @@ class JobRunner {
     }
     const fd = fs.openSync(`${workDir}/jobs_status.json`, 'r');
     this.jTracker = JSON.parse(fs.readFileSync(fd, { encoding: 'utf8' }));
-    console.log(`Here we are: ${JSON.stringify(this.jTracker)}`);
     fs.closeSync(fd);
   }
 

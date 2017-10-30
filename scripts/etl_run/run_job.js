@@ -114,15 +114,3 @@ runTaskSequence('Create', job.job.create, 'Created')
   job.status = 'Error';
   recordJobStatus(job);
 });
-
-// runTaskSequence('Tasks', job.job.tasks, 'Done')
-// .then(status => {
-//   job.status = status;
-//   fd = fs.openSync(`${process.argv[2]}/status.json`, 'w');
-//   fs.writeFileSync(fd, JSON.stringify(job), { encoding: 'utf8' });
-//   fs.closeSync(fd);
-// })
-// .catch(err => {
-//   console.log(`WHOA we gotta dam error ${err}`);
-// });
-

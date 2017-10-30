@@ -14,7 +14,7 @@ node ./mda_generate.js etl --recurse --start=../managed-data-assets/ --dest=../e
 
 __```etl_run.js [options] working_directory```__
 
-Designed to be called from a scheduler like ```cron```. When called with the ```--init``` option, it starts off a sequence of runs, kicking off as many ETL jobs from the job file as can be accommodated (each job is assigned 1 or more points and the script will allow up to ```--parallelLoad``` points to run simultaneously). Each time it is called, it harvests any completed jobs and starts the next set, guaranteeing that no job runs before anything it depends on. If an error occurs, all dependent jobs are canceled, but processing of anything not dependent on the failed job continues.
+Designed to be called from a scheduler like ```cron```. Each time it is called, it harvests any completed jobs and starts the next set, kicking off as many ETL jobs from the job file as can be accommodated (each job is assigned 1 or more points and the script will allow up to ```--parallelLoad``` points to run simultaneously), guaranteeing that no job runs before anything it depends on. If an error occurs, all dependent jobs are canceled, but processing of anything not dependent on the failed job continues.
 
 node ./mda_etl_run.js ../jobs
 

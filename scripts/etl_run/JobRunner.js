@@ -4,28 +4,27 @@ const fork = require('child_process').fork;
 const { getJobPoints, recursivelyDeletePath, countPoints } = require('./utilities');
 
 class JobRunner {
-  constructor(workingDirectory, jobFileName, logger) {
+  constructor(workDir, jobFileName, logger) {
     this.logger = logger;
-    this.workingDirectory = workingDirectory;
+    this.workDir = workDir;
     this.jobFileName = jobFileName;
     this.jTracker = {};
-    this.runningFiles = fs.readdirSync(`${this.workingDirectory}/jobs`);
+    this.runningFiles = fs.readdirSync(`${this.workDir}/jobs`);
   }
 
   initializeRun() {
-    this.loadJobTracker(this.workingDirectory, this.jobFileName, this.logger);
+    this.loadJobTracker(this.workDir, this.jobFileName, this.logger);
   }
 
   harvestRunningJobs() {
-    console.log(`The type of running is ${JSON.stringify(this.jTracker)}`);
     this.jTracker.running = this.jTracker.running.filter(job => {
-      console.log(`Checking the status of running job ${job.name}`);
+      // Check the status of running job
       if (this.runningFiles.indexOf(job.name) < 0) {
         // Something is seriously wrong.
         this.logger.error({ job }, `Unable to find job file for running job ${job.name}`);
         process.exit(1);
       }
-      const fd = fs.openSync(`${this.workingDirectory}/jobs/${job.name}/status.json`, 'r');
+      const fd = fs.openSync(`${this.workDir}/jobs/${job.name}/status.json`, 'r');
       const jobStatus = JSON.parse(fs.readFileSync(fd, { encoding: 'utf8' }));
       fs.closeSync(fd);
       if (jobStatus.status === 'Done') {
@@ -43,12 +42,12 @@ class JobRunner {
   }
 
   saveState() {
-    const fd = fs.openSync(`${this.workingDirectory}/jobs_status.json`, 'w');
+    const fd = fs.openSync(`${this.workDir}/jobs_status.json`, 'w');
     fs.writeFileSync(fd, JSON.stringify(this.jTracker), { encoding: 'utf8' });
     fs.closeSync(fd);
   }
 
-  loadJobTracker(workingDirectory, jobFileName, logger) {
+  loadJobTracker(workDir, jobFileName, logger) {
     this.jTracker = {
       startDate: new Date(),
       currentDate: new Date(),
@@ -59,19 +58,19 @@ class JobRunner {
       running: [],
       completed: [],
     };
-    const files = fs.readdirSync(workingDirectory);
+    const files = fs.readdirSync(workDir);
 
     if (files.indexOf('jobs_status.json') < 0) {
-      logger.error(`Unable to find jobs_status.json in jobs directory ${workingDirectory}`);
+      logger.error(`Unable to find jobs_status.json in jobs directory ${workDir}`);
       process.exit(1);
     }
-    const fd = fs.openSync(`${workingDirectory}/jobs_status.json`, 'r');
+    const fd = fs.openSync(`${workDir}/jobs_status.json`, 'r');
     this.jTracker = JSON.parse(fs.readFileSync(fd, { encoding: 'utf8' }));
     console.log(`Here we are: ${JSON.stringify(this.jTracker)}`);
     fs.closeSync(fd);
   }
 
-  static initializeJobTracker(workingDirectory, jobFileName, logger) {
+  static initializeJobTracker(workDir, jobFileName, logger) {
     const jobTracker = {
       startDate: new Date(),
       currentDate: new Date(),
@@ -82,14 +81,14 @@ class JobRunner {
       running: [],
       completed: [],
     };
-    const files = fs.readdirSync(workingDirectory);
+    const files = fs.readdirSync(workDir);
 
     if (files.indexOf(jobFileName) < 0) {
-      logger.error(`Unable to find job file ${jobFileName} in jobs directory ${workingDirectory}`);
+      logger.error(`Unable to find job file ${jobFileName} in jobs directory ${workDir}`);
       process.exit(1);
     }
 
-    let fd = fs.openSync(`${workingDirectory}/${jobFileName}`, 'r');
+    let fd = fs.openSync(`${workDir}/${jobFileName}`, 'r');
     const jobsDef = JSON.parse(fs.readFileSync(fd, { encoding: 'utf8' }));
     fs.closeSync(fd);
 
@@ -111,12 +110,12 @@ class JobRunner {
         jobTracker.freeToDo.push(job);
       }
     });
-    fd = fs.openSync(`${workingDirectory}/jobs_status.json`, 'w');
+    fd = fs.openSync(`${workDir}/jobs_status.json`, 'w');
     fs.writeFileSync(fd, JSON.stringify(jobTracker), { encoding: 'utf8' });
     fs.closeSync(fd);
 
     if (files.indexOf('jobs') < 0) {
-      fs.mkdirSync(`${workingDirectory}/jobs`);
+      fs.mkdirSync(`${workDir}/jobs`);
     } else {
       // TODO: We should delete all job files in the directory.
     }
@@ -207,11 +206,11 @@ class JobRunner {
   }
 
   startJob(job) {
-    const jobDir = `${this.workingDirectory}/jobs/${job.name}`;
+    const jobDir = `${this.workDir}/jobs/${job.name}`;
     console.log(`Starting the job: ${job.name}`);
     if (this.runningFiles.indexOf(job.name) >= 0) {
-      console.log(`Delete directory ${this.workingDirectory}/jobs/${job.name}`);
-      recursivelyDeletePath(`${this.workingDirectory}/jobs/${job.name}`);
+      console.log(`Delete directory ${this.workDir}/jobs/${job.name}`);
+      recursivelyDeletePath(`${this.workDir}/jobs/${job.name}`);
     }
     fs.mkdirSync(jobDir);
     const fd = fs.openSync(`${jobDir}/status.json`, 'w');
@@ -220,8 +219,8 @@ class JobRunner {
 
     // Now fork a script that will run that job and write out the result at the end.
     const path = require.resolve('./run_job.js');
-    const out = fs.openSync(`${this.workingDirectory}/jobs/${job.name}/out.log`, 'a');
-    const err = fs.openSync(`${this.workingDirectory}/jobs/${job.name}/err.log`, 'a');
+    const out = fs.openSync(`${this.workDir}/jobs/${job.name}/out.log`, 'a');
+    const err = fs.openSync(`${this.workDir}/jobs/${job.name}/err.log`, 'a');
     const options = { detached: true, shell: false, stdio: ['ignore', out, err, 'ipc'] };
 
     const run = fork(path, [jobDir], options);
@@ -233,4 +232,3 @@ class JobRunner {
 }
 
 module.exports = JobRunner;
-

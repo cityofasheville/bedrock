@@ -1,28 +1,31 @@
-/* eslint-disable no-console */
+/* eslint-disable no-console, spaced-comment */
 require('dotenv').config();
 const fs = require('fs');
 const Logger = require('coa-node-logging');
-const utilities = require('../src/utility/utilities');
-const CommandLineArgs = require('../src/utility/CommandLineArgs');
+const utilities = require('./common/utilities');
+const CommandLineArgs = require('./common/CommandLineArgs');
 
-const JobRunner = require('../src/jobrunner/jobrunner');
+const JobRunner = require('./etl_run/JobRunner');
 
 const usage = function usage() {
-  const usageString = `Usage:\t${utilities.stripPath(process.argv[1])} working_directory`
+  const usageString = '\nRun ETL jobs until done.\n\n'
+                    + `Usage:\t${utilities.stripPath(process.argv[1])} working_directory`
                     + '\n\t\t[--parallelLoad=load_points]'
                     + '\n\t\t[--jobFile=job_file_name]'
                     + '\n\t\t[--logfile=logFilePath]';
   console.log(usageString);
+  process.exit(1);
 };
 
+////////////////////////////////////
+// Validate arguments & initialize
+////////////////////////////////////
+
 const args = new CommandLineArgs(process.argv.slice(2));
-if (args.args.length < 1) {
-  usage();
-  process.exit(1);
-}
+if (args.args.length < 1) usage();
 
 const loadPoints = ('parallelLoad' in args.options) ? args.options.parallelLoad : 2;
-const jobFileName = ('jobFile' in args.options) ? args.options.jobFile : 'etl_jobs.json';
+const jobFileName = ('jobFile' in args.options) ? args.options.jobFile : 'etl_jobs_definition.json';
 const jobFileDate = 'etl_jobs_date.json';
 const workingDirectory = args.args[0];
 
@@ -54,10 +57,7 @@ if (init) {
 // Now do the runs
 const runner = new JobRunner(workingDirectory, jobFileName, logger);
 runner.initializeRun();
-console.log('Harvest');
 runner.harvestRunningJobs();
-console.log('Fill the queue');
 runner.fillJobQueue(loadPoints);
-console.log('Done - now exit');
 process.exit(0);
 

@@ -3,7 +3,7 @@ const spawnSync = require('child_process').spawnSync;
 const fs = require('fs');
 const Logger = require('coa-node-logging');
 const ConnectionManager = require('../db/connection_manager');
-const connectionDefinitions = require('../connection_definitions');
+const connectionDefinitions = require('./connection_definitions');
 
 const logger = new Logger('MDA', './mda.log');
 

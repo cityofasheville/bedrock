@@ -27,7 +27,6 @@ function createNode(name, config, path, commonDepends) {
     distribute: config.distribute,
     tasks: config.tasks,
   };
-  console.log(`The job is: ${JSON.stringify(job)}`);
   const node = { name, path, job };
   return node;
 }
@@ -80,7 +79,7 @@ function process(stage, path, dest, mainConfig, logger) {
       Object.keys(graph.nodes).forEach(jName => {
         result.freeJobs.push(graph.nodes[jName]);
       });
-      fd = fs.openSync(`${dest}/etl_jobs.json`, 'w');
+      fd = fs.openSync(`${dest}/etl_jobs_definition.json`, 'w');
       fs.writeFileSync(fd, JSON.stringify(result), { encoding: 'utf8' });
       fs.closeSync(fd);
       d = Date.now();

@@ -2,9 +2,10 @@
 require('dotenv').config();
 const fs = require('fs');
 const Logger = require('coa-node-logging');
-const utilities = require('./src/utility/utilities');
-const CommandLineArgs = require('./src/utility/CommandLineArgs');
-const JobRunner = require('./src/jobrunner/jobrunner');
+const utilities = require('../src/utility/utilities');
+const CommandLineArgs = require('../src/utility/CommandLineArgs');
+
+const JobRunner = require('../src/jobrunner/jobrunner');
 
 const usage = function usage() {
   const usageString = `Usage:\t${utilities.stripPath(process.argv[1])} working_directory`

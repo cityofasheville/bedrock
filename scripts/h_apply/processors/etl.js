@@ -27,7 +27,6 @@ function createNode(name, config, path, commonDepends) {
     distribute: config.distribute,
     tasks: config.tasks,
   };
-  console.log(`The job is: ${JSON.stringify(job)}`);
   const node = { name, path, job };
   return node;
 }

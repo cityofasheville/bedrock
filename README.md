@@ -1,19 +1,29 @@
-# ComplexCity Managed Data System
-Scripts and metadata for City of Asheville reporting and management data infrastrucutre.
+# Processing Scripts
 
-## Design Goals
+There are two key scripts.
 
-1. Provide high-quality metadata to reporting & management data users
-2. Maintain the integrity of the relationship between reporting and source data
-  * Sequence and run ETL jobs that create the reporting data warehouse
-  * Maintain information on data provenance, i.e., help us answer two questions:
-    * How is this dataset created?
-    * Where is this dataset being used in the data infrastructure?
-3. Maintain the integrity of the relationship between the data and applications that use it
-  * Generate GraphQL schema information for use in SimpliCity
-  * Future possibility: answer question "What data is involved in this functionality?
+__```h_apply.js [options] command_name```__
+
+Walks the hierarchy of dataset directories. When if finds a directory associatedwith a managed data asset (indicated by the existence of a ```mda.json``` file), it calls a script specified by ```command_name```. Commands currently include:
+
+* __validate__ - validates that the data described in the ```dataset.json```` file matches the tables used for input and output <sup>1,2</sup>.
+* __etl__ - creates a schedule of (and, soon, parameter files for) ETL jobs based on dependencies between datasets. The output is a job file used by ```etl_run.js```.
+* __graphql__ - outputs GraphQL schema snippets for the dataset for use in SimpliCity (and, soon, default resolvers and dataset dashboard configuration files).
+
+node ./mda_generate.js etl --recurse --start=../managed-data-assets/ --dest=../etl-jobs/
+
+__```etl_run.js [options] working_directory```__
+
+Designed to be called from a scheduler like ```cron```. When called with the ```--init``` option, it starts off a sequence of runs, kicking off as many ETL jobs from the job file as can be accommodated (each job is assigned 1 or more points and the script will allow up to ```--parallelLoad``` points to run simultaneously). Each time it is called, it harvests any completed jobs and starts the next set, guaranteeing that no job runs before anything it depends on. If an error occurs, all dependent jobs are canceled, but processing of anything not dependent on the failed job continues.
+
+node ./mda_etl_run.js ../jobs
 
 
-The system consists of a set of [metadata directories](https://github.com/cityofasheville/mda) (in a different repository now) describing all the datasets in our reporting and management warehouse together with a few [scripts](./src/README.md) that use the metadata to create and maintain data infrastructure.
+### Notes
+
+<sup>1</sup> One of the tenets of the system is that it should be dumb - any logic required to create the view or table used should be maintained by the data steward outside of the ComplexCity system.
+
+<sup>2</sup> Error output is in JSON. For a pretty-printed version, if the output is in errors.log, then simply run: ```bunyan errors.log ```. The ```bunyan``` command can be found in the ```node_modules/.bin/``` subdirectory of the ComplexCity source.
+
 
 

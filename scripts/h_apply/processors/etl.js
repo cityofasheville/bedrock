@@ -44,9 +44,9 @@ function createEdge(name1, name2) {
 
 function addToGraph(config, mainConfig, path, logger) {
   if (config) {
-    addNode(createNode(mainConfig.mda.name, config, path, config.depends), logger);
+    addNode(createNode(mainConfig.mda.name, config, path, mainConfig.mda.depends), logger);
     // Add dependencies
-    config.depends.forEach(name => { graph.edges.push(createEdge(mainConfig.mda.name, name)); });
+    mainConfig.mda.depends.forEach(name => { graph.edges.push(createEdge(mainConfig.mda.name, name)); });
   }
 }
 
@@ -71,7 +71,11 @@ function process(stage, path, dest, mainConfig, logger) {
 
     case 'finish':
       result = { sequencedJobs: [], freeJobs: [] };
+      console.log(JSON.stringify(toposort(graph.edges).reverse()));
       toposort(graph.edges).reverse().forEach(jobName => {
+        if (!graph.nodes.hasOwnProperty(jobName)) {
+          throw new Error(`No such job ${jobName}`);
+        }
         result.sequencedJobs.push(graph.nodes[jobName]);
         delete graph.nodes[jobName];
       });

@@ -7,9 +7,11 @@ module.exports = function processDirectory(path, dest, recurse, handler,
   if (defIndex >= 0) {
     const fd = fs.openSync(`${path}/mda.json`, 'r');
     const mda = JSON.parse(fs.readFileSync(fd, { encoding: 'utf8' }));
-    const lconfig = Object.assign({ mda }, config, { files });
-    const p = handler('run', path, dest, lconfig, logger);
-    Promise.resolve(p);
+    if (mda.active) {
+      const lconfig = Object.assign({ mda }, config, { files });
+      const p = handler('run', path, dest, lconfig, logger);
+      Promise.resolve(p);
+    }
   }
   if (recurse) {
     files.forEach(fileName => {

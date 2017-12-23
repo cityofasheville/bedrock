@@ -1,7 +1,8 @@
 /* eslint-disable no-console, spaced-comment, global-require */
 require('dotenv').config();
-const processDirectory = require('./traverse_and_run_task/processDirectory');
-const processAndValidateArgs = require('./traverse_and_run_task/processAndValidateArgs');
+const processAndValidateArgs = require('./traverse_and_do_task/processAndValidateArgs');
+const processDirectory = require('./traverse_and_do_task/processDirectory');
+
 const args = processAndValidateArgs(process.argv.slice(2));
 const task = args.task;
 

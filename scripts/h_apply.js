@@ -17,7 +17,7 @@ const usageAndExit = function usageAndExit(message = null) {
                     + `Usage:\t${stripPath(process.argv[1])}`
                     + ' [list | etl | graphql | validate]'
                     + '\n\t\t[--start=startDir] [--dest=destDir]'
-                    + '\n\t\t[--recurse]'
+                    + '\n\t\t[--norecurse]'
                     + '\n\t\t[--logfile=logFilePath]'
                     + '\n\t\t[--indent=numberOfSpaces]';
   if (message) console.log(message);
@@ -39,7 +39,7 @@ const logger = new Logger('mda_h_apply', args.getOption('logfile', null));
 const startDir = args.getOption('start', '.');
 const destDir = args.getOption('dest', '.');
 const config = { indent: args.getOption('indent', 2) };
-const recurse = args.hasOption('recurse');
+const recurse = !args.hasOption('norecurse');
 
 if (!fs.existsSync(startDir)) usageAndExit(`mda_h_apply: Start directory ${startDir} not found.`);
 if (!fs.existsSync(destDir)) usageAndExit(`mda_h_apply: Destination directory ${destDir} not found`);

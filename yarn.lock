@@ -171,10 +171,6 @@ co@^4.6.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/co/-/co-4.6.0.tgz#6ea6bdf3d853ae54ccb8e47bfa0bf3f9031fb184"
 
-coa-command-line-args@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/coa-command-line-args/-/coa-command-line-args-1.0.2.tgz#799dafc768faf3ba530e122d7fc1d583087843fc"
-
 coa-node-logging@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/coa-node-logging/-/coa-node-logging-1.1.0.tgz#825c899f10ab78d9a9ee3362a0fadb4ea106ed40"

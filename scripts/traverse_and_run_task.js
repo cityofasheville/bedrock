@@ -5,15 +5,15 @@ const Logger = require('coa-node-logging');
 const CommandLineArgs = require('./common/CommandLineArgs');
 const { stripPath } = require('./common/utilities');
 const processors = {
-  validate: require('./h_apply/processors/validator'),
-  graphql: require('./h_apply/processors/graphql'),
-  etl: require('./h_apply/processors/etl'),
-  list: require('./h_apply/processors/list'),
+  validate: require('./traverse_and_run_task/processors/validator'),
+  graphql: require('./traverse_and_run_task/processors/graphql'),
+  etl: require('./traverse_and_run_task/processors/etl'),
+  list: require('./traverse_and_run_task/processors/list'),
 };
-const processDirectory = require('./h_apply/processDirectory');
+const processDirectory = require('./traverse_and_run_task/processDirectory');
 
 const usageAndExit = function usageAndExit(message = null) {
-  const usageString = '\nApply a processor to a hierarchy of data assets.\n\n'
+  const usageString = '\nTraverse directory hierarchy and run tasks on each data asset directory.\n\n'
                     + `Usage:\t${stripPath(process.argv[1])}`
                     + ' [list | etl | graphql | validate]'
                     + '\n\t\t[--start=startDir] [--dest=destDir]'
@@ -33,16 +33,16 @@ const args = new CommandLineArgs(process.argv.slice(2));
 if (args.argCount() < 1) usageAndExit();
 const command = args.getArg(0);
 const processor = processors[command];
-if (!processor) usageAndExit(`mda_h_apply: ${command} processor not found.`);
+if (!processor) usageAndExit(`traverse_and_run_task: ${command} processor not found.`);
 
-const logger = new Logger('mda_h_apply', args.getOption('logfile', null));
+const logger = new Logger('traverse_and_run_task', args.getOption('logfile', null));
 const startDir = args.getOption('start', '.');
 const destDir = args.getOption('dest', '.');
 const config = { indent: args.getOption('indent', 2) };
 const recurse = !args.hasOption('norecurse');
 
-if (!fs.existsSync(startDir)) usageAndExit(`mda_h_apply: Start directory ${startDir} not found.`);
-if (!fs.existsSync(destDir)) usageAndExit(`mda_h_apply: Destination directory ${destDir} not found`);
+if (!fs.existsSync(startDir)) usageAndExit(`traverse_and_run_task: Start directory ${startDir} not found.`);
+if (!fs.existsSync(destDir)) usageAndExit(`traverse_and_run_task: Destination directory ${destDir} not found`);
 
 //////////////////////////////////////////////
 // This is a 3-phase process:

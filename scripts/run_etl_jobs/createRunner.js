@@ -1,5 +1,5 @@
 const fs = require('fs');
-const JobRunner = require('./run_etl_jobs/JobRunner');
+const JobRunner = require('./JobRunner');
 
 module.exports = function createRunner(args) {
 

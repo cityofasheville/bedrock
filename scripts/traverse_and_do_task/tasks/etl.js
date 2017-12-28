@@ -1,3 +1,5 @@
+/* eslint-disable no-prototype-builtins */
+
 const fs = require('fs');
 const pathModule = require('path');
 const toposort = require('toposort');
@@ -71,7 +73,6 @@ function process(stage, path, dest, mainConfig, logger) {
 
     case 'finish':
       result = { sequencedJobs: [], freeJobs: [] };
-      console.log(JSON.stringify(toposort(graph.edges).reverse()));
       toposort(graph.edges).reverse().forEach(jobName => {
         if (!graph.nodes.hasOwnProperty(jobName)) {
           throw new Error(`No such job ${jobName}`);

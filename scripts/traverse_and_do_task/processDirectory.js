@@ -1,7 +1,6 @@
 const fs = require('fs');
 
-module.exports = function processDirectory(path, dest, recurse, handler,
-                                           config, logger) {
+module.exports = function processDirectory(path, dest, handler, config, logger) {
   const files = fs.readdirSync(path);
   const defIndex = files.indexOf('mda.json');
   if (defIndex >= 0) {
@@ -13,12 +12,13 @@ module.exports = function processDirectory(path, dest, recurse, handler,
       Promise.resolve(p);
     }
   }
-  if (recurse) {
+
+  if (config.recurse) {
     files.forEach(fileName => {
       const fullPath = `${path}/${fileName}`;
       const stat = fs.lstatSync(fullPath);
-      if (stat.isDirectory() && recurse) {
-        processDirectory(fullPath, dest, recurse, handler);
+      if (stat.isDirectory() && config.recurse) {
+        processDirectory(fullPath, dest, handler, config);
       }
     });
   }

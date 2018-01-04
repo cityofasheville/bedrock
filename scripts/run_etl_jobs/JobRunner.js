@@ -34,9 +34,18 @@ class JobRunner {
           this.jTracker.refCount[depName] -= 1;
         });
         this.jTracker.completed.push(job);
-        return null;
+        return false;
+      } else if (jobStatus.status === 'Error') {
+        // We don't decrement refcounts on dependent jobs
+        // so they will not ever run. However, we should actually
+        // TODO: remove them from jTracker.sequencedToDo
+        //       and put them in a 'deferred' array or something
+        console.log(`Job ${job.name} has an error!`);
+        this.jTracker.jobStatus[job.name] = 'Error';
+        this.jTracker.errored.push(job);
+        return false;
       }
-      return job;
+      return true;
     });
     this.saveState();
   }
@@ -57,6 +66,7 @@ class JobRunner {
       freeToDo: [],
       running: [],
       completed: [],
+      errored: [],
     };
     const files = fs.readdirSync(workDir);
 

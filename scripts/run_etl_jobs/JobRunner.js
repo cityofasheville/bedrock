@@ -8,11 +8,23 @@ class JobRunner {
     this.logger = logger;
     this.workDir = workDir;
     this.jobFileName = jobFileName;
-    this.jTracker = {};
+    this.jTracker = JobRunner.emptyTracker();
     this.runningFiles = fs.readdirSync(`${this.workDir}/jobs`);
   }
 
-    /*
+  static emptyTracker() {
+    return {
+      startDate: new Date(),
+      currentDate: new Date(),
+      jobStatus: {},
+      sequencedToDo: [],
+      freeToDo: [],
+      running: [],
+      completed: [],
+      errored: [],
+    };
+  }
+  /*
    ***************************************************************************
    ***************************************************************************
      fillJobQueue - called each invocation
@@ -20,8 +32,9 @@ class JobRunner {
    ***************************************************************************
    */
 
-  saveState() {
-    const fd = fs.openSync(`${this.workDir}/jobs_status.json`, 'w');
+  saveState(filename = null) {
+    const fname = filename || 'jobs_status.json';
+    const fd = fs.openSync(`${this.workDir}/${fname}`, 'w');
     fs.writeFileSync(fd, JSON.stringify(this.jTracker), { encoding: 'utf8' });
     fs.closeSync(fd);
   }
@@ -127,7 +140,7 @@ class JobRunner {
 
   purgeDependents(errorJob) {
     this.jTracker.sequencedToDo = this.jTracker.sequencedToDo.filter(job => {
-      if (job.depends.reduce((accum, currentDepend) => { return (accum || errorJob === currentDepend); }, false)) {
+      if (job.job.depends.reduce((accum, currentDepend) => { return (accum || errorJob === currentDepend); }, false)) {
         this.jTracker.errored.push(job);
         return false;
       }
@@ -171,16 +184,7 @@ class JobRunner {
    ***************************************************************************/
 
   loadJobTracker(workDir, jobFileName, logger) {
-    this.jTracker = {
-      startDate: new Date(),
-      currentDate: new Date(),
-      jobStatus: {},
-      sequencedToDo: [],
-      freeToDo: [],
-      running: [],
-      completed: [],
-      errored: [],
-    };
+    this.jTracker = JobRunner.emptyTracker();
     const files = fs.readdirSync(workDir);
 
     if (files.indexOf('jobs_status.json') < 0) {
@@ -204,15 +208,7 @@ class JobRunner {
    ***************************************************************************/
 
   static initializeJobTracker(workDir, jobFileName, logger) {
-    const jobTracker = {
-      startDate: new Date(),
-      currentDate: new Date(),
-      jobStatus: {},
-      sequencedToDo: [],
-      freeToDo: [],
-      running: [],
-      completed: [],
-    };
+    const jobTracker = JobRunner.emptyTracker();
     const files = fs.readdirSync(workDir);
 
     if (files.indexOf(jobFileName) < 0) {

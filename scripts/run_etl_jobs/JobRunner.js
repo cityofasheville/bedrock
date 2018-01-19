@@ -39,7 +39,9 @@ class JobRunner {
     fs.closeSync(fd);
   }
 
+
   startJob(job) {
+    const reallyRun = true;
     const jobDir = `${this.workDir}/jobs/${job.name}`;
     console.log(`Starting the job: ${job.name}`);
     if (this.runningFiles.indexOf(job.name) >= 0) {
@@ -50,16 +52,17 @@ class JobRunner {
     const fd = fs.openSync(`${jobDir}/status.json`, 'w');
     fs.writeFileSync(fd, JSON.stringify({ name: job.name, path: job.path, job: job.job, status: 'Pending' }));
     fs.closeSync(fd);
+    if (reallyRun) {
+      // Now fork a script that will run that job and write out the result at the end.
+      const path = require.resolve('./run_job.js');
+      const out = fs.openSync(`${this.workDir}/jobs/${job.name}/out.log`, 'a');
+      const err = fs.openSync(`${this.workDir}/jobs/${job.name}/err.log`, 'a');
+      const options = { detached: true, shell: false, stdio: ['ignore', out, err, 'ipc'] };
 
-    // Now fork a script that will run that job and write out the result at the end.
-    const path = require.resolve('./run_job.js');
-    const out = fs.openSync(`${this.workDir}/jobs/${job.name}/out.log`, 'a');
-    const err = fs.openSync(`${this.workDir}/jobs/${job.name}/err.log`, 'a');
-    const options = { detached: true, shell: false, stdio: ['ignore', out, err, 'ipc'] };
+      const run = fork(path, [jobDir], options);
 
-    const run = fork(path, [jobDir], options);
-
-    run.unref();
+      run.unref();
+    }
     this.jTracker.running.push(job);
     this.jTracker.jobStatus[job.name] = 'Started';
   }
@@ -107,10 +110,11 @@ class JobRunner {
           console.log('No more sequenced jobs to do.');
         }
       }
-      if (!haveSequencedJobs) { // Can't run any more sequenced, get some free ones.
+      if (!haveSequencedJobs && freeLoad > 0) { // Can't run any more sequenced, get some free ones.
         const toRun = [];
         const holdJobs = [];
-        for (let i = 0; freeLoad > 0 && i < this.jTracker.freeToDo.length; i += 1) {
+        console.log('In !haveSequencedJobs');
+        for (let i = 0; i < this.jTracker.freeToDo.length; i += 1) {
           const fjob = this.jTracker.freeToDo[i];
           if (getJobPoints(fjob) <= freeLoad) {
             toRun.push(fjob);

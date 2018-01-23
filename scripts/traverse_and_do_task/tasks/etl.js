@@ -14,7 +14,7 @@ function readEtlConfig(path, logger) {
       etlConfig = JSON.parse(fs.readFileSync(fd, { encoding: 'utf8' }));
     }
   } catch (err) {
-    logger.error({ err }, `Error reading ${path}/etl.json`);
+    logger.error(`Error reading ${path}/etl.json`, { err });
   }
   return etlConfig;
 }

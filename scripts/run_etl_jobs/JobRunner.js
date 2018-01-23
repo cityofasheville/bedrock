@@ -157,7 +157,7 @@ class JobRunner {
       // Check the status of running job
       if (this.runningFiles.indexOf(job.name) < 0) {
         // Something is seriously wrong.
-        this.logger.error({ job }, `Unable to find job file for running job ${job.name}`);
+        this.logger.error(`Unable to find job file for running job ${job.name}`, { job });
         process.exit(1);
       }
       const fd = fs.openSync(`${this.workDir}/jobs/${job.name}/status.json`, 'r');

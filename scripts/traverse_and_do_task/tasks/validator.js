@@ -89,16 +89,14 @@ function validate(columns, mda, tableInfo, path, logger) {
   expectedColumns.forEach((cDef) => {
     console.log(`Doing column ${cDef.column}`);
     if (!(cDef.column in columns)) { // Missing column.
-      logger.error('table-missing-column',
-      `Required column ${cDef.column} not found in table ${tableInfo.table}`,
-      { table: tableInfo.table, column: cDef.column });
+      logger.error(`Required column ${cDef.column} not found in table ${tableInfo.table}`,
+      { table: tableInfo.table, column: cDef.column }, 'table-missing-column');
     } else {
       checkColumns[cDef.column] = true;
       const typeErr = verifyType(cDef, columns[cDef.column]);
       if (typeErr) { // Type mis-match.
-        logger.error('column-type-err',
-          `Types error in column ${cDef.column} of table ${tableInfo.table}: ${typeErr}`,
-          { table: tableInfo.table, column: cDef.column, message: typeErr });
+        logger.error(`Types error in column ${cDef.column} of table ${tableInfo.table}: ${typeErr}`,
+          { table: tableInfo.table, column: cDef.column, message: typeErr }, 'column-type-err');
       }
     }
   });
@@ -106,9 +104,8 @@ function validate(columns, mda, tableInfo, path, logger) {
   // Now make sure every table column is accounted for in the definition
   Object.getOwnPropertyNames(checkColumns).forEach((colName) => {
     if (!checkColumns[colName]) {
-      logger.error('definition-missing-column',
-        `Column ${colName}, table ${tableInfo.table} is missing from definition`,
-        { table: tableInfo.table, column: colName });
+      logger.error(`Column ${colName}, table ${tableInfo.table} is missing from definition`,
+        { table: tableInfo.table, column: colName }, 'definition-missing-column');
     }
   });
 }
@@ -117,7 +114,7 @@ function run(pool, path, config, logger) {
   const fd = fs.openSync(`${path}/mda.json`, 'r');
   const ddef = JSON.parse(fs.readFileSync(fd, { encoding: 'utf8' }));
   console.log(`Running validation in ${path}`);
-  ddef.datasets.forEach((ds) => {
+  ddef.datasets.forEach(ds => {
     const target = ds.target;
     if (target) {
       const cn = config.connectionManager.getConnection(target.connection);
@@ -126,13 +123,12 @@ function run(pool, path, config, logger) {
           if (columns && ds.columns_specification.type !== 'none') {
             validate(columns, ds, target, path, logger);
           } else {
-            logger.error('missing-table',
-              `Target table ${target.table} does not exist or contains no columns`,
+            logger.error(`Target table ${target.table} does not exist or contains no columns`,
               {
                 connection: cn.getConnectionName(),
                 schema: target.schema,
                 table: target.table,
-              });
+              }, 'missing-table');
           }
         });
     }
@@ -146,16 +142,15 @@ function run(pool, path, config, logger) {
           if (columns && ds.columns_specification.type !== 'none') {
             validate(columns, ds, source, path, logger);
           } else {
-            logger.error('missing-table',
-              `Source table ${source.table} does not exist or contains no columns`,
+            logger.error(`Source table ${source.table} does not exist or contains no columns`,
               {
                 connection: cn.getConnectionName(),
                 schema: source.schema,
                 table: source.table,
-              });
+              }, 'missing-table');
           }
         })
-        .catch((err) => {
+        .catch(err => {
           console.log(`Source: We got an exception with err = ${JSON.stringify(err)}`);
         });
     }

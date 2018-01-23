@@ -18,7 +18,7 @@ module.exports = function processDirectory(path, dest, handler, config, logger) 
       const fullPath = `${path}/${fileName}`;
       const stat = fs.lstatSync(fullPath);
       if (stat.isDirectory() && config.recurse) {
-        processDirectory(fullPath, dest, handler, config);
+        processDirectory(fullPath, dest, handler, config, logger);
       }
     });
   }

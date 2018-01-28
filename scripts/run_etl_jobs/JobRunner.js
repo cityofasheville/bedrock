@@ -88,7 +88,7 @@ class JobRunner {
   fillJobQueue(loadPoints) {
     // If there are open slots, start new jobs and add to running
     let freeLoad = loadPoints - this.jTracker.running.reduce(countPoints, 0);
-    console.log(`Free load is ${freeLoad}.`);
+    // console.log(`Free load is ${freeLoad}.`);
     let jobsTodo = ((freeLoad > 0) && (this.jTracker.sequencedToDo.length > 0 || this.jTracker.freeToDo.length > 0));
     while (jobsTodo) {
       let job;
@@ -97,7 +97,7 @@ class JobRunner {
       if (haveSequencedJobs) {
         job = this.getNextSequencedJob(freeLoad);
         if (job) {
-          console.log(`Got the next sequenced job: ${job.name}.`);
+          // console.log(`Got the next sequenced job: ${job.name}.`);
           if (job.job.type === null) { // just a sequencing dependency
             this.jTracker.jobStatus[job.name] = 'Done';
           } else { // Start the job
@@ -107,30 +107,34 @@ class JobRunner {
           }
         } else {
           haveSequencedJobs = false;
-          console.log('No more sequenced jobs to do.');
+          console.log(`No more sequenced jobs to do. Freeload is ${freeLoad}`);
         }
       }
-      if (!haveSequencedJobs && freeLoad > 0) { // Can't run any more sequenced, get some free ones.
-        const toRun = [];
-        const holdJobs = [];
-        console.log('In !haveSequencedJobs');
-        for (let i = 0; i < this.jTracker.freeToDo.length; i += 1) {
-          const fjob = this.jTracker.freeToDo[i];
-          if (getJobPoints(fjob) <= freeLoad) {
-            toRun.push(fjob);
-            freeLoad -= getJobPoints(fjob);
-          } else {
-            holdJobs.push(fjob);
+      if (freeLoad <= 0) {
+          jobsTodo = false;
+      } else {
+        if (!haveSequencedJobs) { // Can't run any more sequenced, get some free ones.
+          const toRun = [];
+          const holdJobs = [];
+          // console.log('In !haveSequencedJobs');
+          for (let i = 0; i < this.jTracker.freeToDo.length; i += 1) {
+            const fjob = this.jTracker.freeToDo[i];
+            if (getJobPoints(fjob) <= freeLoad) {
+              toRun.push(fjob);
+              freeLoad -= getJobPoints(fjob);
+            } else {
+              holdJobs.push(fjob);
+            }
           }
+          // console.log(`Running ${toRun.length} free jobs!`);
+          this.jTracker.freeToDo = holdJobs;
+          while (toRun.length > 0) {
+            job = toRun.shift();
+            this.startJob(job);
+          }
+          jobsTodo = false;
+          this.saveState();
         }
-        console.log(`Running ${toRun.length} free jobs!`);
-        this.jTracker.freeToDo = holdJobs;
-        while (toRun.length > 0) {
-          job = toRun.shift();
-          this.startJob(job);
-        }
-        jobsTodo = false;
-        this.saveState();
       }
     }
   }

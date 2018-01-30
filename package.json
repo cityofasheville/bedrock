@@ -15,7 +15,7 @@
   "homepage": "https://github.com/cityofasheville/managed-dataset-definitions",
   "dependencies": {
     "bunyan": "^1.8.5",
-    "coa-node-logging": "^2.0.2",
+    "coa-node-logging": "^2.0.3",
     "dotenv": "^2.0.0",
     "mssql": "^3.3.0",
     "pg": "6.1.0",

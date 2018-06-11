@@ -36,7 +36,6 @@ ${Object.keys(jTracker.jobStatus).map(itm => {
 }).join('\n')}
 `;
 
-console.log(emailText);
 let mailOptions = {
     from: 'dataserviceaccount@ashevillenc.gov',
     to: 'ejackson@ashevillenc.gov',

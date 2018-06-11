@@ -18,6 +18,7 @@
     "coa-node-logging": "^2.0.2",
     "dotenv": "^2.0.0",
     "mssql": "^3.3.0",
+    "nodemailer": "^4.6.6",
     "pg": "6.1.0",
     "pg-pool": "^1.6.0",
     "toposort": "^1.0.0"

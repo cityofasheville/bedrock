@@ -43,9 +43,7 @@ class JobRunner {
   startJob(job) {
     const reallyRun = true;
     const jobDir = `${this.workDir}/jobs/${job.name}`;
-    console.log(`Starting the job: ${job.name}`);
     if (this.runningFiles.indexOf(job.name) >= 0) {
-      console.log(`Delete directory ${this.workDir}/jobs/${job.name}`);
       recursivelyDeletePath(`${this.workDir}/jobs/${job.name}`);
     }
     fs.mkdirSync(jobDir);
@@ -107,7 +105,6 @@ class JobRunner {
           }
         } else {
           haveSequencedJobs = false;
-          console.log(`No more sequenced jobs to do. Freeload is ${freeLoad}`);
         }
       }
       if (freeLoad <= 0) {
@@ -168,12 +165,10 @@ class JobRunner {
       const jobStatus = JSON.parse(fs.readFileSync(fd, { encoding: 'utf8' }));
       fs.closeSync(fd);
       if (jobStatus.status === 'Done') {
-        console.log(`Job ${job.name} is done!`);
         this.jTracker.jobStatus[job.name] = 'Done';
         this.jTracker.completed.push(job);
         return false;
       } else if (jobStatus.status === 'Error') {
-        console.log(`Job ${job.name} has an error!`);
         this.jTracker.jobStatus[job.name] = 'Error';
         this.jTracker.errored.push(job);
         this.purgeDependents(job.name); // Pull off every job that depends on this one

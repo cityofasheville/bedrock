@@ -1,0 +1,26 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "traverse_and_do_task",
+            "program": "C:/COA/complexcity/scripts/traverse_and_do_task.js",
+            "args": [
+                "loaddb",
+                "--start=C:/COA/managed-data-assets",
+                // "--dest=C:/COA/etl_jobs_dir",
+                // "--logfile=C:/COA/etl_jobs_dir/joblog.log"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "testdb",
+            "program": "C:/COA/complexcity/scripts/traverse_and_do_task/tasks/testdb.js",
+        }
+    ]
+}

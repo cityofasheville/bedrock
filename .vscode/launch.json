@@ -8,9 +8,10 @@
             "type": "node",
             "request": "launch",
             "name": "traverse_and_do_task",
-            "program": "C:/COA/complexcity/scripts/traverse_and_do_task.js",
+            "program": "C:/COA/complexcityjon/scripts/traverse_and_do_task.js",
             "args": [
                 "loaddb",
+                "--require dotenv/config  dotenv_config_path=C:/COA/complexcityjon/.env",
                 "--start=C:/COA/managed-data-assets",
                 // "--dest=C:/COA/etl_jobs_dir",
                 // "--logfile=C:/COA/etl_jobs_dir/joblog.log"
@@ -19,8 +20,8 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "testdb",
-            "program": "C:/COA/complexcity/scripts/traverse_and_do_task/tasks/testdb.js",
+            "name": "test",
+            "program": "C:/COA/complexcityjon/scripts/traverse_and_do_task/tasks/test.js",
         }
     ]
 }

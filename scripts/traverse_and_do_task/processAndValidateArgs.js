@@ -8,6 +8,8 @@ const tasks = {
   graphql: require('./tasks/graphql'),
   etl: require('./tasks/etl'),
   list: require('./tasks/list'),
+  loaddb: require('./tasks/loaddb'),
+  test: require('./tasks/test'),     // TESTING
 };
 
 module.exports = function processAndValidateArgs(argv) {

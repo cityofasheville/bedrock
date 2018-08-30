@@ -46,6 +46,15 @@ function runFme(task) {
   }
 }
 
+function runNode(task) {
+  const node = 'c:\\\\Progra~1\\nodejs\\node';
+  const filePath = (task.file[0] === '/') ? task.file : `${job.path}/${task.file}`;
+  console.log(` Doing a Node job from file ${filePath}`);
+  const jobStatus = spawnSync(node, [filePath], { detached: false, shell: false });
+  if (jobStatus.status !== 0) {
+    throw new Error(jobStatus.error);
+  }
+}
 async function runTaskSequence(seqName, tasks, endStatus = 'Done') {
   let hasError = false;
   let errMessage = '';
@@ -54,7 +63,7 @@ async function runTaskSequence(seqName, tasks, endStatus = 'Done') {
     const task = tasks[i];
     console.log(`${seqName}:${jobName}: Task ${i}, type ${task.type} - ${task.active ? 'Active' : 'Inactive'}`);
     if (task.active) {
-      if (task.type === 'sql') {
+      if (task.type === 'sqlxxx') {    //<< TESTING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         try {
           await runSql(task);
         } catch (err) {
@@ -62,7 +71,7 @@ async function runTaskSequence(seqName, tasks, endStatus = 'Done') {
           errMessage = err;
           logger.error(`Error running ${seqName}:${jobName} SQL job, file ${task.file}: ${err}`);
         }
-      } else if (task.type === 'fme') {
+      } else if (task.type === 'fmexxx') {    //<< TESTING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         try {
           runFme(task);
         } catch (err) {
@@ -70,6 +79,15 @@ async function runTaskSequence(seqName, tasks, endStatus = 'Done') {
           errMessage = err.message;
           console.log(`Error running ${seqName}:${jobName} FME job, file ${task.file}: ${JSON.stringify(err)}`);
           logger.error(`Error running ${seqName}:${jobName} FME job, file ${task.file}: ${JSON.stringify(err)}`);
+        }
+      } else if (task.type === 'node') {
+        try {
+          runNode(task);
+        } catch (err) {
+          hasError = true;
+          errMessage = err.message;
+          console.log(`Error running ${seqName}:${jobName} Node job, file ${task.file}: ${JSON.stringify(err)}`);
+          logger.error(`Error running ${seqName}:${jobName} Node job, file ${task.file}: ${JSON.stringify(err)}`);
         }
       }
     }

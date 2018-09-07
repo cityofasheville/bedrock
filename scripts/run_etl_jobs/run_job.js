@@ -63,7 +63,7 @@ async function runTaskSequence(seqName, tasks, endStatus = 'Done') {
     const task = tasks[i];
     console.log(`${seqName}:${jobName}: Task ${i}, type ${task.type} - ${task.active ? 'Active' : 'Inactive'}`);
     if (task.active) {
-      if (task.type === 'sqlxxx') {    //<< TESTING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      if (task.type === 'sql') { 
         try {
           await runSql(task);
         } catch (err) {
@@ -71,7 +71,7 @@ async function runTaskSequence(seqName, tasks, endStatus = 'Done') {
           errMessage = err;
           logger.error(`Error running ${seqName}:${jobName} SQL job, file ${task.file}: ${err}`);
         }
-      } else if (task.type === 'fmexxx') {    //<< TESTING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      } else if (task.type === 'fme') { 
         try {
           runFme(task);
         } catch (err) {

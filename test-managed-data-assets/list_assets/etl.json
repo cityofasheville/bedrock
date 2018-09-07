@@ -1,0 +1,11 @@
+{
+  "create": [],
+  "distribute": [],
+  "tasks": [
+    {
+      "type": "node",
+      "file": "C:/COA/complexcityjon/scripts/traverse_and_do_task.js loaddb --require dotenv/config  dotenv_config_path=C:/COA/complexcityjon/.env --start=C:/COA/mda",
+      "active": true
+    }
+  ]
+}

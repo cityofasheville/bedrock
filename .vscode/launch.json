@@ -13,9 +13,9 @@
             "args": [
                 "etl",
                 "--require dotenv/config  dotenv_config_path=C:/COA/complexcityjon/.env",
-                "--start=C:/COA/managed-data-assets-2",
-                "--dest=C:/COA/etl_jobs_dir",
-                "--logfile=C:/COA/etl_jobs_dir/joblog.log"
+                "--start=C:/COA/managed-data-assets-test",
+                "--dest=C:/COA/etl_jobs_dir_3",
+                "--logfile=C:/COA/etl_jobs_dir_3/joblog.log"
             ]
         },
         {
@@ -24,8 +24,8 @@
             "name": "2run_etl_jobs",
             "program": "C:/COA/complexcityjon/scripts/run_etl_jobs.js",
             "args": [
-                "--logfile=C:/COA/etl_jobs_dir/etl.log",
-                "C:/COA/etl_jobs_dir"
+                "--logfile=C:/COA/etl_jobs_dir_3/etl.log",
+                "C:/COA/etl_jobs_dir_3"
             ]
         },        
         {
@@ -37,8 +37,6 @@
                 "loaddb",
                 "--require dotenv/config  dotenv_config_path=C:/COA/complexcityjon/.env",
                 "--start=C:/COA/managed-data-assets",
-                // "--dest=C:/COA/etl_jobs_dir",
-                // "--logfile=C:/COA/etl_jobs_dir/joblog.log"
             ]
         },
     ]

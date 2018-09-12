@@ -1,5 +1,5 @@
-rem start in C:/COA/complexcityjon
+rem start in C:/COA/jon/complexcityjon
 
-rem node C:\COA\complexcityjon\scripts\traverse_and_do_task.js etl --start=C:\COA\managed-data-assets-2 --dest=C:\COA\etl_jobs_dir_2 --logfile=C:\COA\etl_jobs_dir_2\joblog.log
+rem node C:\COA\jon\complexcityjon\scripts\traverse_and_do_task.js etl --start=C:\COA\jon\managed-data-assets-test --dest=C:\COA\jon\etl_jobs_dir --logfile=C:\COA\jon\etl_jobs_dir\joblog.log
 
-node C:\COA\complexcityjon\scripts\run_etl_jobs.js --logfile=C:/COA/etl_jobs_dir_2/etl.log C:/COA/etl_jobs_dir_2
+node C:\COA\jon\complexcityjon\scripts\run_etl_jobs.js --logfile=C:/COA/jon/etl_jobs_dir/etl.log C:/COA/jon/etl_jobs_dir

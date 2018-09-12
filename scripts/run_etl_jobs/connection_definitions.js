@@ -6,14 +6,6 @@ const connections = {
     database: process.env.db1database,
     user: process.env.db1user,
     password: process.env.db1password,
-  },
-  datastoreX: {
-    type: 'pg',
-    authMethod: 'password',
-    host: process.env.fauxhost,
-    database: process.env.fauxdatabase,
-    user: process.env.fauxuser,
-    password: process.env.fauxpassword,
   },  
   warehouse1: {
     type: 'pg',

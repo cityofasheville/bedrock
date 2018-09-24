@@ -33,14 +33,14 @@ function finish() {
   };
   var pool = new Pool(dbConfig)
   pool.connect().then(client => {
-    client.query('truncate table meta.mda_assetlist');
-    client.query('truncate table meta.mda_assetlist_depend');
+    client.query('truncate table mda.mda_assetlist');
+    client.query('truncate table mda.mda_assetlist_depend');
     data.forEach(row=>{
-      let sql = 'INSERT INTO meta.mda_assetlist(name, active, type, description)' +
+      let sql = 'INSERT INTO mda.mda_assetlist(name, active, type, description)' +
         ' VALUES ($1, $2, $3, $4) RETURNING id;'
       client.query(sql, [row.name,row.active?1:0,row.type,row.description]).then(res => {
         row.depends.forEach(deprow=>{
-          sql = 'INSERT INTO meta.mda_assetlist_depend(assetlist_id, depends) VALUES ($1, $2)';
+          sql = 'INSERT INTO mda.mda_assetlist_depend(assetlist_id, depends) VALUES ($1, $2)';
           client.query(sql, [res.rows[0].id,deprow]);
         })
       })

@@ -171,9 +171,9 @@ co@^4.6.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/co/-/co-4.6.0.tgz#6ea6bdf3d853ae54ccb8e47bfa0bf3f9031fb184"
 
-coa-node-logging@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/coa-node-logging/-/coa-node-logging-2.0.2.tgz#e747c79a0c14981fa1edb68ea67f3f76b13b2992"
+coa-node-logging@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/coa-node-logging/-/coa-node-logging-2.0.3.tgz#89c540203c74cb6cbecabb0d4eb83a58659eb96b"
   dependencies:
     bunyan "^1.8.5"
 

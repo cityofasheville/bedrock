@@ -37,13 +37,42 @@ async function runSql(task) {
 }
 
 function runFme(task) {
-  const fme = 'c:\\\\FME\\fme';
+  const fme = 'c:\\FME2017\\fme';
   const filePath = (task.file[0] === '/') ? task.file : `${job.path}/${task.file}`;
   console.log(` Doing an FME job from file ${filePath}`);
   const jobStatus = spawnSync(fme, [filePath], { detached: false, shell: false });
   if (jobStatus.status !== 0) {
     throw new Error(jobStatus.error);
   }
+}
+
+function runNode(task) {
+  const node = 'c:/Progra~1/nodejs/node';
+  const filePath = (task.file[0] === '/') ? task.file : `${job.path}/${task.file}`;
+  console.log(` Doing a Node job from file ${filePath}`);
+  const jobStatus = spawnSync(node, [filePath], { detached: false, shell: true });
+  if (jobStatus.status !== 0) {
+    throw new Error(jobStatus.error);
+  }
+}
+
+function runBash(task) {
+  const bash = 'C:/Progra~1/Git/usr/bin/bash.exe';
+  const filePath = (task.file[0] === '/') ? task.file : `${job.path}/${task.file}`;
+  console.log(` Doing a Bash job from file ${filePath}`);
+  const jobStatus = spawnSync(bash, [filePath], { detached: false, shell: true });
+  if (jobStatus.status !== 0) {
+    throw new Error(jobStatus.error);
+  }
+}
+
+function runExe(task) {
+    const filePath = (task.file[0] === '/') ? task.file : `${job.path}/${task.file}`;
+    console.log(` Doing an Exe job from file ${filePath}`);
+    const jobStatus = spawnSync(filePath, { detached: false, shell: true });
+    if (jobStatus.status !== 0) {
+      throw new Error(jobStatus.error);
+    }  
 }
 
 async function runTaskSequence(seqName, tasks, endStatus = 'Done') {
@@ -54,7 +83,7 @@ async function runTaskSequence(seqName, tasks, endStatus = 'Done') {
     const task = tasks[i];
     console.log(`${seqName}:${jobName}: Task ${i}, type ${task.type} - ${task.active ? 'Active' : 'Inactive'}`);
     if (task.active) {
-      if (task.type === 'sql') {
+      if (task.type === 'sql') { 
         try {
           await runSql(task);
         } catch (err) {
@@ -62,7 +91,7 @@ async function runTaskSequence(seqName, tasks, endStatus = 'Done') {
           errMessage = err;
           logger.error(`Error running ${seqName}:${jobName} SQL job, file ${task.file}: ${err}`);
         }
-      } else if (task.type === 'fme') {
+      } else if (task.type === 'fme') { 
         try {
           runFme(task);
         } catch (err) {
@@ -70,6 +99,33 @@ async function runTaskSequence(seqName, tasks, endStatus = 'Done') {
           errMessage = err.message;
           console.log(`Error running ${seqName}:${jobName} FME job, file ${task.file}: ${JSON.stringify(err)}`);
           logger.error(`Error running ${seqName}:${jobName} FME job, file ${task.file}: ${JSON.stringify(err)}`);
+        }
+      } else if (task.type === 'node') {
+        try {
+          runNode(task);
+        } catch (err) {
+          hasError = true;
+          errMessage = err.message;
+          console.log(`Error running ${seqName}:${jobName} Node job, file ${task.file}: ${JSON.stringify(err)}`);
+          logger.error(`Error running ${seqName}:${jobName} Node job, file ${task.file}: ${JSON.stringify(err)}`);
+        }
+      } else if (task.type === 'exe') {
+        try {
+          runExe(task);
+        } catch (err) {
+          hasError = true;
+          errMessage = err.message;
+          console.log(`Error running ${seqName}:${jobName} Exe job, file ${task.file}: ${JSON.stringify(err)}`);
+          logger.error(`Error running ${seqName}:${jobName} Exe job, file ${task.file}: ${JSON.stringify(err)}`);
+        }
+      } else if (task.type === 'bash') {
+        try {
+          runBash(task);
+        } catch (err) {
+          hasError = true;
+          errMessage = err.message;
+          console.log(`Error running ${seqName}:${jobName} Bash job, file ${task.file}: ${JSON.stringify(err)}`);
+          logger.error(`Error running ${seqName}:${jobName} Bash job, file ${task.file}: ${JSON.stringify(err)}`);
         }
       }
     }

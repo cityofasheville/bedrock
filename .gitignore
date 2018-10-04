@@ -5,6 +5,6 @@ mda_endpoints.js
 mda_types.js
 .env
 *.log
-
+*.csv
 
 

@@ -37,7 +37,7 @@ async function runSql(task) {
 }
 
 function runFme(task) {
-  const fme = 'c:\\FME2017\\fme';
+  const fme = 'c:\\FME\\fme';
   const filePath = (task.file[0] === '/') ? task.file : `${job.path}/${task.file}`;
   console.log(` Doing an FME job from file ${filePath}`);
   const jobStatus = spawnSync(fme, [filePath], { detached: false, shell: false });

@@ -6,5 +6,5 @@ mda_types.js
 .env
 *.log
 *.csv
-
+.vscode/
 

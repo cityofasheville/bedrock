@@ -1,7 +1,5 @@
 #!/usr/bin/bash
 
-# start in C:/coa/complexcity
+# start in C:/jon/complexcity
 
-# node C:/coa/complexcity/scripts/traverse_and_do_task.js etl --start=C:/coa/test-managed-data-assets --dest=C:/coa/etl_jobs_dir --logfile=C:/coa/etl_jobs_dir/joblog.log
-
-node C:/coa/complexcity/scripts/run_etl_jobs.js --logfile=C:/coa/etl_jobs_dir/etl.log C:/coa/etl_jobs_dir
+node C:/jon/complexcity/scripts/run_etl_jobs.js --logfile=C:/jon/etl_jobs_dir/etl.log C:/jon/etl_jobs_dir

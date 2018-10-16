@@ -2,7 +2,7 @@
   "name": "bedrock",
   "version": "1.0.0",
   "description": "System for data inventory and dependency management",
-  "main": "scripts/index.js",
+  "main": "index.js",
   "scripts": {
     "checkin": "echo \"Error - checkin command not yet implemented\""
   },

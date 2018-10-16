@@ -7,4 +7,6 @@ mda_types.js
 *.log
 *.csv
 .vscode/
+runit.sh
+runit1.sh
 

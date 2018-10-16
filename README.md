@@ -1,4 +1,8 @@
-# Processing Scripts
+# Bedrock
+
+System for data inventory and dependency management
+
+## Processing Scripts
 
 There are two key scripts.
 

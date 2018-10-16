@@ -2,6 +2,10 @@
   "name": "managed-dataset-definitions",
   "version": "1.0.0",
   "description": "Managed Dataset Definitions",
+  "main": "scripts/index.js",
+  "scripts": {
+    "checkin": "echo \"Error - checkin command not yet implemented\""
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cityofasheville/managed-dataset-definitions.git"

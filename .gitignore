@@ -6,5 +6,7 @@ mda_types.js
 .env
 *.log
 *.csv
-
+.vscode/
+runit.sh
+runit1.sh
 

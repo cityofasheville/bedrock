@@ -39,8 +39,8 @@ async function runSql(task) {
 function runFme(task) {
   const fme = 'c:\\FME\\fme';
   const filePath = (task.file[0] === '/') ? task.file : `${job.path}/${task.file}`;
-  console.log(` Doing an FME job from file ${filePath}`);
-  const jobStatus = spawnSync(fme, [filePath], { detached: false, shell: false });
+  console.log(` Doing an FME job from file ${filePath} in path ${job.path}`);
+  const jobStatus = spawnSync(fme, [filePath], { detached: false, shell: false, cwd: job.path });
   if (jobStatus.status !== 0) {
     throw new Error(jobStatus.error);
   }
@@ -50,7 +50,7 @@ function runNode(task) {
   const node = 'c:/Progra~1/nodejs/node';
   const filePath = (task.file[0] === '/') ? task.file : `${job.path}/${task.file}`;
   console.log(` Doing a Node job from file ${filePath}`);
-  const jobStatus = spawnSync(node, [filePath], { detached: false, shell: true });
+  const jobStatus = spawnSync(node, [filePath], { detached: false, shell: true, cwd: job.path });
   if (jobStatus.status !== 0) {
     throw new Error(jobStatus.error);
   }
@@ -59,8 +59,8 @@ function runNode(task) {
 function runBash(task) {
   const bash = 'C:/Progra~1/Git/usr/bin/bash.exe';
   const filePath = (task.file[0] === '/') ? task.file : `${job.path}/${task.file}`;
-  console.log(` Doing a Bash job from file ${filePath}`);
-  const jobStatus = spawnSync(bash, [filePath], { detached: false, shell: true });
+  console.log(` Doing a Bash job from file ${filePath} in path ${job.path}`);
+  const jobStatus = spawnSync(bash, [filePath], { detached: false, shell: true, cwd: job.path });
   if (jobStatus.status !== 0) {
     throw new Error(jobStatus.error);
   }
@@ -69,7 +69,7 @@ function runBash(task) {
 function runExe(task) {
     const filePath = (task.file[0] === '/') ? task.file : `${job.path}/${task.file}`;
     console.log(` Doing an Exe job from file ${filePath}`);
-    const jobStatus = spawnSync(filePath, { detached: false, shell: true });
+    const jobStatus = spawnSync(filePath, { detached: false, shell: true, cwd: job.path });
     if (jobStatus.status !== 0) {
       throw new Error(jobStatus.error);
     }  

@@ -1,22 +1,22 @@
 {
-  "name": "managed-dataset-definitions",
+  "name": "bedrock",
   "version": "1.0.0",
-  "description": "Managed Dataset Definitions",
+  "description": "System for data inventory and dependency management",
   "main": "scripts/index.js",
   "scripts": {
     "checkin": "echo \"Error - checkin command not yet implemented\""
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cityofasheville/managed-dataset-definitions.git"
+    "url": "git+https://github.com/cityofasheville/bedrock.git"
   },
   "keywords": [
-    "SimpliCity",
-    "GraphQL"
+    "data management",
+    "open data"
   ],
   "author": "Eric Jackson <ejackson@ashevillenc.gov>",
   "license": "MIT",
-  "homepage": "https://github.com/cityofasheville/managed-dataset-definitions",
+  "homepage": "https://github.com/cityofasheville/bedrock",
   "dependencies": {
     "bunyan": "^1.8.5",
     "coa-node-logging": "^2.0.3",

@@ -1,3 +1,6 @@
-const complexCity = { "version": "1.0.0" };
+const version = require('../package.json').version;
+const bedrock = { 
+    version,
+};
 
-module.exports.complexCity = complexCity;
+module.exports = bedrock;

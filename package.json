@@ -4,7 +4,9 @@
   "description": "System for data inventory and dependency management",
   "main": "index.js",
   "scripts": {
-    "checkin": "echo \"Error - checkin command not yet implemented\""
+    "checkin": "echo \"Error - checkin command not yet implemented\"",
+    "checkout": "echo \"Error - checkout command not yet implemented\"",
+    "loaddb": "node  --require dotenv/config ./scripts/traverse_and_do_task.js loaddb dotenv_config_path=.env --start=C:/jon/managed-data-assets"
   },
   "repository": {
     "type": "git",

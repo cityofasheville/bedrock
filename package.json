@@ -4,9 +4,11 @@
   "description": "System for data inventory and dependency management",
   "main": "index.js",
   "scripts": {
-    "checkin": "echo \"Error - checkin command not yet implemented\"",
-    "checkout": "echo \"Error - checkout command not yet implemented\"",
-    "loaddb": "node  --require dotenv/config ./scripts/traverse_and_do_task.js loaddb dotenv_config_path=.env --start=C:/jon/managed-data-assets"
+    "init_etl": "node ./scripts/traverse_and_do_task.js etl --start=C:/jon/managed-data-assets --dest=C:/jon/etl_jobs_dir --logfile=C:/jon/etl_jobs_dir/joblog.log",
+    "run_etl": "node C:/jon/bedrock/scripts/run_etl_jobs.js --logfile=C:/jon/etl_jobs_dir/etl.log C:/jon/etl_jobs_dir",
+    "checkout": "echo \"todo - checkout command not yet implemented\"",
+    "checkin": "node ./scripts/traverse_and_do_task.js checkin --start=./working_directory/assets",
+    "loaddb": "node ./scripts/traverse_and_do_task.js loaddb --start=C:/jon/managed-data-assets"
   },
   "repository": {
     "type": "git",

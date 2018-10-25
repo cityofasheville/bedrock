@@ -7,21 +7,23 @@ function init() {
   
 }
 
-function runForEachPath(path, logger) {
+function runForEachPath(path, logger, config) {
     try {
         const files = fs.readdirSync(path);
         const defIndex = files.indexOf('mda.json');
         if (defIndex >= 0) {
             const fd = fs.openSync(`${path}/mda.json`, 'r');
             const mda = JSON.parse(fs.readFileSync(fd, { encoding: 'utf8' }));
-            data.push(mda);
+            if(!config.oneasset || config.oneasset === mda.name){
+              data.push(mda);
+            }
         }
       } catch (err) {
         logger.error({ err }, `Error reading ${path}/mda.json`);
       }  
 }
 
-function finish() {
+function finish(config) {
   const dbConfig = {
       host: process.env.db1host,
       user: process.env.db1user,
@@ -33,8 +35,10 @@ function finish() {
   };
   var pool = new Pool(dbConfig)
   pool.connect().then(client => {
-    client.query('truncate table bedrock.assets');
-    client.query('truncate table bedrock.asset_depends');
+    if(!config.oneasset){
+      client.query('truncate table bedrock.assets');
+      client.query('truncate table bedrock.asset_depends');
+    }
     data.forEach(row=>{
       let sql = 'INSERT INTO bedrock.assets(name, active, type, description)' +
         ' VALUES ($1, $2, $3, $4) RETURNING id;'
@@ -59,10 +63,10 @@ switch (stage) {
     init();
     break;
   case 'run':
-    runForEachPath(path, logger);
+    runForEachPath(path, logger, config);
     break;
   case 'finish':
-    finish();
+    finish(config);
     break;
   default:
     break;

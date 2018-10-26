@@ -35,13 +35,17 @@ function finish(config) {
   };
   var pool = new Pool(dbConfig)
   pool.connect().then(client => {
-    if(!config.oneasset){
-      client.query('truncate table bedrock.assets');
-      client.query('truncate table bedrock.asset_depends');
-    }
+    // if(!config.oneasset){
+    //   client.query('truncate table bedrock.assets');
+    //   client.query('truncate table bedrock.asset_depends');
+    // }
     data.forEach(row=>{
       let sql = 'INSERT INTO bedrock.assets(name, active, type, description)' +
-        ' VALUES ($1, $2, $3, $4) RETURNING id;'
+        ' VALUES ($1, $2, $3, $4) ON CONFLICT (name) DO UPDATE ' +
+        ' SET active = excluded.active, ' + 
+        '     type = excluded.type, ' +
+        '     description = excluded.description ' +
+        ' RETURNING id;'
       client.query(sql, [row.name,row.active?1:0,row.type,row.description]).then(res => {
         row.depends.forEach(deprow=>{
           sql = 'INSERT INTO bedrock.asset_depends(asset_id, depends) VALUES ($1, $2)';

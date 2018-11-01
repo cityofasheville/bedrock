@@ -6,7 +6,7 @@ const processDirectory = require('./traverse_and_do_task/processDirectory');
 const args = processAndValidateArgs(process.argv.slice(2));
 const task = args.task;
 
-console.log(args);
+//console.log(args);
 
 ///////////////////////////////////////////////////////
 // Each task potentially has an initialization phase,

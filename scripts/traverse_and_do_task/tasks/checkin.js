@@ -13,11 +13,11 @@ function runForEachPath(path, logger, config) {
         if (files.indexOf('mda.json') >= 0) {
             const mdafd = fs.openSync(`${path}/mda.json`, 'r');
             const mda = JSON.parse(fs.readFileSync(mdafd, { encoding: 'utf8' }));
-            if(!config.oneasset || config.oneasset === mda.name){
+            if(!config.oneasset || config.oneasset === mda.name){  //if running for all assets or this asset
               if (files.indexOf('etl.json') >= 0) {
                 const etlfd = fs.openSync(`${path}/etl.json`, 'r');
                 const etl = JSON.parse(fs.readFileSync(etlfd, { encoding: 'utf8' }));
-                etl.tasks.forEach((task,ix) => {
+                etl.tasks.forEach((task,ix) => {  //get file content (eg. *fmw or *sql)
                   if (files.indexOf(task.file) >= 0) {
                     const filefd = fs.openSync(`${path}/${task.file}`, 'r');
                     const file_content = fs.readFileSync(filefd, { encoding: 'utf8' })
@@ -25,6 +25,7 @@ function runForEachPath(path, logger, config) {
                   }
                 })
                 mda.etl = etl;              
+                mda.path = path;
               }
               data.push(mda);
             }
@@ -32,7 +33,7 @@ function runForEachPath(path, logger, config) {
       } catch (err) {
         logger.error({ err }, `Error reading ${path}/mda.json`);
       }
-      console.log(data);
+      //console.log(data);
 }
 
 function finish(config) {
@@ -56,22 +57,22 @@ function finish(config) {
       let sqllookup = 'SELECT id FROM bedrock.asset_locations WHERE short_name = $1;';
       client.query(sqllookup, [row.location]).then(res => {
         if(!res.rows[0]){
-          console.error('Invalid location ' + row.location + ' for asset ' + row.name + '\nValid Entries:');
-          client.query('SELECT short_name FROM bedrock.asset_locations;').then(res => {
-            res.rows.forEach(row => {
-              console.error(row.short_name);
-            })
-          })
+          console.error('Invalid location ' + row.location + ' for asset ' + row.name);
+          // client.query('SELECT short_name FROM bedrock.asset_locations;').then(res => {
+          //   res.rows.forEach(row => {
+          //     console.error(row.short_name);
+          //   })
+          // })
           return;
         }else{
-          let sqlinsert = 'INSERT INTO bedrock.assets(name, location, active, type, description)' +
-                          ' VALUES ($1, $2, $3, $4, $5)' + 
+          let sqlinsert = 'INSERT INTO bedrock.assets(name, location, path, active, type, description)' +
+                          ' VALUES ($1, $2, $3, $4, $5, $6)' + 
                           ' ON CONFLICT (name, location) DO UPDATE ' +
                           ' SET active = excluded.active, ' + 
                           '     type = excluded.type, ' +
                           '     description = excluded.description ' +
                           ' RETURNING id;'
-          client.query(sqlinsert, [row.name, res.rows[0].id, row.active, row.type, row.description])
+          client.query(sqlinsert, [row.name, res.rows[0].id, row.path, row.active, row.type, row.description])
           .then(res => {
             row.depends.forEach(deprow=>{
               let sqlinsertdep = 'INSERT INTO bedrock.asset_depends(asset_id, depends) VALUES ($1, $2)';
@@ -83,7 +84,6 @@ function finish(config) {
             })
           })
           .catch(e => {
-            client.release();
             console.error('query error', e.message, e.stack);
           })
         }

@@ -10,17 +10,29 @@ function init() {
 function runForEachPath(path, logger, config) {
     try {
         const files = fs.readdirSync(path);
-        const defIndex = files.indexOf('mda.json');
-        if (defIndex >= 0) {
-            const fd = fs.openSync(`${path}/mda.json`, 'r');
-            const mda = JSON.parse(fs.readFileSync(fd, { encoding: 'utf8' }));
+        if (files.indexOf('mda.json') >= 0) {
+            const mdafd = fs.openSync(`${path}/mda.json`, 'r');
+            const mda = JSON.parse(fs.readFileSync(mdafd, { encoding: 'utf8' }));
             if(!config.oneasset || config.oneasset === mda.name){
+              if (files.indexOf('etl.json') >= 0) {
+                const etlfd = fs.openSync(`${path}/etl.json`, 'r');
+                const etl = JSON.parse(fs.readFileSync(etlfd, { encoding: 'utf8' }));
+                etl.tasks.forEach((task,ix) => {
+                  if (files.indexOf(task.file) >= 0) {
+                    const filefd = fs.openSync(`${path}/${task.file}`, 'r');
+                    const file_content = fs.readFileSync(filefd, { encoding: 'utf8' })
+                    etl.tasks[ix].file_content = file_content;
+                  }
+                })
+                mda.etl = etl;              
+              }
               data.push(mda);
             }
         }
       } catch (err) {
         logger.error({ err }, `Error reading ${path}/mda.json`);
-      }  
+      }
+      console.log(data);
 }
 
 function finish(config) {
@@ -38,6 +50,7 @@ function finish(config) {
     if(!config.oneasset){ // if we are doing all assets, clear tables first: there could be dropped assets
       client.query('truncate table bedrock.assets');
       client.query('truncate table bedrock.asset_depends');
+      client.query('truncate table bedrock.etl_tasks');
     }
     data.forEach(row=>{
       let sqllookup = 'SELECT id FROM bedrock.asset_locations WHERE short_name = $1;';
@@ -52,19 +65,25 @@ function finish(config) {
           return;
         }else{
           let sqlinsert = 'INSERT INTO bedrock.assets(name, location, active, type, description)' +
-                    ' VALUES ($1, $2, $3, $4, $5) ON CONFLICT (name, location) DO UPDATE ' +
-                    ' SET active = excluded.active, ' + 
-                    '     type = excluded.type, ' +
-                    '     description = excluded.description ' +
-                    ' RETURNING id;'
-          client.query(sqlinsert, [row.name,res.rows[0].id,row.active,row.type,row.description]).then(res => {
+                          ' VALUES ($1, $2, $3, $4, $5)' + 
+                          ' ON CONFLICT (name, location) DO UPDATE ' +
+                          ' SET active = excluded.active, ' + 
+                          '     type = excluded.type, ' +
+                          '     description = excluded.description ' +
+                          ' RETURNING id;'
+          client.query(sqlinsert, [row.name, res.rows[0].id, row.active, row.type, row.description])
+          .then(res => {
             row.depends.forEach(deprow=>{
-              let sqlinsertdet = 'INSERT INTO bedrock.asset_depends(asset_id, depends) VALUES ($1, $2)';
-              client.query(sqlinsertdet, [res.rows[0].id,deprow]);
+              let sqlinsertdep = 'INSERT INTO bedrock.asset_depends(asset_id, depends) VALUES ($1, $2)';
+              client.query(sqlinsertdep, [res.rows[0].id,deprow]);
+            });
+            row.etl.tasks.forEach((task,ix) => {
+              let sqlinsertetl = 'INSERT INTO bedrock.etl_tasks(asset_id, task_order, type, file, file_content, db, active) VALUES ($1, $2, $3, $4, $5, $6, $7)';
+              client.query(sqlinsertetl, [res.rows[0].id, ix, task.type, task.file, task.file_content, task.db, task.active ]);
             })
           })
           .catch(e => {
-            //client.release();
+            client.release();
             console.error('query error', e.message, e.stack);
           })
         }

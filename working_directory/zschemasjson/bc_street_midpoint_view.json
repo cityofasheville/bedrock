@@ -1,0 +1,3 @@
+["bc_street_midpoint_view","shape",1,"","YES","USER-DEFINED","","","","","","",""],
+["bc_street_midpoint_view","objectid",2,"","YES","integer","",32,2,0,"","",""],
+["bc_street_midpoint_view","centerline_id",3,"","YES","numeric","",38,10,8,"","",""],

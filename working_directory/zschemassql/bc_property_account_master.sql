@@ -1,0 +1,25 @@
+DELETE FROM bedrock.schema_columns WHERE table_name = 'bc_property_account_master';
+INSERT INTO bedrock.schema_columns VALUES
+('bc_property_account_master','am_account_no',1,NULL,'YES','character varying',200,NULL,NULL,NULL,NULL,NULL,NULL),
+('bc_property_account_master','am_address1',2,NULL,'YES','character varying',200,NULL,NULL,NULL,NULL,NULL,NULL),
+('bc_property_account_master','am_address2',3,NULL,'YES','character varying',200,NULL,NULL,NULL,NULL,NULL,NULL),
+('bc_property_account_master','am_address3',4,NULL,'YES','character varying',200,NULL,NULL,NULL,NULL,NULL,NULL),
+('bc_property_account_master','am_bad_address_flag',5,NULL,'YES','character varying',200,NULL,NULL,NULL,NULL,NULL,NULL),
+('bc_property_account_master','am_bypass_postal_flag',6,NULL,'YES','character varying',200,NULL,NULL,NULL,NULL,NULL,NULL),
+('bc_property_account_master','am_city',7,NULL,'YES','character varying',200,NULL,NULL,NULL,NULL,NULL,NULL),
+('bc_property_account_master','am_exempt_account_flag',8,NULL,'YES','character varying',200,NULL,NULL,NULL,NULL,NULL,NULL),
+('bc_property_account_master','am_first_name',9,NULL,'YES','character varying',200,NULL,NULL,NULL,NULL,NULL,NULL),
+('bc_property_account_master','am_foreign_address_flag',10,NULL,'YES','character varying',200,NULL,NULL,NULL,NULL,NULL,NULL),
+('bc_property_account_master','am_foreign_country',11,NULL,'YES','character varying',200,NULL,NULL,NULL,NULL,NULL,NULL),
+('bc_property_account_master','am_foreign_zip',12,NULL,'YES','character varying',200,NULL,NULL,NULL,NULL,NULL,NULL),
+('bc_property_account_master','am_last_name',13,NULL,'YES','character varying',200,NULL,NULL,NULL,NULL,NULL,NULL),
+('bc_property_account_master','am_last_update_date',14,NULL,'YES','character varying',200,NULL,NULL,NULL,NULL,NULL,NULL),
+('bc_property_account_master','am_last_update_user',15,NULL,'YES','character varying',200,NULL,NULL,NULL,NULL,NULL,NULL),
+('bc_property_account_master','am_middle_name',16,NULL,'YES','character varying',200,NULL,NULL,NULL,NULL,NULL,NULL),
+('bc_property_account_master','am_name_suffix',17,NULL,'YES','character varying',200,NULL,NULL,NULL,NULL,NULL,NULL),
+('bc_property_account_master','am_owner_type',18,NULL,'YES','character varying',200,NULL,NULL,NULL,NULL,NULL,NULL),
+('bc_property_account_master','am_state',19,NULL,'YES','character varying',200,NULL,NULL,NULL,NULL,NULL,NULL),
+('bc_property_account_master','am_zip',20,NULL,'YES','character varying',200,NULL,NULL,NULL,NULL,NULL,NULL),
+('bc_property_account_master','am_zip_plus4',21,NULL,'YES','character varying',200,NULL,NULL,NULL,NULL,NULL,NULL),
+('bc_property_account_master','pkam_account_no',22,NULL,'YES','character varying',200,NULL,NULL,NULL,NULL,NULL,NULL);
+DELETE FROM bedrock.schemas WHERE table_name = 'bc_property_account_master'; INSERT INTO bedrock.schemas VALUES ('bc_property_account_master','Warehouse copy of amaccountmaster in Buncombe County',NOW());

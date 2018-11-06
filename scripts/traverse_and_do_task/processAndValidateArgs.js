@@ -17,7 +17,7 @@ module.exports = function processAndValidateArgs(argv) {
   if (args.argCount() < 1) usageAndExit();
 
   const command = args.getArg(0);
-  const oneasset = args.getArg(1);
+  const oneAsset = args.getArg(1);
   const task = tasks[command];
   if (!task) usageAndExit(`traverse_and_run_task: ${command} task not found.`);
 
@@ -43,7 +43,7 @@ module.exports = function processAndValidateArgs(argv) {
       indent: args.getOption('indent', 2),
       schema,
       metadata,
-      oneasset,
+      oneAsset,
     },
   };
 };

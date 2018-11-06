@@ -1,0 +1,5 @@
+["coa_overlay_historic_districts_property_view","shape",1,"","YES","USER-DEFINED","","","","","","",""],
+["coa_overlay_historic_districts_property_view","objectid",2,"","YES","integer","",32,2,0,"","",""],
+["coa_overlay_historic_districts_property_view","pinnum",3,"","YES","character varying",50,"","","","","",""],
+["coa_overlay_historic_districts_property_view","owner",4,"","YES","character varying",50,"","","","","",""],
+["coa_overlay_historic_districts_property_view","historic_district_name",5,"","YES","character varying",100,"","","","","",""],

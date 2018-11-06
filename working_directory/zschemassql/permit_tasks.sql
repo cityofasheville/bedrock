@@ -1,0 +1,28 @@
+DELETE FROM bedrock.schema_columns WHERE table_name = 'permit_tasks';
+INSERT INTO bedrock.schema_columns VALUES
+('permit_tasks','permit_num',1,NULL,'YES','character varying',30,NULL,NULL,NULL,NULL,NULL,NULL),
+('permit_tasks','permit_group',2,NULL,'YES','character varying',100,NULL,NULL,NULL,NULL,NULL,NULL),
+('permit_tasks','permit_type',3,NULL,'YES','character varying',30,NULL,NULL,NULL,NULL,NULL,NULL),
+('permit_tasks','permit_subtype',4,NULL,'YES','character varying',30,NULL,NULL,NULL,NULL,NULL,NULL),
+('permit_tasks','permit_category',5,NULL,'YES','character varying',30,NULL,NULL,NULL,NULL,NULL,NULL),
+('permit_tasks','process_code',6,NULL,'YES','character varying',70,NULL,NULL,NULL,NULL,NULL,NULL),
+('permit_tasks','task',7,NULL,'YES','character varying',100,NULL,NULL,NULL,NULL,NULL,NULL),
+('permit_tasks','task_status',8,NULL,'YES','character varying',200,NULL,NULL,NULL,NULL,NULL,NULL),
+('permit_tasks','current_status_date',9,NULL,'YES','timestamp without time zone',NULL,NULL,NULL,NULL,6,NULL,NULL),
+('permit_tasks','step_number',10,NULL,'YES','character varying',10,NULL,NULL,NULL,NULL,NULL,NULL),
+('permit_tasks','relation_sequence_id',11,NULL,'YES','character varying',10,NULL,NULL,NULL,NULL,NULL,NULL),
+('permit_tasks','parent_task_name',12,NULL,'YES','character varying',155,NULL,NULL,NULL,NULL,NULL,NULL),
+('permit_tasks','user_name',13,NULL,'YES','character varying',141,NULL,NULL,NULL,NULL,NULL,NULL),
+('permit_tasks','user_id',14,NULL,'YES','character varying',70,NULL,NULL,NULL,NULL,NULL,NULL),
+('permit_tasks','user_department',15,NULL,'YES','character varying',80,NULL,NULL,NULL,NULL,NULL,NULL),
+('permit_tasks','due_date',16,NULL,'YES','timestamp without time zone',NULL,NULL,NULL,NULL,6,NULL,NULL),
+('permit_tasks','record_date',17,NULL,'YES','timestamp without time zone',NULL,NULL,NULL,NULL,6,NULL,NULL),
+('permit_tasks','comments',18,NULL,'YES','character varying',4000,NULL,NULL,NULL,NULL,NULL,NULL),
+('permit_tasks','is_completed',19,NULL,'YES','character varying',1,NULL,NULL,NULL,NULL,NULL,NULL),
+('permit_tasks','is_active',20,NULL,'YES','character varying',1,NULL,NULL,NULL,NULL,NULL,NULL),
+('permit_tasks','assigned_date',21,NULL,'YES','timestamp without time zone',NULL,NULL,NULL,NULL,6,NULL,NULL),
+('permit_tasks','assigned_user',22,NULL,'YES','character varying',141,NULL,NULL,NULL,NULL,NULL,NULL),
+('permit_tasks','assigned_department',23,NULL,'YES','character varying',80,NULL,NULL,NULL,NULL,NULL,NULL),
+('permit_tasks','process_history_sequence_number',24,NULL,'YES','bigint',NULL,64,2,0,NULL,NULL,NULL),
+('permit_tasks','record_id',25,NULL,'YES','character varying',17,NULL,NULL,NULL,NULL,NULL,NULL);
+DELETE FROM bedrock.schemas WHERE table_name = 'permit_tasks'; INSERT INTO bedrock.schemas VALUES ('permit_tasks','Permit tasks data',NOW());

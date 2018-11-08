@@ -2,12 +2,31 @@ const fs = require('fs');
 const Pool = require('pg-pool');
 
 let data = [];
+const metadataPath = './working_directory/metadata/' ;
 
-function init() {
-  
+function init(config) {
+  if(config.schema){ //just schema
+    if(config.oneAsset){
+      data.push({ name: config.oneAsset });
+    }else{
+      data.push({ name: "Load_All_Assets" });
+    }
+  } else if(config.metadata){ //just metadata
+    const files = fs.readdirSync(metadataPath);
+    files.forEach(file => {
+      const fileContent = readMetadataFile(file);
+      const mda = {};
+      mda.meta = JSON.parse(fileContent);
+      mda.name = mda.meta.name;
+      if(!config.oneAsset || config.oneAsset === mda.name){  //if running for all assets or this asset
+        data.push(mda); 
+      }
+    });    
+  } 
 }
 
 function runForEachPath(path, logger, config) {
+  if(!config.schema && !config.metadata){
     try {
         const files = fs.readdirSync(path);
         if (files.indexOf('mda.json') >= 0) {
@@ -27,21 +46,11 @@ function runForEachPath(path, logger, config) {
                 mda.etl = etl;              
               }
 
-              const schemasPath = './working_directory/schemas/' ; // + path.slice(27);
-              if (fs.existsSync(`${schemasPath}${mda.name}.sql`)) {
-                const schemafd = fs.openSync(`${schemasPath}${mda.name}.sql`, 'r');
-                const fileContent = fs.readFileSync(schemafd, { encoding: 'utf8' })
-                mda.sql = fileContent;
-              }
-
-              const metadataPath = './working_directory/metadata/' ; // + path.slice(27);
               if (fs.existsSync(`${metadataPath}${mda.name}.json`)) {
-                const metafd = fs.openSync(`${metadataPath}${mda.name}.json`, 'r');
-                const fileContent = fs.readFileSync(metafd, { encoding: 'utf8' })
-                mda.meta = fileContent;
+                mda.meta = readMetadataFile(`${mda.name}.json`);
               }
 
-              mda.path = path.slice(27); // remove the ./working_directory/assets/
+              mda.path = path.slice(27); // remove the "./working_directory/assets/"
               data.push(mda);
             }
         }
@@ -49,8 +58,15 @@ function runForEachPath(path, logger, config) {
         logger.error({ err }, `Error reading ${path}/mda.json`);
       }
       // console.log(data);
+    }
 }
 
+function readMetadataFile(filename){
+  const metafd = fs.openSync(`${metadataPath}${filename}`, 'r');
+  const fileContent = fs.readFileSync(metafd, { encoding: 'utf8' })
+  return fileContent;
+}
+////////////////////////////////////////////////////////////////////////
 function finish(config) {
   const dbConfig = {
       host: process.env.db1host,
@@ -63,23 +79,30 @@ function finish(config) {
   };
   var pool = new Pool(dbConfig)
   pool.connect().then(client => {
-    if(!config.oneAsset){ // if we are doing all assets, clear tables first: there could be dropped assets
+    if(!config.oneAsset && !config.metadata && !config.schema){ // if we are doing all assets, clear tables first: there could be dropped assets
       clearTables(client);
     }
     data.forEach(asset=>{
-      checkinAsset(asset, client);
+      if(config.metadata){
+        checkinMeta(asset, client);
+      }else if(config.schema){
+        loadSchemas(asset, client);
+      }else{
+        checkinAsset(asset, client);
+      }
     });
     client.release();
   })
 }
 
 function clearTables(client){
-  client.query('truncate table bedrock.assets');
-  client.query('truncate table bedrock.asset_depends');
-  client.query('truncate table bedrock.etl_tasks');
-  client.query('truncate table bedrock.schemas');
-  client.query('truncate table bedrock.schema_columns');
-  client.query('truncate table bedrock.metadata');
+        client.query('truncate table bedrock.assets')
+  .then(client.query('truncate table bedrock.asset_depends'))
+  .then(client.query('truncate table bedrock.etl_tasks'))
+  .then(client.query('truncate table bedrock.schemas'))
+  .then(client.query('truncate table bedrock.schema_columns'))
+  .then(client.query('truncate table bedrock.metadata'))
+  .catch(e => {console.error('query error', e.message, e.stack); });
 }
 
 function checkinAsset(asset, client){
@@ -111,9 +134,9 @@ function checkinAsset(asset, client){
 }
 
 function checkinDep(asset, client){
-  asset.depends.forEach(deprow=>{
-    let sqlInsertDep = 'INSERT INTO bedrock.asset_depends(asset_id, depends) VALUES ($1, $2)';
-    client.query(sqlInsertDep, [asset.id,deprow])
+  asset.depends&&asset.depends.forEach(deprow=>{
+    client.query('DELETE FROM bedrock.asset_depends WHERE asset_id = $1', [ asset.id ])
+    .then(client.query('INSERT INTO bedrock.asset_depends(asset_id, depends) VALUES ($1, $2)', [ asset.id, deprow ]))
     .catch(e => {console.error('query error', e.message, e.stack); });
   });
 }
@@ -122,39 +145,51 @@ function checkinEtl(asset, client){
   const etl = asset.etl;
   Object.keys(etl).forEach(category => { //create,distribute,tasks
     etl[category].forEach((task,ix) => {
-      let sqlInsertEtl = 'INSERT INTO bedrock.etl_tasks(asset_id, task_order, category, type, file, file_content, db, active) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)';
-      client.query(sqlInsertEtl, [asset.id, ix, category, task.type, task.file, task.fileContent, task.db, task.active ])
+      let sqlInsertEtl = 'INSERT INTO bedrock.etl_tasks(asset_id, task_order, category, type, file, file_content, db, active) ' +
+                         'VALUES ($1, $2, $3, $4, $5, $6, $7, $8)';
+      client.query('DELETE FROM bedrock.etl_tasks WHERE asset_id = $1', [ asset.id ])
+      .then(client.query(sqlInsertEtl, [asset.id, ix, category, task.type, task.file, task.fileContent, task.db, task.active ]))
       .catch(e => {console.error('query error', e.message, e.stack); });
     });
   });
 }
 
 function loadSchemas(asset, client){
-  let sqlInsertSchemaCol = 'INSERT INTO bedrock.schema_columns(' +
-    'table_name, column_name, ordinal_position, column_default, is_nullable, data_type, character_maximum_length, numeric_precision, numeric_precision_radix, numeric_scale, datetime_precision, interval_type, interval_precision) ' +
-    'SELECT table_name, column_name, ordinal_position, column_default, is_nullable, ' +
-    'data_type, character_maximum_length, numeric_precision, numeric_precision_radix, ' +
-    'numeric_scale, datetime_precision, interval_type, interval_precision ' +
-    'FROM information_schema.columns  ' +
-    'WHERE table_name = $1 ;';
-  client.query(sqlInsertSchemaCol, [ asset.name ])
-  .catch(e => {console.error('query error', e.message, e.stack); });
-
-  let sqlInsertSchema = 'INSERT INTO bedrock.schemas VALUES ($1, $2, NOW());';
-  client.query(sqlInsertSchema, [ asset.name, asset.description ])
-  .catch(e => {console.error('query error', e.message, e.stack); });
+  if(asset.name === "Load_All_Assets"){
+    let sqlInsertSchemaCol_All = 'INSERT INTO bedrock.schema_columns(' +
+      'table_name, column_name, ordinal_position, column_default, is_nullable, data_type, character_maximum_length, numeric_precision, numeric_precision_radix, numeric_scale, datetime_precision, interval_type, interval_precision) ' +
+      'SELECT table_name, column_name, ordinal_position, column_default, is_nullable, ' +
+      'data_type, character_maximum_length, numeric_precision, numeric_precision_radix, ' +
+      'numeric_scale, datetime_precision, interval_type, interval_precision ' +
+      'FROM information_schema.columns where table_schema = \'internal\';';
+    client.query('DELETE FROM bedrock.schema_columns;')
+    .then(client.query(sqlInsertSchemaCol_All))
+    .catch(e => {console.error('query error', e.message, e.stack); });
+  }else{
+      let sqlInsertSchemaCol = 'INSERT INTO bedrock.schema_columns(' +
+      'table_name, column_name, ordinal_position, column_default, is_nullable, data_type, character_maximum_length, numeric_precision, numeric_precision_radix, numeric_scale, datetime_precision, interval_type, interval_precision) ' +
+      'SELECT table_name, column_name, ordinal_position, column_default, is_nullable, ' +
+      'data_type, character_maximum_length, numeric_precision, numeric_precision_radix, ' +
+      'numeric_scale, datetime_precision, interval_type, interval_precision ' +
+      'FROM information_schema.columns WHERE table_schema = \'internal\' AND table_name = $1;';
+    client.query('DELETE FROM bedrock.schema_columns WHERE table_name = $1; ', [ asset.name ])
+    //.then(client.query('DELETE FROM bedrock.schemas WHERE table_name = $1; ', [ asset.name ]))
+    .then(client.query(sqlInsertSchemaCol, [ asset.name ]))
+    //.then(client.query('INSERT INTO bedrock.schemas VALUES ($1, $2, NOW());', [ asset.name, asset.description ]))
+    .catch(e => {console.error('query error', e.message, e.stack); });
+  }
 }
 
 function checkinMeta(asset, client){
-    let sqlInsertMeta = 'INSERT INTO bedrock.metadata(asset_id, name, json) VALUES ($1, $2, $3)';
-    client.query(sqlInsertMeta, [ asset.id, asset.name, asset.meta ])
+    client.query('DELETE FROM bedrock.metadata WHERE name = $1', [ asset.name ])
+    .then(client.query('INSERT INTO bedrock.metadata(name, json) VALUES ($1, $2)', [ asset.name, asset.meta ]))
     .catch(e => {console.error('query error', e.message, e.stack); });
 }
 
 function processing(stage, path, dest, config, logger) {
   switch (stage) {
     case 'init':
-      init();
+      init(config);
       break;
     case 'run':
       runForEachPath(path, logger, config);

@@ -26,12 +26,21 @@ function runForEachPath(path, logger, config) {
                 })
                 mda.etl = etl;              
               }
+
               const schemasPath = './working_directory/schemas/' ; // + path.slice(27);
               if (fs.existsSync(`${schemasPath}${mda.name}.sql`)) {
                 const schemafd = fs.openSync(`${schemasPath}${mda.name}.sql`, 'r');
                 const fileContent = fs.readFileSync(schemafd, { encoding: 'utf8' })
                 mda.sql = fileContent;
               }
+
+              const metadataPath = './working_directory/metadata/' ; // + path.slice(27);
+              if (fs.existsSync(`${metadataPath}${mda.name}.json`)) {
+                const metafd = fs.openSync(`${metadataPath}${mda.name}.json`, 'r');
+                const fileContent = fs.readFileSync(metafd, { encoding: 'utf8' })
+                mda.meta = fileContent;
+              }
+
               mda.path = path.slice(27); // remove the ./working_directory/assets/
               data.push(mda);
             }
@@ -70,7 +79,7 @@ function clearTables(client){
   client.query('truncate table bedrock.etl_tasks');
   client.query('truncate table bedrock.schemas');
   client.query('truncate table bedrock.schema_columns');
-  // client.query('truncate table bedrock.metadata');
+  client.query('truncate table bedrock.metadata');
 }
 
 function checkinAsset(asset, client){
@@ -80,6 +89,7 @@ function checkinAsset(asset, client){
       console.error('Invalid location ' + asset.location + ' for asset ' + asset.name);
       return;
     }else{
+      asset.loc_id = res.rows[0].id;
       let sqlInsert = 'INSERT INTO bedrock.assets(name, location, path, active, type, description)' +
                       ' VALUES ($1, $2, $3, $4, $5, $6)' + 
                       ' ON CONFLICT (name, location) DO UPDATE ' +
@@ -87,39 +97,58 @@ function checkinAsset(asset, client){
                       '     type = excluded.type, ' +
                       '     description = excluded.description ' +
                       ' RETURNING id;'
-      client.query(sqlInsert, [asset.name, res.rows[0].id, asset.path, asset.active, asset.type, asset.description])
+      client.query(sqlInsert, [asset.name, asset.loc_id, asset.path, asset.active, asset.type, asset.description])
       .then(res => {
-        checkinDep(asset, res, client);
-        checkinEtl(asset, res, client);
+        asset.id = res.rows[0].id;
+        checkinDep(asset, client);
+        checkinEtl(asset, client);
+        loadSchemas(asset, client);
+        checkinMeta(asset, client);
       })
-      .catch(e => {
-        console.error('query error', e.message, e.stack);
-      });
+      .catch(e => {console.error('query error', e.message, e.stack); });
     }
   }) 
 }
 
-function checkinDep(asset, res, client){
+function checkinDep(asset, client){
   asset.depends.forEach(deprow=>{
     let sqlInsertDep = 'INSERT INTO bedrock.asset_depends(asset_id, depends) VALUES ($1, $2)';
-    client.query(sqlInsertDep, [res.rows[0].id,deprow])
-    .catch(e => {
-      console.error('query error', e.message, e.stack);
-    });
+    client.query(sqlInsertDep, [asset.id,deprow])
+    .catch(e => {console.error('query error', e.message, e.stack); });
   });
 }
 
-function checkinEtl(asset, res, client){
+function checkinEtl(asset, client){
   const etl = asset.etl;
   Object.keys(etl).forEach(category => { //create,distribute,tasks
     etl[category].forEach((task,ix) => {
       let sqlInsertEtl = 'INSERT INTO bedrock.etl_tasks(asset_id, task_order, category, type, file, file_content, db, active) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)';
-      client.query(sqlInsertEtl, [res.rows[0].id, ix, category, task.type, task.file, task.fileContent, task.db, task.active ])
-      .catch(e => {
-        console.error('query error', e.message, e.stack);
-      });
+      client.query(sqlInsertEtl, [asset.id, ix, category, task.type, task.file, task.fileContent, task.db, task.active ])
+      .catch(e => {console.error('query error', e.message, e.stack); });
     });
   });
+}
+
+function loadSchemas(asset, client){
+  let sqlInsertSchemaCol = 'INSERT INTO bedrock.schema_columns(' +
+    'table_name, column_name, ordinal_position, column_default, is_nullable, data_type, character_maximum_length, numeric_precision, numeric_precision_radix, numeric_scale, datetime_precision, interval_type, interval_precision) ' +
+    'SELECT table_name, column_name, ordinal_position, column_default, is_nullable, ' +
+    'data_type, character_maximum_length, numeric_precision, numeric_precision_radix, ' +
+    'numeric_scale, datetime_precision, interval_type, interval_precision ' +
+    'FROM information_schema.columns  ' +
+    'WHERE table_name = $1 ;';
+  client.query(sqlInsertSchemaCol, [ asset.name ])
+  .catch(e => {console.error('query error', e.message, e.stack); });
+
+  let sqlInsertSchema = 'INSERT INTO bedrock.schemas VALUES ($1, $2, NOW());';
+  client.query(sqlInsertSchema, [ asset.name, asset.description ])
+  .catch(e => {console.error('query error', e.message, e.stack); });
+}
+
+function checkinMeta(asset, client){
+    let sqlInsertMeta = 'INSERT INTO bedrock.metadata(asset_id, name, json) VALUES ($1, $2, $3)';
+    client.query(sqlInsertMeta, [ asset.id, asset.name, asset.meta ])
+    .catch(e => {console.error('query error', e.message, e.stack); });
 }
 
 function processing(stage, path, dest, config, logger) {

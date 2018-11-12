@@ -9,7 +9,7 @@ function init(config) {
     if(config.oneAsset){
       data.push({ name: config.oneAsset });
     }else{
-      data.push({ name: "Load_All_Assets" });
+      data.push({ name: "Load_All_Asset_Schemas" });
     }
   } else if(config.metadata){ //just metadata
     const files = fs.readdirSync(metadataPath);
@@ -133,12 +133,15 @@ function checkinAsset(asset, client){
   }) 
 }
 
-function checkinDep(asset, client){
-  asset.depends&&asset.depends.forEach(deprow=>{
-    client.query('DELETE FROM bedrock.asset_depends WHERE asset_id = $1', [ asset.id ])
-    .then(client.query('INSERT INTO bedrock.asset_depends(asset_id, depends) VALUES ($1, $2)', [ asset.id, deprow ]))
-    .catch(e => {console.error('query error', e.message, e.stack); });
-  });
+function checkinDep(asset, client){ 
+  asset.depends && 
+  (asset.depends.forEach(deprow=>{
+    client.query('INSERT INTO bedrock.asset_depends("asset_id", "depends") VALUES ($1, $2) ' +
+    'ON CONFLICT ("asset_id", "depends") DO NOTHING ', [ asset.id, deprow ])
+      .catch(e => {console.error('query error', e.message, e.stack); });
+  }));
+  
+
 }
 
 function checkinEtl(asset, client){
@@ -155,10 +158,10 @@ function checkinEtl(asset, client){
 }
 
 function loadSchemas(asset, client){
-  if(asset.name === "Load_All_Assets"){
+  if(asset.name === "Load_All_Asset_Schemas"){
     let sqlInsertSchemaCol_All = 'INSERT INTO bedrock.schema_columns(' +
-      'table_name, column_name, ordinal_position, column_default, is_nullable, data_type, character_maximum_length, numeric_precision, numeric_precision_radix, numeric_scale, datetime_precision, interval_type, interval_precision) ' +
-      'SELECT table_name, column_name, ordinal_position, column_default, is_nullable, ' +
+      'table_catalog, table_schema, table_name, column_name, ordinal_position, column_default, is_nullable, data_type, character_maximum_length, numeric_precision, numeric_precision_radix, numeric_scale, datetime_precision, interval_type, interval_precision) ' +
+      'SELECT table_catalog, table_schema, table_name, column_name, ordinal_position, column_default, is_nullable, ' +
       'data_type, character_maximum_length, numeric_precision, numeric_precision_radix, ' +
       'numeric_scale, datetime_precision, interval_type, interval_precision ' +
       'FROM information_schema.columns where table_schema = \'internal\';';
@@ -167,8 +170,8 @@ function loadSchemas(asset, client){
     .catch(e => {console.error('query error', e.message, e.stack); });
   }else{
       let sqlInsertSchemaCol = 'INSERT INTO bedrock.schema_columns(' +
-      'table_name, column_name, ordinal_position, column_default, is_nullable, data_type, character_maximum_length, numeric_precision, numeric_precision_radix, numeric_scale, datetime_precision, interval_type, interval_precision) ' +
-      'SELECT table_name, column_name, ordinal_position, column_default, is_nullable, ' +
+      'table_catalog, table_schema, table_name, column_name, ordinal_position, column_default, is_nullable, data_type, character_maximum_length, numeric_precision, numeric_precision_radix, numeric_scale, datetime_precision, interval_type, interval_precision) ' +
+      'SELECT table_catalog, table_schema, table_name, column_name, ordinal_position, column_default, is_nullable, ' +
       'data_type, character_maximum_length, numeric_precision, numeric_precision_radix, ' +
       'numeric_scale, datetime_precision, interval_type, interval_precision ' +
       'FROM information_schema.columns WHERE table_schema = \'internal\' AND table_name = $1;';

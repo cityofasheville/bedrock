@@ -149,24 +149,33 @@ function checkinEtl(asset, client){
   Object.keys(etl).forEach(category => { //create,distribute,tasks
     etl[category].forEach((task,ix) => {
       let sqlInsertEtl = 'INSERT INTO bedrock.etl_tasks(asset_id, task_order, category, type, file, file_content, db, active) ' +
-                         'VALUES ($1, $2, $3, $4, $5, $6, $7, $8)';
-      client.query('DELETE FROM bedrock.etl_tasks WHERE asset_id = $1', [ asset.id ])
-      .then(client.query(sqlInsertEtl, [asset.id, ix, category, task.type, task.file, task.fileContent, task.db, task.active ]))
+                         'VALUES ($1, $2, $3, $4, $5, $6, $7, $8)' +
+                         ' ON CONFLICT (asset_id, task_order) DO UPDATE ' +
+                         ' SET category = excluded.category, ' + 
+                         '     type = excluded.type, ' +
+                         '     file = excluded.file, ' +                     
+                         '     file_content = excluded.file_content, ' +                     
+                         '     db = excluded.db, ' +                     
+                         '     active = excluded.active ';                  
+      client.query(sqlInsertEtl, [asset.id, ix, category, task.type, task.file, task.fileContent, task.db, task.active ])
       .catch(e => {console.error('query error', e.message, e.stack); });
     });
   });
 }
 
-function loadSchemas(asset, client){
+
+
+
+function loadSchemas(asset, client){ // console.log(asset.name, asset.description);
   if(asset.name === "Load_All_Asset_Schemas"){
     let sqlInsertSchemaCol_All = 'INSERT INTO bedrock.schema_columns(' +
       'table_catalog, table_schema, table_name, column_name, ordinal_position, column_default, is_nullable, data_type, character_maximum_length, numeric_precision, numeric_precision_radix, numeric_scale, datetime_precision, interval_type, interval_precision) ' +
       'SELECT table_catalog, table_schema, table_name, column_name, ordinal_position, column_default, is_nullable, ' +
       'data_type, character_maximum_length, numeric_precision, numeric_precision_radix, ' +
       'numeric_scale, datetime_precision, interval_type, interval_precision ' +
-      'FROM information_schema.columns where table_schema = \'internal\';';
+      'FROM information_schema.columns where table_schema = $1;';
     client.query('DELETE FROM bedrock.schema_columns;')
-    .then(client.query(sqlInsertSchemaCol_All))
+    .then(client.query(sqlInsertSchemaCol_All, [ 'internal' ]))
     .catch(e => {console.error('query error', e.message, e.stack); });
   }else{
       let sqlInsertSchemaCol = 'INSERT INTO bedrock.schema_columns(' +
@@ -174,18 +183,19 @@ function loadSchemas(asset, client){
       'SELECT table_catalog, table_schema, table_name, column_name, ordinal_position, column_default, is_nullable, ' +
       'data_type, character_maximum_length, numeric_precision, numeric_precision_radix, ' +
       'numeric_scale, datetime_precision, interval_type, interval_precision ' +
-      'FROM information_schema.columns WHERE table_schema = \'internal\' AND table_name = $1;';
-    client.query('DELETE FROM bedrock.schema_columns WHERE table_name = $1; ', [ asset.name ])
-    //.then(client.query('DELETE FROM bedrock.schemas WHERE table_name = $1; ', [ asset.name ]))
-    .then(client.query(sqlInsertSchemaCol, [ asset.name ]))
-    //.then(client.query('INSERT INTO bedrock.schemas VALUES ($1, $2, NOW());', [ asset.name, asset.description ]))
+      'FROM information_schema.columns WHERE table_schema = $1 AND table_name = $2;';
+    client.query('DELETE FROM bedrock.schema_columns WHERE table_name = $1;', [ asset.name ])
+    .then(client.query('DELETE FROM bedrock.schemas WHERE table_name = $1;', [ asset.name ]))
+    .then(client.query(sqlInsertSchemaCol, [ 'internal', asset.name ]))
+    .then(client.query('INSERT INTO bedrock.schemas VALUES ($1, $2, NOW());', [ asset.name, asset.description ]))
     .catch(e => {console.error('query error', e.message, e.stack); });
   }
 }
 
-function checkinMeta(asset, client){
-    client.query('DELETE FROM bedrock.metadata WHERE name = $1', [ asset.name ])
-    .then(client.query('INSERT INTO bedrock.metadata(name, json) VALUES ($1, $2)', [ asset.name, asset.meta ]))
+function checkinMeta(asset, client){ 
+  asset.meta&&client.query('DELETE FROM bedrock.metadata WHERE name = $1', [ asset.name ])
+    .then(res=>{client.query('INSERT INTO bedrock.metadata(name, json) VALUES ($1, $2)', [ asset.name, asset.meta ])
+    })
     .catch(e => {console.error('query error', e.message, e.stack); });
 }
 

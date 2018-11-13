@@ -5,7 +5,7 @@ let transporter = nodemailer.createTransport({
     host: '192.168.0.8',
 });
 
-const workDir = 'C:/COA/etl_jobs_dir';
+const workDir = 'C:/jon/etl_jobs_dir';
 const files = fs.readdirSync(workDir);
 
 if (files.indexOf('jobs_status.json') < 0) {

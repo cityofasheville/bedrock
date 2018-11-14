@@ -1,0 +1,8 @@
+{
+"name": "everbridge_cust",
+"location": "everbridge",
+"active": "true",
+"type": "table",
+"description": "Load water customers to Everbridge",
+"depends": []
+}

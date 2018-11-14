@@ -1,0 +1,8 @@
+{
+"name": "workorders",
+"location": "mdastore1",
+"active": "true",
+"type": "table",
+"description": "TrackIT workorder data",
+"depends": []
+}

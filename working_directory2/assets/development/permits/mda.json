@@ -1,0 +1,8 @@
+{
+"name": "permits",
+"location": "mdastore1",
+"active": "true",
+"type": "table",
+"description": "Permits data",
+"depends": []
+}

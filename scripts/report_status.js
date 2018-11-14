@@ -23,6 +23,8 @@ const unfinished = jTracker.sequencedToDo.length +
 const completed = jTracker.completed.length;
 const status = (errors + unfinished > 0) ? 'ERROR' : 'OK';
 const emailText = `
+Running from directory: ${workDir}
+
 Final status: ${status}
 
 Total errors: ${errors}

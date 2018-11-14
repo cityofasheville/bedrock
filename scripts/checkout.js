@@ -15,26 +15,53 @@ const dbConfig = {
     database: process.env.db1database,
     max: 10,
     idleTimeoutMillis: 10000,
-  //  ssl: true,
 };
-var pool = new Pool(dbConfig)
+var pool = new Pool(dbConfig);
 pool.connect().then(client => {
-    let sqllookup = 'SELECT id FROM bedrock.assets limit 1;';
-    client.query(sqllookup, [asset.location]).then(res => {
-    if(!res.rows[0]){
-        console.error('no data');
-        return;
-    }else{
-        res.rows.forEach(row=>{
-            fs.mkdir(startDir + row.path, { recursive: true }, (err) => {
-                if (err) throw err;
-                console.log(startDir + row.path);
-            });
-        })
+    const sqlAsset = 'SELECT ass.id, ass.name, ass.path, loc.short_name AS location, ' +
+    'ass.active, ass.type, ass.description ' +
+    'FROM bedrock.assets ass ' +
+    'INNER JOIN bedrock.asset_locations loc ' +
+    'ON ass.location = loc.id ' +
+    'where ass.id = 4258;';
+    client.query( sqlAsset ).then(assets => {
+        if(!assets.rows[0]){
+            console.log('no data');
+            cleanUp(client);
+        }else{ 
+            assets.rows.forEach(asset=>{ console.log(asset.id);
+                let dependList = '[';
+                const sqlDepends = 'SELECT depends FROM bedrock.asset_depends where asset_id = $1';
+                client.query( sqlDepends, [ asset.id ]).then(depends => {
+                    depends.rows.forEach(depend => {
+                        dependList = dependList + '\n       "' + depend.depends + '"'
+                    })
+                    dependList = dependList + '\n   ]';
+                    const fullpath = startDir + '/' + asset.path;
+                    // console.log(asset);
+                    fs.mkdirSync(fullpath, { recursive: true });
+                    const mdaData = 
+`{
+    "name": "${asset.name}",
+    "location": "${asset.location}",
+    "active": "${asset.active}",
+    "type": "${asset.type}",
+    "description": "${asset.description}",
+    "depends": ${dependList}
+}`;
+                    const fileData = new Uint8Array(Buffer.from(mdaData));
+                    fs.writeFileSync(fullpath + '/mda.json', fileData, 'utf8');
+                    cleanUp(client);
+                });
+            })
 
-    }
-    });
+        }
+    })
+    .catch(e => {console.error('query error', e.message, e.stack); cleanUp(client)});
 });
-console.log('check out');
-process.exit(0);
 
+
+function cleanUp(client){
+    client.release();
+    process.exit(0);
+}

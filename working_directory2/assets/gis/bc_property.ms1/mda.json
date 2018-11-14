@@ -1,0 +1,8 @@
+{
+"name": "bc_property.ms1",
+"location": "mdastore1",
+"active": "true",
+"type": "table",
+"description": "Property table from County",
+"depends": []
+}

@@ -1,0 +1,8 @@
+{
+"name": "coa_districts_zoning",
+"location": "mdastore1",
+"active": "true",
+"type": "table",
+"description": "Asheville zoning districts",
+"depends": []
+}

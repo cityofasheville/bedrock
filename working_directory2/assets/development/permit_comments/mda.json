@@ -1,0 +1,10 @@
+{
+    "name": "permit_comments",
+    "location": "mdastore1",
+    "active": "true",
+    "type": "table",
+    "description": "Permit comments data",
+    "depends": [
+       "permits"
+   ]
+}

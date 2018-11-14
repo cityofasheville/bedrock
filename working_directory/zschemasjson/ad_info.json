@@ -1,7 +1,0 @@
-["ad_info","emp_id",1,"","NO","integer","",32,2,0,"","",""],
-["ad_info","ad_username",2,"","YES","text","","","","","","",""],
-["ad_info","ad_enabled",3,"","YES","integer","",32,2,0,"","",""],
-["ad_info","email_city",4,"","YES","text","","","","","","",""],
-["ad_info","phone_desk",5,"","YES","text","","","","","","",""],
-["ad_info","phone_cell",6,"","YES","text","","","","","","",""],
-["ad_info","ad_memberships",7,"","YES","text","","","","","","",""],

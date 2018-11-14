@@ -1,0 +1,8 @@
+{
+"name": "coa_active_jurisdictions.ms1",
+"location": "mdastore1",
+"active": "true",
+"type": "table",
+"description": "Asheville corporate limits",
+"depends": []
+}

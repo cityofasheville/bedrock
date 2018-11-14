@@ -1,4 +1,0 @@
-["permit_contractors","permit_num",1,"","YES","character varying",30,"","","","","",""],
-["permit_contractors","contractor_name",2,"","YES","character varying",255,"","","","","",""],
-["permit_contractors","contractor_license_number",3,"","YES","character varying",30,"","","","","",""],
-["permit_contractors","record_id",4,"","YES","character varying",17,"","","","","",""],

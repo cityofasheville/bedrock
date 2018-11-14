@@ -1,4 +1,0 @@
-["permit_comments","permit_num",1,"","YES","character varying",30,"","","","","",""],
-["permit_comments","comment_seq_number",2,"","YES","bigint","",64,2,0,"","",""],
-["permit_comments","comment_date",3,"","YES","timestamp without time zone","","","","",6,"",""],
-["permit_comments","comments",4,"","YES","text","","","","","","",""],

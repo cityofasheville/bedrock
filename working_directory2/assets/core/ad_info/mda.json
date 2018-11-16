@@ -1,9 +1,0 @@
-{
-  "name": "ad_info",
-  "location": "mdastore1",
-  "active": "true",
-  "type": "table",
-  "description": "AD information for employees",
-  "depends": [
-  ]
-}

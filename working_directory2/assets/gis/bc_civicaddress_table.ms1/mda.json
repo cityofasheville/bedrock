@@ -1,9 +1,0 @@
-{
-  "name": "bc_civicaddress_table.ms1",
-  "location": "mdastore1",
-  "active": "true",
-  "type": "table",
-  "description": "Civic address table from County",
-  "depends": [
-  ]
-}

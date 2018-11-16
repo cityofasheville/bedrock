@@ -1,9 +1,0 @@
-{
-  "name": "pcard_transactions",
-  "location": "mdastore1",
-  "active": "true",
-  "type": "table",
-  "description": "PCard transactions",
-  "depends": [
-  ]
-}

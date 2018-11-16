@@ -31,14 +31,7 @@ const dbConfig = {
         cleanUp(client);
     }else{ 
         for(let asset of assets.rows){
-            let dependArray = [];
-            const sqlDepends = 'SELECT depends FROM bedrock.asset_depends where asset_id = $1';
-            var depends = await client.query( sqlDepends, [ asset.id ]);
-            for( let depend of depends.rows){
-                dependArray.push('\n    "' + depend.depends + '"');
-            };
-            dependList = '[' + dependArray.join(',') + '\n  ]';
-
+            //create dir
             const fullpath = startDir + '/' + asset.path;
             fullpath.split('/')
             .reduce((currentPath, folder) => {
@@ -49,7 +42,16 @@ const dbConfig = {
                 return currentPath;
             }, '');
             
-            const mdaData = 
+            //write mda.json
+            let dependArray = [];
+            const sqlDepends = 'SELECT depends FROM bedrock.asset_depends where asset_id = $1';
+            let depends = await client.query( sqlDepends, [ asset.id ]);
+            for( let depend of depends.rows){
+                dependArray.push('\n    "' + depend.depends + '"');
+            };
+            let dependList = dependArray.length>0 ? '[' + dependArray.join(',') + '\n  ]' : '[]';
+
+            const mdaStr = 
             `{\n`+
             `  "name": "${asset.name}",\n`+
             `  "location": "${asset.location}",\n`+
@@ -58,9 +60,56 @@ const dbConfig = {
             `  "description": "${asset.description}",\n`+
             `  "depends": ${dependList}\n`+
             `}\n`;
-            const fileData = new Uint8Array(Buffer.from(mdaData));
-            fs.writeFileSync(fullpath + '/mda.json', fileData, 'utf8');
+            const fileDataMda = new Uint8Array(Buffer.from(mdaStr));
+            fs.writeFileSync(fullpath + '/mda.json', fileDataMda, 'utf8');
             console.log("File mda.json written: ", asset.name);
+
+            //write etl.json
+            let createArr = [];
+            let distributeArr = [];
+            let tasksArr = [];
+            
+            const sqlEtl = 'SELECT asset_id, category, type, file, file_content, db, active, task_order ' +
+            'FROM bedrock.etl_tasks WHERE asset_id = $1 ORDER BY category, task_order'
+            let etlData = await client.query( sqlEtl, [ asset.id ]);
+
+            for( let row of etlData.rows){
+                let db = row.db ? `      "db": "${row.db}",\n` : ``;
+
+                
+                const taskStr = 
+                `    {\n`+
+                `      "type": "${row.type}",\n`+
+                `      "file": "${row.file}",\n`+
+                `${row.db ? '      "db": "'+row.db+'",\n' : ''}` +
+                `      "active": ${row.active}\n`+
+                `    }`;
+
+                if(row.category==="create"){createArr.push(taskStr);}
+                else if(row.category==="distribute"){distributeArr.push(taskStr);}
+                else if(row.category==="tasks"){tasksArr.push(taskStr);}
+
+                // write working files(fmw, sql)
+                if(row.file && row.file_content){
+                    const fileDataWorking = new Uint8Array(Buffer.from(row.file_content));
+                    fs.writeFileSync(fullpath + '/' + row.file, fileDataWorking, 'utf8');
+                }
+            };
+            const etlStr = 
+            `{\n`+
+            `  "create": [`+
+            `${createArr.length>0?'\n'+createArr.join(',\n')+'\n  ':''}`+
+            `],\n`+
+            `  "distribute": [`+
+            `${distributeArr.length>0?'\n'+distributeArr.join(',\n')+'\n  ':''}`+
+            `],\n`+
+            `  "tasks": [`+
+            `${tasksArr.length>0?'\n'+tasksArr.join(',\n')+'\n  ':''}`+
+            `]\n`+
+            `}`;
+            const fileDataEtl = new Uint8Array(Buffer.from(etlStr));
+            fs.writeFileSync(fullpath + '/etl.json', fileDataEtl, 'utf8');
+            console.log("File etl.json written: ", asset.name);           
         };
         cleanUp(client);
     };

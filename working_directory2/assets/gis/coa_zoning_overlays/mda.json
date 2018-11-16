@@ -1,9 +1,0 @@
-{
-  "name": "coa_zoning_overlays",
-  "location": "mdastore1",
-  "active": "true",
-  "type": "table",
-  "description": "Asheville zoning overlays",
-  "depends": [
-  ]
-}

@@ -36,13 +36,17 @@ function runForEachPath(path, logger, config) {
               if (files.indexOf('etl.json') >= 0) {
                 const etlfd = fs.openSync(`${path}/etl.json`, 'r');
                 const etl = JSON.parse(fs.readFileSync(etlfd, { encoding: 'utf8' }));
-                etl.tasks.forEach((task,ix) => {  //get file content (eg. *fmw or *sql)
-                  if (files.indexOf(task.file) >= 0) {
-                    const filefd = fs.openSync(`${path}/${task.file}`, 'r');
-                    const fileContent = fs.readFileSync(filefd, { encoding: 'utf8' })
-                    etl.tasks[ix].fileContent = fileContent;
-                  }
-                })
+                //get file content (eg. *fmw or *sql)
+                let categories = ['tasks','distribute','create'];
+                categories.forEach(category => {
+                  etl[category].forEach((task,ix) => {  
+                    if (files.indexOf(task.file) >= 0) {
+                      const filefd = fs.openSync(`${path}/${task.file}`, 'r');
+                      const fileContent = fs.readFileSync(filefd, { encoding: 'utf8' })
+                      etl[category][ix].fileContent = fileContent;
+                    }
+                  })                  
+                });
                 mda.etl = etl;              
               }
 

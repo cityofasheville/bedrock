@@ -1,9 +1,0 @@
-{
-  "name": "capital_projects_gis_warehouse",
-  "location": "coagiswarehouse1",
-  "active": "true",
-  "type": "table",
-  "description": "Capital projects information",
-  "depends": [
-  ]
-}

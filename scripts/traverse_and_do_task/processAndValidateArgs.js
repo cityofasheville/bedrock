@@ -8,7 +8,6 @@ const tasks = {
   graphql: require('./tasks/graphql'),
   etl: require('./tasks/etl'),
   list: require('./tasks/list'),
-  loaddb: require('./tasks/loaddb'),
   checkin: require('./tasks/checkin'),
 };
 

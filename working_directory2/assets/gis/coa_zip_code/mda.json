@@ -1,9 +1,0 @@
-{
-  "name": "coa_zip_code",
-  "location": "mdastore1",
-  "active": "true",
-  "type": "table",
-  "description": "Asheville zip code areas",
-  "depends": [
-  ]
-}

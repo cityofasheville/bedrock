@@ -1,9 +1,0 @@
-{
-  "name": "Budget Transforms",
-  "location": "mdastore1",
-  "active": "true",
-  "type": "multi-table",
-  "description": "Category and section mappings, exclusions, etc. for GL data for budget",
-  "depends": [
-  ]
-}

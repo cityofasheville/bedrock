@@ -1,8 +1,10 @@
 {
-"name": "permit_contractors",
-"location": "mdastore1",
-"active": "true",
-"type": "table",
-"description": "Permit contractors data",
-"depends": []
+  "name": "permit_contractors",
+  "location": "mdastore1",
+  "active": "true",
+  "type": "table",
+  "description": "Permit contractors data",
+  "depends": [
+    "permits"
+  ]
 }

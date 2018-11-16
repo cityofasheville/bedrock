@@ -1,8 +1,9 @@
 {
-"name": "everbridge_emps",
-"location": "everbridge",
-"active": "true",
-"type": "table",
-"description": "Load employees to Everbridge",
-"depends": []
+  "name": "everbridge_emps",
+  "location": "everbridge",
+  "active": "true",
+  "type": "table",
+  "description": "Load employees to Everbridge",
+  "depends": [
+  ]
 }

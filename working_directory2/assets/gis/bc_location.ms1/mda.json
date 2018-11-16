@@ -1,8 +1,9 @@
 {
-"name": "bc_location.ms1",
-"location": "mdastore1",
-"active": "true",
-"type": "table",
-"description": "Locations table from County",
-"depends": []
+  "name": "bc_location.ms1",
+  "location": "mdastore1",
+  "active": "true",
+  "type": "table",
+  "description": "Locations table from County",
+  "depends": [
+  ]
 }

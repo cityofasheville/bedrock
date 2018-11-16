@@ -1,8 +1,9 @@
 {
-"name": "permit_tasks",
-"location": "mdastore1",
-"active": "true",
-"type": "table",
-"description": "Permit tasks data",
-"depends": []
+  "name": "permit_tasks",
+  "location": "mdastore1",
+  "active": "true",
+  "type": "table",
+  "description": "Permit tasks data",
+  "depends": [
+  ]
 }

@@ -1,8 +1,9 @@
 {
-"name": "Capital Projects Master",
-"location": "mdastore1",
-"active": "true",
-"type": "multi-table",
-"description": "Capital projects information",
-"depends": []
+  "name": "Capital Projects Master",
+  "location": "mdastore1",
+  "active": "true",
+  "type": "multi-table",
+  "description": "Capital projects information",
+  "depends": [
+  ]
 }

@@ -1,8 +1,11 @@
 {
-"name": "bc_property_pinnum_formatted_owner_names",
-"location": "mdastore1",
-"active": "true",
-"type": "table",
-"description": "Preprocessed owner names",
-"depends": []
+  "name": "bc_property_pinnum_formatted_owner_names",
+  "location": "mdastore1",
+  "active": "true",
+  "type": "table",
+  "description": "Preprocessed owner names",
+  "depends": [
+    "bc_property_account_master",
+    "bc_property.ms1"
+  ]
 }

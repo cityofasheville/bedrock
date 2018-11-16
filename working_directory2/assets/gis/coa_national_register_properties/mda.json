@@ -1,8 +1,9 @@
 {
-"name": "coa_national_register_properties",
-"location": "mdastore1",
-"active": "true",
-"type": "table",
-"description": "National register properties",
-"depends": []
+  "name": "coa_national_register_properties",
+  "location": "mdastore1",
+  "active": "true",
+  "type": "table",
+  "description": "National register properties",
+  "depends": [
+  ]
 }

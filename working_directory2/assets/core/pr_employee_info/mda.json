@@ -1,8 +1,9 @@
 {
-"name": "pr_employee_info",
-"location": "mdastore1",
-"active": "true",
-"type": "table",
-"description": "Basic information for employees",
-"depends": []
+  "name": "pr_employee_info",
+  "location": "mdastore1",
+  "active": "true",
+  "type": "table",
+  "description": "Basic information for employees",
+  "depends": [
+  ]
 }

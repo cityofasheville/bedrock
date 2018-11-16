@@ -1,8 +1,9 @@
 {
-"name": "coa_cip_project_shapes",
-"location": "mdastore1",
-"active": "true",
-"type": "multi-table",
-"description": "Point, line and polygon shapes for CIP projects",
-"depends": []
+  "name": "coa_cip_project_shapes",
+  "location": "mdastore1",
+  "active": "true",
+  "type": "multi-table",
+  "description": "Point, line and polygon shapes for CIP projects",
+  "depends": [
+  ]
 }

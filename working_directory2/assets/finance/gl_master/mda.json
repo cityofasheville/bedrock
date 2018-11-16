@@ -1,8 +1,9 @@
 {
-"name": "gl_master",
-"location": "mdastore1",
-"active": "true",
-"type": "table",
-"description": "Master general ledger history",
-"depends": []
+  "name": "gl_master",
+  "location": "mdastore1",
+  "active": "true",
+  "type": "table",
+  "description": "Master general ledger history",
+  "depends": [
+  ]
 }

@@ -16,50 +16,55 @@ const dbConfig = {
     max: 10,
     idleTimeoutMillis: 10000,
 };
-var pool = new Pool(dbConfig);
-pool.connect().then(client => {
+
+(async function Run(){
+    var pool = new Pool(dbConfig);
+    let client = await pool.connect();
     const sqlAsset = 'SELECT ass.id, ass.name, ass.path, loc.short_name AS location, ' +
     'ass.active, ass.type, ass.description ' +
     'FROM bedrock.assets ass ' +
     'INNER JOIN bedrock.asset_locations loc ' +
-    'ON ass.location = loc.id ' +
-    'where ass.id = 4258;';
-    client.query( sqlAsset ).then(assets => {
-        if(!assets.rows[0]){
-            console.log('no data');
-            cleanUp(client);
-        }else{ 
-            assets.rows.forEach(asset=>{ console.log(asset.id);
-                let dependList = '[';
-                const sqlDepends = 'SELECT depends FROM bedrock.asset_depends where asset_id = $1';
-                client.query( sqlDepends, [ asset.id ]).then(depends => {
-                    depends.rows.forEach(depend => {
-                        dependList = dependList + '\n       "' + depend.depends + '"'
-                    })
-                    dependList = dependList + '\n   ]';
-                    const fullpath = startDir + '/' + asset.path;
-                    // console.log(asset);
-                    fs.mkdirSync(fullpath, { recursive: true });
-                    const mdaData = 
-`{
-    "name": "${asset.name}",
-    "location": "${asset.location}",
-    "active": "${asset.active}",
-    "type": "${asset.type}",
-    "description": "${asset.description}",
-    "depends": ${dependList}
-}`;
-                    const fileData = new Uint8Array(Buffer.from(mdaData));
-                    fs.writeFileSync(fullpath + '/mda.json', fileData, 'utf8');
-                    cleanUp(client);
-                });
-            })
+    'ON ass.location = loc.id ' ;
+    let assets = await client.query( sqlAsset );
+    if(!assets.rows[0]){
+        console.log('No data');
+        cleanUp(client);
+    }else{ 
+        for(let asset of assets.rows){
+            let dependArray = [];
+            const sqlDepends = 'SELECT depends FROM bedrock.asset_depends where asset_id = $1';
+            var depends = await client.query( sqlDepends, [ asset.id ]);
+            for( let depend of depends.rows){
+                dependArray.push('\n    "' + depend.depends + '"');
+            };
+            dependList = '[' + dependArray.join(',') + '\n  ]';
 
-        }
-    })
-    .catch(e => {console.error('query error', e.message, e.stack); cleanUp(client)});
-});
-
+            const fullpath = startDir + '/' + asset.path;
+            fullpath.split('/')
+            .reduce((currentPath, folder) => {
+                currentPath += folder + '/';
+                if (!fs.existsSync(currentPath)){
+                    fs.mkdirSync(currentPath);
+                }
+                return currentPath;
+            }, '');
+            
+            const mdaData = 
+            `{\n`+
+            `  "name": "${asset.name}",\n`+
+            `  "location": "${asset.location}",\n`+
+            `  "active": "${asset.active}",\n`+
+            `  "type": "${asset.type}",\n`+
+            `  "description": "${asset.description}",\n`+
+            `  "depends": ${dependList}\n`+
+            `}\n`;
+            const fileData = new Uint8Array(Buffer.from(mdaData));
+            fs.writeFileSync(fullpath + '/mda.json', fileData, 'utf8');
+            console.log("File mda.json written: ", asset.name);
+        };
+        cleanUp(client);
+    };
+})().catch(e => {console.error('query error', e.message, e.stack); cleanUp(client)});
 
 function cleanUp(client){
     client.release();

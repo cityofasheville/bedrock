@@ -1,8 +1,9 @@
 {
-"name": "dsd_first_review_sla",
-"location": "mdastore1",
-"active": "true",
-"type": "table",
-"description": "DSD first-review SLA performance",
-"depends": []
+  "name": "dsd_first_review_sla",
+  "location": "mdastore1",
+  "active": "true",
+  "type": "table",
+  "description": "DSD first-review SLA performance",
+  "depends": [
+  ]
 }

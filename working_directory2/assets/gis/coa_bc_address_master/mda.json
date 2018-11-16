@@ -1,8 +1,19 @@
 {
-"name": "coa_bc_address_master",
-"location": "mdastore1",
-"active": "true",
-"type": "table",
-"description": "Master address table",
-"depends": []
+  "name": "coa_bc_address_master",
+  "location": "mdastore1",
+  "active": "true",
+  "type": "table",
+  "description": "Master address table",
+  "depends": [
+    "bc_civicaddress_table.ms1",
+    "bc_location.ms1",
+    "bc_property_account_master",
+    "bc_property.ms1",
+    "bc_property_pinnum_formatted_owner_names",
+    "coa_active_jurisdictions.ms1",
+    "coa_districts_public_works",
+    "coa_districts_water",
+    "coa_districts_zoning",
+    "coa_zip_code"
+  ]
 }

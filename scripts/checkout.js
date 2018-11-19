@@ -55,14 +55,14 @@ const dbConfig = {
             `{\n`+
             `  "name": "${asset.name}",\n`+
             `  "location": "${asset.location}",\n`+
-            `  "active": "${asset.active}",\n`+
+            `  "active": ${asset.active},\n`+
             `  "type": "${asset.type}",\n`+
             `  "description": "${asset.description}",\n`+
             `  "depends": ${dependList}\n`+
-            `}\n`;
+            `}`;
             const fileDataMda = new Uint8Array(Buffer.from(mdaStr));
             fs.writeFileSync(fullpath + '/mda.json', fileDataMda, 'utf8');
-            console.log("File mda.json written: ", asset.name);
+            // console.log("File mda.json written: ", asset.name);
 
             //write etl.json
             let createArr = [];
@@ -72,44 +72,45 @@ const dbConfig = {
             const sqlEtl = 'SELECT asset_id, category, type, file, file_content, db, active, task_order ' +
             'FROM bedrock.etl_tasks WHERE asset_id = $1 ORDER BY category, task_order'
             let etlData = await client.query( sqlEtl, [ asset.id ]);
+            if(etlData[0]){
+                for( let row of etlData.rows){
+                    let db = row.db ? `      "db": "${row.db}",\n` : ``;
 
-            for( let row of etlData.rows){
-                let db = row.db ? `      "db": "${row.db}",\n` : ``;
+                    
+                    const taskStr = 
+                    `    {\n`+
+                    `      "type": "${row.type}",\n`+
+                    `      "file": "${row.file}",\n`+
+                    `${row.db ? '      "db": "'+row.db+'",\n' : ''}` +
+                    `      "active": ${row.active}\n`+
+                    `    }`;
 
-                
-                const taskStr = 
-                `    {\n`+
-                `      "type": "${row.type}",\n`+
-                `      "file": "${row.file}",\n`+
-                `${row.db ? '      "db": "'+row.db+'",\n' : ''}` +
-                `      "active": ${row.active}\n`+
-                `    }`;
+                    if(row.category==="create"){createArr.push(taskStr);}
+                    else if(row.category==="distribute"){distributeArr.push(taskStr);}
+                    else if(row.category==="tasks"){tasksArr.push(taskStr);}
 
-                if(row.category==="create"){createArr.push(taskStr);}
-                else if(row.category==="distribute"){distributeArr.push(taskStr);}
-                else if(row.category==="tasks"){tasksArr.push(taskStr);}
-
-                // write working files(fmw, sql)
-                if(row.file && row.file_content){
-                    const fileDataWorking = new Uint8Array(Buffer.from(row.file_content));
-                    fs.writeFileSync(fullpath + '/' + row.file, fileDataWorking, 'utf8');
-                }
-            };
-            const etlStr = 
-            `{\n`+
-            `  "create": [`+
-            `${createArr.length>0?'\n'+createArr.join(',\n')+'\n  ':''}`+
-            `],\n`+
-            `  "distribute": [`+
-            `${distributeArr.length>0?'\n'+distributeArr.join(',\n')+'\n  ':''}`+
-            `],\n`+
-            `  "tasks": [`+
-            `${tasksArr.length>0?'\n'+tasksArr.join(',\n')+'\n  ':''}`+
-            `]\n`+
-            `}`;
-            const fileDataEtl = new Uint8Array(Buffer.from(etlStr));
-            fs.writeFileSync(fullpath + '/etl.json', fileDataEtl, 'utf8');
-            console.log("File etl.json written: ", asset.name);           
+                    // write working files(fmw, sql)
+                    if(row.file && row.file_content){
+                        const fileDataWorking = new Uint8Array(Buffer.from(row.file_content));
+                        fs.writeFileSync(fullpath + '/' + row.file, fileDataWorking, 'utf8');
+                    }
+                };
+                const etlStr = 
+                `{\n`+
+                `  "create": [`+
+                `${createArr.length>0?'\n'+createArr.join(',\n')+'\n  ':''}`+
+                `],\n`+
+                `  "distribute": [`+
+                `${distributeArr.length>0?'\n'+distributeArr.join(',\n')+'\n  ':''}`+
+                `],\n`+
+                `  "tasks": [`+
+                `${tasksArr.length>0?'\n'+tasksArr.join(',\n')+'\n  ':''}`+
+                `]\n`+
+                `}\n`;
+                const fileDataEtl = new Uint8Array(Buffer.from(etlStr));
+                fs.writeFileSync(fullpath + '/etl.json', fileDataEtl, 'utf8');
+                // console.log("File etl.json written: ", asset.name);  
+            }         
         };
         cleanUp(client);
     };

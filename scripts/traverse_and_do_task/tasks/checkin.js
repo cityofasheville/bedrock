@@ -12,20 +12,22 @@ function init(config) {
       data.push({ name: "Load_All_Asset_Schemas" });
     }
   } else if(config.metadata){ //just metadata
-    const files = fs.readdirSync(metadataPath);
-    files.forEach(file => {
-      const fileContent = readMetadataFile(file);
-      const mda = {};
-      mda.meta = JSON.parse(fileContent);
-      mda.name = mda.meta.name;
-      if(!config.oneAsset || config.oneAsset === mda.name){  //if running for all assets or this asset
-        data.push(mda); 
-      }
-    });    
+    if(fs.existsSync(metadataPath)){
+      const files = fs.readdirSync(metadataPath);
+      files.forEach(file => {
+        const fileContent = readMetadataFile(file);
+        const mda = {};
+        mda.meta = JSON.parse(fileContent);
+        mda.name = mda.meta.name;
+        if(!config.oneAsset || config.oneAsset === mda.name){  //if running for all assets or this asset
+          data.push(mda); 
+        }
+      });   
+    }; 
   } 
 }
 
-function runForEachPath(path, logger, config) {
+function runForEachPath(path, logger, config) { 
   if(!config.schema && !config.metadata){
     try {
         const files = fs.readdirSync(path);
@@ -47,7 +49,7 @@ function runForEachPath(path, logger, config) {
                     }
                   })                  
                 });
-                mda.etl = etl;              
+                mda.etl = etl;      
               }
 
               if (fs.existsSync(`${metadataPath}${mda.name}.json`)) {
@@ -61,7 +63,6 @@ function runForEachPath(path, logger, config) {
       } catch (err) {
         logger.error({ err }, `Error reading ${path}/mda.json`);
       }
-      // console.log(data);
     }
 }
 
@@ -71,7 +72,7 @@ function readMetadataFile(filename){
   return fileContent;
 }
 ////////////////////////////////////////////////////////////////////////
-function finish(config) {
+function finish(config) { 
   const dbConfig = {
       host: process.env.db1host,
       user: process.env.db1user,
@@ -116,6 +117,9 @@ function checkinAsset(asset, client){
       console.error('Invalid location ' + asset.location + ' for asset ' + asset.name);
       return;
     }else{
+      if(!(asset.name&&res.rows[0].id&&asset.path&&asset.active&&asset.type)){
+        console.log('Asset not complete: Required fields: (name, location, path, active, type) ', asset.name)
+      }
       asset.loc_id = res.rows[0].id;
       let sqlInsert = 'INSERT INTO bedrock.assets(name, location, path, active, type, description)' +
                       ' VALUES ($1, $2, $3, $4, $5, $6)' + 
@@ -150,7 +154,7 @@ function checkinDep(asset, client){
 
 function checkinEtl(asset, client){
   const etl = asset.etl;
-  Object.keys(etl).forEach(category => { //create,distribute,tasks
+  etl && Object.keys(etl).forEach(category => { //create,distribute,tasks
     etl[category].forEach((task,ix) => {
       let sqlInsertEtl = 'INSERT INTO bedrock.etl_tasks(asset_id, task_order, category, type, file, file_content, db, active) ' +
                          'VALUES ($1, $2, $3, $4, $5, $6, $7, $8)' +
@@ -170,7 +174,7 @@ function checkinEtl(asset, client){
 
 
 
-function loadSchemas(asset, client){ // console.log(asset.name, asset.description);
+function loadSchemas(asset, client){ 
   if(asset.name === "Load_All_Asset_Schemas"){
     let sqlInsertSchemaCol_All = 'INSERT INTO bedrock.schema_columns(' +
       'table_catalog, table_schema, table_name, column_name, ordinal_position, column_default, is_nullable, data_type, character_maximum_length, numeric_precision, numeric_precision_radix, numeric_scale, datetime_precision, interval_type, interval_precision) ' +

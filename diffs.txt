@@ -1,11 +1,14 @@
-Only in ./working_directory/assets/core/employee_main: employee_main.sql
+Files ./working_directory/assets/core/ad_info/etl.json and ./working_directory2/assets/core/ad_info/etl.json differ
 Files ./working_directory/assets/core/employee_main/mda.json and ./working_directory2/assets/core/employee_main/mda.json differ
+Files ./working_directory/assets/core/pr_employee_info/etl.json and ./working_directory2/assets/core/pr_employee_info/etl.json differ
 Files ./working_directory/assets/core/pr_employee_info/mda.json and ./working_directory2/assets/core/pr_employee_info/mda.json differ
-Only in ./working_directory2/assets/development/dsd_first_review_sla: etl - Copy.json
 Files ./working_directory/assets/development/dsd_first_review_sla/etl.json and ./working_directory2/assets/development/dsd_first_review_sla/etl.json differ
 Files ./working_directory/assets/development/dsd_first_review_sla/mda.json and ./working_directory2/assets/development/dsd_first_review_sla/mda.json differ
+Files ./working_directory/assets/development/inspections/etl.json and ./working_directory2/assets/development/inspections/etl.json differ
 Files ./working_directory/assets/development/inspections/mda.json and ./working_directory2/assets/development/inspections/mda.json differ
+Files ./working_directory/assets/development/permit_comments/etl.json and ./working_directory2/assets/development/permit_comments/etl.json differ
 Files ./working_directory/assets/development/permit_comments/mda.json and ./working_directory2/assets/development/permit_comments/mda.json differ
+Files ./working_directory/assets/development/permit_contractors/etl.json and ./working_directory2/assets/development/permit_contractors/etl.json differ
 Files ./working_directory/assets/development/permit_contractors/mda.json and ./working_directory2/assets/development/permit_contractors/mda.json differ
 Files ./working_directory/assets/development/permit_tasks/etl.json and ./working_directory2/assets/development/permit_tasks/etl.json differ
 Files ./working_directory/assets/development/permit_tasks/mda.json and ./working_directory2/assets/development/permit_tasks/mda.json differ
@@ -13,13 +16,10 @@ Files ./working_directory/assets/development/permits/etl.json and ./working_dire
 Files ./working_directory/assets/development/permits/mda.json and ./working_directory2/assets/development/permits/mda.json differ
 Only in ./working_directory/assets/development: README.md
 Only in ./working_directory/assets: documentation
-Only in ./working_directory/assets/everbridge/Customers: cust.scr
-Only in ./working_directory/assets/everbridge/Customers: cust.sh
-Only in ./working_directory/assets/everbridge/Customers: etl.json
-Only in ./working_directory/assets/everbridge/Customers: everbridge_water_customers_ftp.fmw
+Files ./working_directory/assets/everbridge/Customers/etl.json and ./working_directory2/assets/everbridge/Customers/etl.json differ
 Files ./working_directory/assets/everbridge/Customers/mda.json and ./working_directory2/assets/everbridge/Customers/mda.json differ
 Only in ./working_directory/assets/everbridge/Employees: avl.PR_City_Employees_Everbridge.csv
-Only in ./working_directory/assets/everbridge/Employees: emp.scr
+Files ./working_directory/assets/everbridge/Employees/emp.scr and ./working_directory2/assets/everbridge/Employees/emp.scr differ
 Files ./working_directory/assets/everbridge/Employees/etl.json and ./working_directory2/assets/everbridge/Employees/etl.json differ
 Files ./working_directory/assets/everbridge/Employees/mda.json and ./working_directory2/assets/everbridge/Employees/mda.json differ
 Only in ./working_directory/assets/finance: budget_mapping_sheet2wh.fmw
@@ -27,11 +27,16 @@ Only in ./working_directory/assets/finance: budget_parameters_view
 Files ./working_directory/assets/finance/budget_transforms/etl.json and ./working_directory2/assets/finance/budget_transforms/etl.json differ
 Files ./working_directory/assets/finance/budget_transforms/mda.json and ./working_directory2/assets/finance/budget_transforms/mda.json differ
 Only in ./working_directory/assets/finance: cip
+Files ./working_directory/assets/finance/general_ledger_parameters/etl.json and ./working_directory2/assets/finance/general_ledger_parameters/etl.json differ
 Files ./working_directory/assets/finance/general_ledger_parameters/mda.json and ./working_directory2/assets/finance/general_ledger_parameters/mda.json differ
+Files ./working_directory/assets/finance/gl_budget/etl.json and ./working_directory2/assets/finance/gl_budget/etl.json differ
 Files ./working_directory/assets/finance/gl_budget/mda.json and ./working_directory2/assets/finance/gl_budget/mda.json differ
+Files ./working_directory/assets/finance/gl_master/etl.json and ./working_directory2/assets/finance/gl_master/etl.json differ
 Files ./working_directory/assets/finance/gl_master/mda.json and ./working_directory2/assets/finance/gl_master/mda.json differ
 Only in ./working_directory/assets/finance: OLD
+Files ./working_directory/assets/finance/pcard/pcard_statement_status_history/etl.json and ./working_directory2/assets/finance/pcard/pcard_statement_status_history/etl.json differ
 Files ./working_directory/assets/finance/pcard/pcard_statement_status_history/mda.json and ./working_directory2/assets/finance/pcard/pcard_statement_status_history/mda.json differ
+Files ./working_directory/assets/finance/pcard/pcard_transactions/etl.json and ./working_directory2/assets/finance/pcard/pcard_transactions/etl.json differ
 Files ./working_directory/assets/finance/pcard/pcard_transactions/mda.json and ./working_directory2/assets/finance/pcard/pcard_transactions/mda.json differ
 Only in ./working_directory/assets/finance: project_master
 Only in ./working_directory/assets/finance: README.md
@@ -39,35 +44,51 @@ Only in ./working_directory/assets/finance: v_gl_5yr_plus_budget_mapped
 Only in ./working_directory/assets/finance: v_gl_budget_mapped
 Only in ./working_directory/assets/finance: v_gl_master_mapped
 Only in ./working_directory/assets/finance: working
+Files ./working_directory/assets/gis/bc_civicaddress_table.ms1/etl.json and ./working_directory2/assets/gis/bc_civicaddress_table.ms1/etl.json differ
 Files ./working_directory/assets/gis/bc_civicaddress_table.ms1/mda.json and ./working_directory2/assets/gis/bc_civicaddress_table.ms1/mda.json differ
+Files ./working_directory/assets/gis/bc_location.ms1/etl.json and ./working_directory2/assets/gis/bc_location.ms1/etl.json differ
 Files ./working_directory/assets/gis/bc_location.ms1/mda.json and ./working_directory2/assets/gis/bc_location.ms1/mda.json differ
+Files ./working_directory/assets/gis/bc_property.ms1/etl.json and ./working_directory2/assets/gis/bc_property.ms1/etl.json differ
 Files ./working_directory/assets/gis/bc_property.ms1/mda.json and ./working_directory2/assets/gis/bc_property.ms1/mda.json differ
+Files ./working_directory/assets/gis/bc_property_account_master/etl.json and ./working_directory2/assets/gis/bc_property_account_master/etl.json differ
 Files ./working_directory/assets/gis/bc_property_account_master/mda.json and ./working_directory2/assets/gis/bc_property_account_master/mda.json differ
 Only in ./working_directory/assets/gis/bc_property_pinnum_formatted_owner_names: bc_property_pinnum_formatted_owner_names.sql
+Files ./working_directory/assets/gis/bc_property_pinnum_formatted_owner_names/etl.json and ./working_directory2/assets/gis/bc_property_pinnum_formatted_owner_names/etl.json differ
 Files ./working_directory/assets/gis/bc_property_pinnum_formatted_owner_names/mda.json and ./working_directory2/assets/gis/bc_property_pinnum_formatted_owner_names/mda.json differ
 Files ./working_directory/assets/gis/bc_street.ms1/etl.json and ./working_directory2/assets/gis/bc_street.ms1/etl.json differ
 Files ./working_directory/assets/gis/bc_street.ms1/mda.json and ./working_directory2/assets/gis/bc_street.ms1/mda.json differ
 Only in ./working_directory/assets/gis: climate
+Files ./working_directory/assets/gis/coa_active_jurisdictions.ms1/etl.json and ./working_directory2/assets/gis/coa_active_jurisdictions.ms1/etl.json differ
 Files ./working_directory/assets/gis/coa_active_jurisdictions.ms1/mda.json and ./working_directory2/assets/gis/coa_active_jurisdictions.ms1/mda.json differ
 Only in ./working_directory/assets/gis: coa_asheville_neighborhoods
-Only in ./working_directory/assets/gis/coa_bc_address_master: create-coa_bc_address_master-table.sql
+Files ./working_directory/assets/gis/coa_bc_address_master/etl.json and ./working_directory2/assets/gis/coa_bc_address_master/etl.json differ
 Files ./working_directory/assets/gis/coa_bc_address_master/mda.json and ./working_directory2/assets/gis/coa_bc_address_master/mda.json differ
+Files ./working_directory/assets/gis/coa_cip_project_shapes/etl.json and ./working_directory2/assets/gis/coa_cip_project_shapes/etl.json differ
 Files ./working_directory/assets/gis/coa_cip_project_shapes/mda.json and ./working_directory2/assets/gis/coa_cip_project_shapes/mda.json differ
+Files ./working_directory/assets/gis/coa_districts_public_works/etl.json and ./working_directory2/assets/gis/coa_districts_public_works/etl.json differ
 Files ./working_directory/assets/gis/coa_districts_public_works/mda.json and ./working_directory2/assets/gis/coa_districts_public_works/mda.json differ
+Files ./working_directory/assets/gis/coa_districts_water/etl.json and ./working_directory2/assets/gis/coa_districts_water/etl.json differ
 Files ./working_directory/assets/gis/coa_districts_water/mda.json and ./working_directory2/assets/gis/coa_districts_water/mda.json differ
+Files ./working_directory/assets/gis/coa_districts_zoning/etl.json and ./working_directory2/assets/gis/coa_districts_zoning/etl.json differ
 Files ./working_directory/assets/gis/coa_districts_zoning/mda.json and ./working_directory2/assets/gis/coa_districts_zoning/mda.json differ
+Files ./working_directory/assets/gis/coa_local_historic_landmarks/etl.json and ./working_directory2/assets/gis/coa_local_historic_landmarks/etl.json differ
 Files ./working_directory/assets/gis/coa_local_historic_landmarks/mda.json and ./working_directory2/assets/gis/coa_local_historic_landmarks/mda.json differ
+Files ./working_directory/assets/gis/coa_national_register_properties/etl.json and ./working_directory2/assets/gis/coa_national_register_properties/etl.json differ
 Files ./working_directory/assets/gis/coa_national_register_properties/mda.json and ./working_directory2/assets/gis/coa_national_register_properties/mda.json differ
 Only in ./working_directory/assets/gis: coa_overlay_historic_districts_property_view
 Only in ./working_directory/assets/gis: coa_overlay_historic_districts_view
 Only in ./working_directory/assets/gis: coa_street_maintenance.ds1
+Files ./working_directory/assets/gis/coa_zip_code/etl.json and ./working_directory2/assets/gis/coa_zip_code/etl.json differ
 Files ./working_directory/assets/gis/coa_zip_code/mda.json and ./working_directory2/assets/gis/coa_zip_code/mda.json differ
+Files ./working_directory/assets/gis/coa_zoning_overlays/etl.json and ./working_directory2/assets/gis/coa_zoning_overlays/etl.json differ
 Files ./working_directory/assets/gis/coa_zoning_overlays/mda.json and ./working_directory2/assets/gis/coa_zoning_overlays/mda.json differ
 Only in ./working_directory/assets/gis: TBD
 Only in ./working_directory/assets/gis: v_address_maintenance
 Only in ./working_directory/assets/gis: v_coa_simple_street_maintenance
 Only in ./working_directory/assets: gis-maintenance
+Files ./working_directory/assets/googlesheets/capital_projects_gis_warehouse/etl.json and ./working_directory2/assets/googlesheets/capital_projects_gis_warehouse/etl.json differ
 Files ./working_directory/assets/googlesheets/capital_projects_gis_warehouse/mda.json and ./working_directory2/assets/googlesheets/capital_projects_gis_warehouse/mda.json differ
+Files ./working_directory/assets/googlesheets/capital_projects_master/etl.json and ./working_directory2/assets/googlesheets/capital_projects_master/etl.json differ
 Files ./working_directory/assets/googlesheets/capital_projects_master/mda.json and ./working_directory2/assets/googlesheets/capital_projects_master/mda.json differ
 Files ./working_directory/assets/it/workorders/etl.json and ./working_directory2/assets/it/workorders/etl.json differ
 Files ./working_directory/assets/it/workorders/mda.json and ./working_directory2/assets/it/workorders/mda.json differ

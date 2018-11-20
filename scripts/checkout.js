@@ -51,6 +51,11 @@ const dbConfig = {
             };
             let dependList = dependArray.length>0 ? '[' + dependArray.join(',') + '\n  ]' : '[]';
 
+            const sqlAssetFile = 'SELECT type, file, file_content FROM bedrock.asset_files where asset_id = $1';
+            let AssetFile = await client.query( sqlAssetFile, [ asset.id ]);
+
+            let FileObj = AssetFile.rows[0] ? AssetFile.rows[0] : {};
+
             const mdaStr = 
             `{\n`+
             `  "name": "${asset.name}",\n`+
@@ -58,11 +63,17 @@ const dbConfig = {
             `  "active": ${asset.active},\n`+
             `  "type": "${asset.type}",\n`+
             `  "description": "${asset.description}",\n`+
-            `  "depends": ${dependList}\n`+
-            `}`;
+            `  "depends": ${dependList}`+
+            `${FileObj.file ? ',\n  "schema": {\n    "type": "' + FileObj.type + '",\n    "file": "' + FileObj.file + '"\n  }' : ''}` +
+            `\n}`;
             const fileDataMda = new Uint8Array(Buffer.from(mdaStr));
             fs.writeFileSync(fullpath + '/mda.json', fileDataMda, 'utf8');
-            // console.log("File mda.json written: ", asset.name);
+
+            // write asset files(asset creation sqls)
+            if(FileObj.file && FileObj.file_content){
+                const fileDataWorking = new Uint8Array(Buffer.from(FileObj.file_content));
+                fs.writeFileSync(fullpath + '/' + FileObj.file, fileDataWorking, 'utf8');
+            }
 
             //write etl.json
             let createArr = [];
@@ -72,11 +83,9 @@ const dbConfig = {
             const sqlEtl = 'SELECT asset_id, category, type, file, file_content, db, active, task_order ' +
             'FROM bedrock.etl_tasks WHERE asset_id = $1 ORDER BY category, task_order'
             let etlData = await client.query( sqlEtl, [ asset.id ]);
-            if(etlData[0]){
+            if(etlData.rows[0]){
                 for( let row of etlData.rows){
                     let db = row.db ? `      "db": "${row.db}",\n` : ``;
-
-                    
                     const taskStr = 
                     `    {\n`+
                     `      "type": "${row.type}",\n`+

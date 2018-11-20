@@ -35,6 +35,15 @@ function runForEachPath(path, logger, config) {
             const mdafd = fs.openSync(`${path}/mda.json`, 'r');
             const mda = JSON.parse(fs.readFileSync(mdafd, { encoding: 'utf8' }));
             if(!config.oneAsset || config.oneAsset === mda.name){  //if running for all assets or this asset
+              //if this mda has a schema file (non-etl file)
+              if(mda.schema && mda.schema.file){
+                if (files.indexOf(mda.schema.file) >= 0) {
+                  const filefd = fs.openSync(`${path}/${mda.schema.file}`, 'r');
+                  const fileContent = fs.readFileSync(filefd, { encoding: 'utf8' })
+                  mda.schema.fileContent = fileContent;
+                }
+              }
+
               if (files.indexOf('etl.json') >= 0) {
                 const etlfd = fs.openSync(`${path}/etl.json`, 'r');
                 const etl = JSON.parse(fs.readFileSync(etlfd, { encoding: 'utf8' }));
@@ -102,6 +111,7 @@ function finish(config) {
 
 function clearTables(client){
         client.query('truncate table bedrock.assets')
+  .then(client.query('truncate table bedrock.asset_files'))
   .then(client.query('truncate table bedrock.asset_depends'))
   .then(client.query('truncate table bedrock.etl_tasks'))
   .then(client.query('truncate table bedrock.schemas'))
@@ -135,6 +145,7 @@ function checkinAsset(asset, client){
         checkinEtl(asset, client);
         loadSchemas(asset, client);
         checkinMeta(asset, client);
+        checkinFiles(asset, client);
       })
       .catch(e => {console.error('query error', e.message, e.stack); });
     }
@@ -171,9 +182,6 @@ function checkinEtl(asset, client){
   });
 }
 
-
-
-
 function loadSchemas(asset, client){ 
   if(asset.name === "Load_All_Asset_Schemas"){
     let sqlInsertSchemaCol_All = 'INSERT INTO bedrock.schema_columns(' +
@@ -205,6 +213,16 @@ function checkinMeta(asset, client){
     .then(res=>{client.query('INSERT INTO bedrock.metadata(name, json) VALUES ($1, $2)', [ asset.name, asset.meta ])
     })
     .catch(e => {console.error('query error', e.message, e.stack); });
+}
+
+function checkinFiles(asset, client){
+  const schema = asset.schema;
+  if(schema){
+    let sqlInsertFiles = 'INSERT INTO bedrock.asset_files(asset_id, type, file, file_content) ' +
+                        'VALUES ($1, $2, $3, $4)';                  
+    client.query(sqlInsertFiles, [asset.id, schema.type, schema.file, schema.fileContent ])
+    .catch(e => {console.error('query error', e.message, e.stack); });
+  };
 }
 
 function processing(stage, path, dest, config, logger) {

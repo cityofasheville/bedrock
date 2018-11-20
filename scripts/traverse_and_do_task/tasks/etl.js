@@ -3,6 +3,7 @@
 const fs = require('fs');
 const pathModule = require('path');
 const toposort = require('toposort');
+const checkout = require('../../checkout');
 
 function readEtlConfig(path, logger) {
   let etlConfig = null;
@@ -56,13 +57,14 @@ function addToGraph(config, mainConfig, path, logger) {
 // In the sequenced set any dependencies of a job are guaranteed to be listed
 // before it. The freeJobs array contains jobs with no dependencies.
 
-function process(stage, path, dest, mainConfig, logger) {
+async function process(stage, path, dest, mainConfig, logger) {
   let fd;
   let result;
   let d;
   let resolvedPath;
   switch (stage) {
     case 'init':
+      await checkout().catch(e => {console.error('query error', e.message, e.stack); cleanUp(client)});
       graph = { nodes: {}, edges: [] };
       break;
 

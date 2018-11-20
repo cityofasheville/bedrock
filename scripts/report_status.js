@@ -40,7 +40,7 @@ ${Object.keys(jTracker.jobStatus).map(itm => {
 
 let mailOptions = {
     from: 'dataserviceaccount@ashevillenc.gov',
-    to: 'gisadmins@ashevillenc.gov',
+    to: 'gisadmins@ashevillenc.gov;jtwilson@ashevillenc.gov',
     subject: `ETL Jobs Status: ${status}`,
     text: emailText,
 };

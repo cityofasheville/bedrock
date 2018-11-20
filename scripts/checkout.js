@@ -17,8 +17,8 @@ const dbConfig = {
     idleTimeoutMillis: 10000,
 };
 
-(async function Run(){
-    var pool = new Pool(dbConfig);
+ async function checkout(){
+    let pool = new Pool(dbConfig);
     let client = await pool.connect();
     const sqlAsset = 'SELECT ass.id, ass.name, ass.path, loc.short_name AS location, ' +
     'ass.active, ass.type, ass.description ' +
@@ -119,13 +119,16 @@ const dbConfig = {
                 const fileDataEtl = new Uint8Array(Buffer.from(etlStr));
                 fs.writeFileSync(fullpath + '/etl.json', fileDataEtl, 'utf8');
                 // console.log("File etl.json written: ", asset.name);  
-            }         
+            }     
         };
         cleanUp(client);
     };
-})().catch(e => {console.error('query error', e.message, e.stack); cleanUp(client)});
+}
+checkout().catch(e => {console.error('query error', e.message, e.stack); cleanUp(client)});
 
 function cleanUp(client){
     client.release();
     process.exit(0);
 }
+
+module.exports = checkout;

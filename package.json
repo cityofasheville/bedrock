@@ -4,7 +4,11 @@
   "description": "System for data inventory and dependency management",
   "main": "index.js",
   "scripts": {
-    "checkin": "echo \"Error - checkin command not yet implemented\""
+    "init_etl": "node ./scripts/traverse_and_do_task.js etl --start=C:/jon/managed-data-assets --dest=C:/jon/etl_jobs_dir --logfile=C:/jon/etl_jobs_dir/joblog.log",
+    "run_etl": "node C:/jon/bedrock/scripts/run_etl_jobs.js --logfile=C:/jon/etl_jobs_dir/etl.log C:/jon/etl_jobs_dir",
+    "checkout": "node ./scripts/checkout.js --start=c:/jon/bedrock/working_directory2/assets",
+    "checkin": "node ./scripts/traverse_and_do_task.js checkin --start=./working_directory/assets"
+
   },
   "repository": {
     "type": "git",
@@ -18,24 +22,24 @@
   "license": "MIT",
   "homepage": "https://github.com/cityofasheville/bedrock",
   "dependencies": {
-    "bunyan": "^1.8.5",
-    "coa-node-logging": "^2.0.3",
+    "bunyan": "^1.8.12",
+    "coa-node-logging": "^2.0.4",
     "dotenv": "^2.0.0",
-    "mssql": "^3.3.0",
-    "nodemailer": "^4.6.6",
-    "pg": "^6.1.6",
-    "pg-pool": "^1.6.0",
-    "toposort": "^1.0.0"
+    "mssql": "^4.2.3",
+    "nodemailer": "^4.6.8",
+    "pg": "^7.6.1",
+    "pg-pool": "^2.0.4",
+    "toposort": "^2.0.2"
   },
   "optionalDependencies": {
     "msnodesqlv8": "^0.3.1"
   },
   "devDependencies": {
-    "eslint": "^3.12.2",
-    "eslint-config-airbnb": "^13.0.0",
-    "eslint-plugin-import": "^2.2.0",
-    "eslint-plugin-jsx-a11y": "^2.2.3",
-    "eslint-plugin-react": "^6.8.0"
+    "eslint": "^5.9.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^6.1.2",
+    "eslint-plugin-react": "^7.11.1"
   },
   "eslintConfig": {
     "parser": "babel-eslint",

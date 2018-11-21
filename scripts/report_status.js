@@ -5,7 +5,7 @@ let transporter = nodemailer.createTransport({
     host: '192.168.0.8',
 });
 
-const workDir = 'C:/COA/etl_jobs_dir';
+const workDir = 'C:/jon/etl_jobs_dir';
 const files = fs.readdirSync(workDir);
 
 if (files.indexOf('jobs_status.json') < 0) {
@@ -23,6 +23,8 @@ const unfinished = jTracker.sequencedToDo.length +
 const completed = jTracker.completed.length;
 const status = (errors + unfinished > 0) ? 'ERROR' : 'OK';
 const emailText = `
+Running from directory: ${workDir}
+
 Final status: ${status}
 
 Total errors: ${errors}
@@ -38,7 +40,7 @@ ${Object.keys(jTracker.jobStatus).map(itm => {
 
 let mailOptions = {
     from: 'dataserviceaccount@ashevillenc.gov',
-    to: 'gisadmins@ashevillenc.gov',
+    to: 'gisadmins@ashevillenc.gov;jtwilson@ashevillenc.gov',
     subject: `ETL Jobs Status: ${status}`,
     text: emailText,
 };

@@ -5,7 +5,7 @@ let transporter = nodemailer.createTransport({
     host: '192.168.0.8',
 });
 
-const workDir = 'C:/coa/etl_jobs_dir';
+const workDir = 'C:/jon/etl_jobs_dir';
 const files = fs.readdirSync(workDir);
 
 if (files.indexOf('jobs_status.json') < 0) {
@@ -31,12 +31,32 @@ Total errors: ${errors}
 Total unfinished: ${unfinished}
 Total completed: ${completed}
 
-Detailed job results:
+${errors>0?'Errored Jobs:':''}
+${jTracker.errored.map(itm => {
+    return `${itm.name}`;
+}).join('\n')}
 
-${Object.keys(jTracker.jobStatus).map(itm => {
-    return `${itm}: ${jTracker.jobStatus[itm]}`;
+${unfinished>0?'Unfinished Jobs:':''}
+${jTracker.sequencedToDo.map(itm => {
+    return `${itm.name}`;
+}).join('\n')}
+${jTracker.freeToDo.map(itm => {
+    return `${itm.name}`;
+}).join('\n')}
+${jTracker.running.map(itm => {
+    return `${itm.name}`;
+}).join('\n')}
+
+${completed>0?'Completed jobs:':''}
+${jTracker.completed.map(itm => {
+    return `${itm.name}`;
 }).join('\n')}
 `;
+
+// ${Object.keys(jTracker.jobStatus).map(itm => {
+//     return `${itm}: ${jTracker.jobStatus[itm]}`;
+// }).join('\n')}
+// `;
 
 let mailOptions = {
     from: 'dataserviceaccount@ashevillenc.gov',

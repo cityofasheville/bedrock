@@ -5,8 +5,11 @@ const Pool = require('pg-pool');
 const CommandLineArgs = require('./common/CommandLineArgs');
 
 const args = new CommandLineArgs(process.argv.slice(2));
-//if (args.argCount() < 1) usageAndExit();
-const startDir = args.getOption('start', '.');
+//TODO if (args.argCount() < 1) usageAndExit();
+
+const startDir = args.hasOption('start') 
+? args.getOption('start', '.')
+: "./working_directory/assets";
 
 const dbConfig = {
     host: process.env.db1host,
@@ -17,14 +20,15 @@ const dbConfig = {
     idleTimeoutMillis: 10000,
 };
 
- async function checkout(){
+async function checkout(){
+    let ReturnErr = false;
     let pool = new Pool(dbConfig);
     let client = await pool.connect();
-    const sqlAsset = 'SELECT ass.id, ass.name, ass.path, loc.short_name AS location, ' +
-    'ass.active, ass.type, ass.description ' +
-    'FROM bedrock.assets ass ' +
+    const sqlAsset = 'SELECT ast.id, ast.name, ast.path, loc.short_name AS location, ' +
+    'ast.active, ast.type, ast.description ' +
+    'FROM bedrock.assets ast ' +
     'INNER JOIN bedrock.asset_locations loc ' +
-    'ON ass.location = loc.id ' ;
+    'ON ast.location = loc.id limit 1' ;
     let assets = await client.query( sqlAsset );
     if(!assets.rows[0]){
         console.log('No data');
@@ -85,7 +89,7 @@ const dbConfig = {
             let etlData = await client.query( sqlEtl, [ asset.id ]);
             if(etlData.rows[0]){
                 for( let row of etlData.rows){
-                    let db = row.db ? `      "db": "${row.db}",\n` : ``;
+                    //let db = row.db ? `      "db": "${row.db}",\n` : ``;
                     const taskStr = 
                     `    {\n`+
                     `      "type": "${row.type}",\n`+
@@ -123,12 +127,20 @@ const dbConfig = {
         };
         cleanUp(client);
     };
+    return new Promise(function(resolve, reject) {
+        if (ReturnErr) {
+            reject(ReturnErr);
+        } else {
+            resolve(0);
+        }
+})
 }
-checkout().catch(e => {console.error('query error', e.message, e.stack); cleanUp(client)});
+// checkout().catch(e => {console.error('query error', e.message, e.stack); cleanUp(client)});
 
 function cleanUp(client){
     client.release();
-    process.exit(0);
+    //process.exit(0);
 }
 
 module.exports = checkout;
+

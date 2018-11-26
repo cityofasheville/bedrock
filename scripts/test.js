@@ -1,8 +1,10 @@
+const fs = require('fs');
 const checkout = require('./checkout');
 
-async function Run(){
-    let result = await checkout().catch(e => console.error("Caught: " + e));
-    console.log(result);
 
-}
-Run();
+checkout().then(()=>{
+    if(fs.existsSync('C:/jon/bedrock/working_directory/assets/it/workorders/mda.json')){
+    console.log('file exists');
+    }
+}).catch(e => console.error("Caught: " + e));
+    

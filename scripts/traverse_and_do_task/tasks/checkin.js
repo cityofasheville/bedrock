@@ -65,7 +65,7 @@ function runForEachPath(path, logger, config) {
                 mda.meta = readMetadataFile(`${mda.name}.json`);
               }
 
-              mda.path = path.slice(27); // remove the "./working_directory/assets/"
+              mda.path = path.split('/assets/')[1]; // remove the "./working_directory/assets/"
               data.push(mda);
             }
         }

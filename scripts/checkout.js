@@ -21,14 +21,13 @@ const dbConfig = {
 };
 
 async function checkout(){
-    let ReturnErr = false;
     let pool = new Pool(dbConfig);
     let client = await pool.connect();
     const sqlAsset = 'SELECT ast.id, ast.name, ast.path, loc.short_name AS location, ' +
     'ast.active, ast.type, ast.description ' +
     'FROM bedrock.assets ast ' +
     'INNER JOIN bedrock.asset_locations loc ' +
-    'ON ast.location = loc.id limit 1' ;
+    'ON ast.location = loc.id' ; //////////////////////////////////////////////////////////// limit 1
     let assets = await client.query( sqlAsset );
     if(!assets.rows[0]){
         console.log('No data');
@@ -127,15 +126,11 @@ async function checkout(){
         };
         cleanUp(client);
     };
-    return new Promise(function(resolve, reject) {
-        if (ReturnErr) {
-            reject(ReturnErr);
-        } else {
-            resolve(0);
-        }
-})
 }
-// checkout().catch(e => {console.error('query error', e.message, e.stack); cleanUp(client)});
+
+if (require.main === module) {
+    checkout().catch(e => {console.error('query error', e.message, e.stack); cleanUp(client)});
+}
 
 function cleanUp(client){
     client.release();

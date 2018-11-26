@@ -14,7 +14,10 @@ const task = args.task;
 // (param: stage, path, dest, config, logger)
 ///////////////////////////////////////////////////////
 
-task('init', null, args.destDir, args.config, args.logger);
-processDirectory(args.startDir, args.destDir, task, args.config, args.logger);
-task('finish', null, args.destDir, args.config, args.logger);
+async function Run(){
+    await task('init', null, args.destDir, args.config, args.logger);
+    await processDirectory(args.startDir, args.destDir, task, args.config, args.logger);
+    await task('finish', null, args.destDir, args.config, args.logger);
+}
+Run();
 

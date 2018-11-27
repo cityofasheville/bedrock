@@ -3,11 +3,15 @@
   "version": "1.0.0",
   "description": "System for data inventory and dependency management",
   "main": "index.js",
-  "scripts": {
+  "bin": {
+    "bedrock": "./bin/bedrock.js"
+  },
+"scripts": {
     "init_etl": "node ./scripts/traverse_and_do_task.js etl --start=./working_directory/assets --dest=./etl_jobs_dir --logfile=./etl_jobs_dir/joblog.log",
     "run_etl": "node ./scripts/run_etl_jobs.js --logfile=./etl_jobs_dir/etl.log ./etl_jobs_dir",
     "checkout": "node ./scripts/checkout.js --start=./working_directory/assets",
-    "checkin": "node ./scripts/traverse_and_do_task.js checkin --start=./working_directory_full/assets"
+    "checkin": "node ./scripts/traverse_and_do_task.js checkin --start=./working_directory/assets",
+    "send_rpt": "node ./scripts/report_status.js"
   },
   "repository": {
     "type": "git",

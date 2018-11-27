@@ -4,11 +4,10 @@
   "description": "System for data inventory and dependency management",
   "main": "index.js",
   "scripts": {
-    "init_etl": "node ./scripts/traverse_and_do_task.js etl --start=c:/jon/bedrock/working_directory/assets --dest=C:/jon/etl_jobs_dir --logfile=C:/jon/etl_jobs_dir/joblog.log",
-    "run_etl": "node C:/jon/bedrock/scripts/run_etl_jobs.js --logfile=C:/jon/etl_jobs_dir/etl.log C:/jon/etl_jobs_dir",
-    "checkout": "node ./scripts/checkout.js --start=c:/jon/bedrock/working_directory/assets",
-    "checkin": "node ./scripts/traverse_and_do_task.js checkin --start=./working_directory_full/assets",
-    "init_etl-REAL": "node ./scripts/traverse_and_do_task.js etl --start=C:/jon/managed-data-assets --dest=C:/jon/etl_jobs_dir --logfile=C:/jon/etl_jobs_dir/joblog.log"
+    "init_etl": "node ./scripts/traverse_and_do_task.js etl --start=./working_directory/assets --dest=./etl_jobs_dir --logfile=./etl_jobs_dir/joblog.log",
+    "run_etl": "node ./scripts/run_etl_jobs.js --logfile=./etl_jobs_dir/etl.log ./etl_jobs_dir",
+    "checkout": "node ./scripts/checkout.js --start=./working_directory/assets",
+    "checkin": "node ./scripts/traverse_and_do_task.js checkin --start=./working_directory_full/assets"
   },
   "repository": {
     "type": "git",

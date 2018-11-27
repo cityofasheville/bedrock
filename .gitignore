@@ -10,4 +10,4 @@ mda_types.js
 runit.sh
 runit1.sh
 working_directory/
-working_directory_full/
+etl_jobs_dir/

@@ -6,7 +6,7 @@ const Logger = require('coa-node-logging');
 const tasks = {
   validate: require('./tasks/validator'),
   graphql: require('./tasks/graphql'),
-  etl: require('./tasks/etl'),
+  init_etl: require('./tasks/init_etl'),
   list: require('./tasks/list'),
   checkin: require('./tasks/checkin'),
 };
@@ -21,7 +21,7 @@ module.exports = function processAndValidateArgs(argv) {
   if (!task) usageAndExit(`traverse_and_run_task: ${command} task not found.`);
 
   const startDir = args.getOption('start', '.');
-  const destDir = args.getOption('dest', '.');
+  const destDir = args.getOption('dest', __dirname + '/../../etl_jobs_dir');
   const schema = args.hasOption('schema');
   const metadata = args.hasOption('metadata');
   
@@ -34,7 +34,7 @@ module.exports = function processAndValidateArgs(argv) {
 
   return {
     task,
-    startDir,
+    //startDir,
     destDir,
     logger: new Logger('traverse_and_run_task', args.getOption('logfile', null)),
     config: {
@@ -43,6 +43,7 @@ module.exports = function processAndValidateArgs(argv) {
       schema,
       metadata,
       oneAsset,
+      startDir,
     },
   };
 };

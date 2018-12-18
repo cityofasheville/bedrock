@@ -1,12 +1,6 @@
 /* eslint-disable no-console, spaced-comment, global-require */
-require('dotenv').config();
 const processAndValidateArgs = require('./traverse_and_do_task/processAndValidateArgs');
 const processDirectory = require('./traverse_and_do_task/processDirectory');
-
-const args = processAndValidateArgs(process.argv.slice(2));
-const task = args.task;
-
-//console.log(args);
 
 ///////////////////////////////////////////////////////
 // Each task potentially has an initialization phase,
@@ -14,10 +8,13 @@ const task = args.task;
 // (param: stage, path, dest, config, logger)
 ///////////////////////////////////////////////////////
 
-async function Run(){
+async function traverse_and_do_task(){
+    const args = processAndValidateArgs(process.argv.slice(2));
+    const task = args.task;
     await task('init', null, args.destDir, args.config, args.logger);
-    await processDirectory(args.startDir, args.destDir, task, args.config, args.logger);
+    await processDirectory(args.config.startDir, args.destDir, task, args.config, args.logger);
     await task('finish', null, args.destDir, args.config, args.logger);
 }
-Run();
+
+module.exports = traverse_and_do_task;
 

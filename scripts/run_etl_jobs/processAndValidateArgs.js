@@ -13,8 +13,8 @@ module.exports = function processAndValidateArgs(argv) {
     loadPoints: ('parallelLoad' in args.options) ? args.options.parallelLoad : 2,
     jobFileName: ('jobFile' in args.options) ? args.options.jobFile : 'etl_jobs_definition.json',
     jobFileDate: 'etl_jobs_date.json',
-    workingDirectory: args.args[0],
-    logger: new Logger('traverse_and_run_task', args.getOption('logfile', null)),
+    workingDirectory: ('dest' in args.options) ? args.options.dest : __dirname + '/../../etl_jobs_dir',  // args.args[0],
+    logger: new Logger('traverse_and_run_task', args.getOption('logfile', './etl_jobs_dir/etl.log')),
   };
   console.log('done with processing');
   return config;

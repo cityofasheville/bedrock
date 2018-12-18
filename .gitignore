@@ -7,7 +7,5 @@ mda_types.js
 *.log
 *.csv
 .vscode/
-runit.sh
-runit1.sh
-working_directory/
 etl_jobs_dir/
+working_directory/

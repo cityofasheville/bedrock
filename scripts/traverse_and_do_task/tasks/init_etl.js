@@ -64,7 +64,7 @@ async function process(stage, path, dest, mainConfig, logger) {
   let resolvedPath;
   switch (stage) {
     case 'init':
-      await checkout().catch(e => console.error("Caught: " + e)); ////////////////////////
+      await checkout().catch(e => console.error("checkout error: " + e));
       graph = { nodes: {}, edges: [] };
       break;
 

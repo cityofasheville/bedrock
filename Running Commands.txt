@@ -1,0 +1,39 @@
+
+RUN FROM npm: (--start defaults to ./working_directory)
+npm run bedrock checkout
+npm run bedrock checkout ad_info
+npm run bedrock checkin
+npm run bedrock checkin ad_info
+npm run bedrock init_etl
+npm run bedrock run_etl
+npm run bedrock report
+
+RUN FROM GLOBAL INSTALL: (--start defaults to current dir)
+bedrock checkout  
+bedrock checkout ad_info
+bedrock checkin
+bedrock checkin ad_info
+bedrock init_etl
+bedrock run_etl
+bedrock report
+
+Defaults:
+--start=.
+--dest=./etl_jobs_dir               (init_etl)
+--logfile=./etl_jobs_dir/joblog.log (init_etl)
+--logfile=./etl_jobs_dir/etl.log    (run_etl)
+
+    // "init_etl": "node ./scripts/traverse_and_do_task.js etl --start=./working_directory --dest=./etl_jobs_dir --logfile=./etl_jobs_dir/joblog.log",
+    // "run_etl": "node ./scripts/run_etl_jobs.js --logfile=./etl_jobs_dir/etl.log ./etl_jobs_dir", (change to --dest=./etl_jobs_dir)
+    // "checkout": "node ./scripts/checkout.js --start=./working_directory",
+    // "checkin": "node ./scripts/traverse_and_do_task.js checkin --start=./working_directory",
+    // "report": "node ./scripts/report_status.js"
+
+GOING AWAY 
+npm run bedrock checkout --metadata
+npm run bedrock checkin --metadata
+bedrock checkout --metadata
+bedrock checkin --metadata
+
+
+

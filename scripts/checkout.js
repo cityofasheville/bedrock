@@ -1,50 +1,42 @@
 /* eslint-disable no-console, spaced-comment */
-require('dotenv').config();
 const fs = require('fs');
 const Pool = require('pg-pool');
 const CommandLineArgs = require('./common/CommandLineArgs');
 
-const args = new CommandLineArgs(process.argv.slice(2));
-//TODO if (args.argCount() < 1) usageAndExit();
-
-const startDir = args.hasOption('start') 
-? args.getOption('start', '.')
-: "./working_directory/assets";
-
-const dbConfig = {
-    host: process.env.db1host,
-    user: process.env.db1user,
-    password: process.env.db1password,
-    database: process.env.db1database,
-    max: 10,
-    idleTimeoutMillis: 10000,
-};
-
 async function checkout(){
+    const args = new CommandLineArgs(process.argv.slice(2));
+    //TODO if (args.argCount() < 1) usageAndExit();
+    const oneAsset = args.getArg(1);
+    const startDir = args.getOption('start', '.');
+
+    const dbConfig = {
+        host: process.env.db1host,
+        user: process.env.db1user,
+        password: process.env.db1password,
+        database: process.env.db1database,
+        max: 10,
+        idleTimeoutMillis: 10000,
+    };
     let pool = new Pool(dbConfig);
     let client = await pool.connect();
-    const sqlAsset = 'SELECT ast.id, ast.name, ast.path, loc.short_name AS location, ' +
-    'ast.active, ast.type, ast.description ' +
+
+    let sqlAsset = 'SELECT ast.id, ast.name, loc.short_name AS location, ast.active, ast.type, ast.description, ast.category,  ' +
+    'ast.tags, array_length(ast.tags, 1) tag_len, ast.schema, ast.title, ast.publication_date, ast.responsible_party, ' +
+    'ast.responsible_party_role, ast.url, ast.abstract, ast.status, ast.update_frequency, ast.keywords, ' +
+    'ast.use_constraints, ast.metadata_constraints, ast.resource_constraints, ast.topic_category,  ' +
+    'ast.geo_extent_east, ast.geo_extent_west, ast.geo_extent_north, ast.geo_extent_south, ast.feature_catalog,  ' +
+    'ast.process_description, ast.spatial_reference, ast.metadata_creation_date, ast.contact_role_code, $1 AS foo ' +
     'FROM bedrock.assets ast ' +
     'INNER JOIN bedrock.asset_locations loc ' +
-    'ON ast.location = loc.id' ; //////////////////////////////////////////////////////////// limit 1
-    let assets = await client.query( sqlAsset );
+    'ON ast.location = loc.id ' ;
+    if(oneAsset){sqlAsset=sqlAsset+ 'WHERE ast.name = $1 '}
+    let assets = await client.query( sqlAsset, [oneAsset]);
     if(!assets.rows[0]){
         console.log('No data');
-        cleanUp(client);
-    }else{ 
+    }else{
         for(let asset of assets.rows){
-            //create dir
-            const fullpath = startDir + '/' + asset.path;
-            fullpath.split('/')
-            .reduce((currentPath, folder) => {
-                currentPath += folder + '/';
-                if (!fs.existsSync(currentPath)){
-                    fs.mkdirSync(currentPath);
-                }
-                return currentPath;
-            }, '');
-            
+            const fullpath = startDir + '/' + asset.name;
+            if (!fs.existsSync(fullpath)){ fs.mkdirSync(fullpath); }
             //write mda.json
             let dependArray = [];
             const sqlDepends = 'SELECT depends FROM bedrock.asset_depends where asset_id = $1';
@@ -54,29 +46,44 @@ async function checkout(){
             };
             let dependList = dependArray.length>0 ? '[' + dependArray.join(',') + '\n  ]' : '[]';
 
-            const sqlAssetFile = 'SELECT type, file, file_content FROM bedrock.asset_files where asset_id = $1';
-            let AssetFile = await client.query( sqlAssetFile, [ asset.id ]);
-
-            let FileObj = AssetFile.rows[0] ? AssetFile.rows[0] : {};
-
-            const mdaStr = 
+            let mdaStr = 
             `{\n`+
             `  "name": "${asset.name}",\n`+
             `  "location": "${asset.location}",\n`+
             `  "active": ${asset.active},\n`+
             `  "type": "${asset.type}",\n`+
             `  "description": "${asset.description}",\n`+
-            `  "depends": ${dependList}`+
-            `${FileObj.file ? ',\n  "schema": {\n    "type": "' + FileObj.type + '",\n    "file": "' + FileObj.file + '"\n  }' : ''}` +
-            `\n}`;
+            `  "depends": ${dependList},\n` +
+            `  "category": "${asset.category}",\n`+
+            `  "tags": ${arrToStr(asset.tags)},\n`+
+            `  "schema": "${asset.schema}",\n`+
+            `  "title": "${asset.title}",\n`+
+            `  "publication_date": "${dateToStr(asset.publication_date)}",\n`+
+            `  "responsible_party": "${asset.responsible_party}",\n`+
+            `  "responsible_party_role": "${asset.responsible_party_role}",\n`+
+            `  "url": "${asset.url}",\n`+
+            `  "abstract": "${asset.abstract}",\n`+
+            `  "status": "${asset.status}",\n`+
+            `  "update_frequency": "${asset.update_frequency}",\n`+
+            `  "keywords": ${arrToStr(asset.keywords)},\n`+
+            `  "use_constraints": "${asset.use_constraints}",\n`+
+            `  "metadata_constraints": ${arrToStr(asset.metadata_constraints)},\n`+
+            `  "resource_constraints": "${asset.resource_constraints}",\n`+
+            `  "topic_category": ${arrToStr(asset.topic_category)},\n`+
+            `  "geographic_extent" : {\n` +
+            `      "east": "${asset.geo_extent_east}",\n`+
+            `      "west": "${asset.geo_extent_west}",\n`+
+            `      "north": "${asset.geo_extent_north}",\n`+
+            `      "south": "${asset.geo_extent_south}"\n  },\n`+
+            `  "feature_catalog": "${asset.feature_catalog}",\n`+
+            `  "process_description": "${asset.process_description}",\n`+
+            `  "spatial_reference": "${asset.spatial_reference}",\n`+
+            `  "metadata_creation_date": "${dateToStr(asset.metadata_creation_date)}",\n`+
+            `  "contact_role_code": "${asset.contact_role_code}"\n}`
+            
+            mdaStr = mdaStr.replace(/"null"(,?)\n/g,'""$1\n');
             const fileDataMda = new Uint8Array(Buffer.from(mdaStr));
             fs.writeFileSync(fullpath + '/mda.json', fileDataMda, 'utf8');
-
-            // write asset files(asset creation sqls)
-            if(FileObj.file && FileObj.file_content){
-                const fileDataWorking = new Uint8Array(Buffer.from(FileObj.file_content));
-                fs.writeFileSync(fullpath + '/' + FileObj.file, fileDataWorking, 'utf8');
-            }
 
             //write etl.json
             let createArr = [];
@@ -88,7 +95,6 @@ async function checkout(){
             let etlData = await client.query( sqlEtl, [ asset.id ]);
             if(etlData.rows[0]){
                 for( let row of etlData.rows){
-                    //let db = row.db ? `      "db": "${row.db}",\n` : ``;
                     const taskStr = 
                     `    {\n`+
                     `      "type": "${row.type}",\n`+
@@ -122,19 +128,26 @@ async function checkout(){
                 const fileDataEtl = new Uint8Array(Buffer.from(etlStr));
                 fs.writeFileSync(fullpath + '/etl.json', fileDataEtl, 'utf8');
                 // console.log("File etl.json written: ", asset.name);  
-            }     
+                    // console.log("File etl.json written: ", asset.name);  
+                // console.log("File etl.json written: ", asset.name);  
+            }
         };
-        cleanUp(client);
-    };
-}
-
-if (require.main === module) {
-    checkout().catch(e => {console.error('query error', e.message, e.stack); cleanUp(client)});
-}
-
-function cleanUp(client){
+    }
     client.release();
-    //process.exit(0);
+}
+
+function arrToStr(arr){
+    return arr
+    ? `[`+
+    `${arr[0]==='' ? '' : '\n    "'+arr.join('",\n    "')+'"\n  '}`+
+    `]`
+    : '[]';
+}
+
+function dateToStr(dt){
+    return dt 
+    ? dt.toISOString()
+    : '';
 }
 
 module.exports = checkout;

@@ -75,11 +75,12 @@ function checkinAsset(asset, client){
   let sqllookup = 'SELECT id FROM bedrock.asset_locations WHERE short_name = $1;';
   client.query(sqllookup, [asset.location]).then(res => {
     if(!res.rows[0]){
-      console.error('Invalid location ' + asset.location + ' for asset ' + asset.name);
+      console.error('Invalid location "' + asset.location + '" for asset ' + asset.name);
       return;
     }else{
       if(!(asset.name && res.rows[0].id && asset.active && asset.type)){
         console.log('Asset not complete: Required fields: (name, location, active, type) ', asset.name)
+        return;
       }
       asset.loc_id = res.rows[0].id;
       let sqlInsert = 'INSERT INTO bedrock.assets( ' +

@@ -6,16 +6,16 @@
     "type": "table",
     "description": "Master address table",
     "depends": [
-    "bc_civicaddress_table.ms1",
-    "bc_location.ms1",
-    "bc_property_account_master",
-    "bc_property.ms1",
-    "bc_property_pinnum_formatted_owner_names",
-    "coa_active_jurisdictions.ms1",
-    "coa_districts_public_works",
-    "coa_districts_water",
-    "coa_districts_zoning",
-    "coa_zip_code"
+        "bc_civicaddress_table.ms1",
+        "bc_location.ms1",
+        "bc_property_account_master",
+        "bc_property.ms1",
+        "bc_property_pinnum_formatted_owner_names",
+        "coa_active_jurisdictions.ms1",
+        "coa_districts_public_works",
+        "coa_districts_water",
+        "coa_districts_zoning",
+        "coa_zip_code"
     ],
     "schema": "coa_address",
     "title": "Master address table",
@@ -27,22 +27,18 @@
     "status": "ongoing",
     "update-frequency": "daily",
     "keywords": [
-    "gis",
-    "Asheville"
+        "gis",
+        "Asheville"
     ],
     "use-constraints": "None",
     "topic-category": [
     "location"
     ],
     "geographic-extent": {
-    "XMin":"-82.65",
-    "XMax":"-82.47",
-    "YMin":"35.47",
-    "YMax:":"35.65"
-    },
-    "temporal_extent": {
-    "begin_date_time": "2018-11-29T15:16:15Z",
-    "end_date_time": "2018-11-29T15:16:15Z"
+        "east":"-82.65",
+        "west":"-82.47",
+        "north":"35.47",
+        "south:":"35.65"
     },
     "feature-catalog": "See note 3",
     "process-description": [

@@ -16,6 +16,11 @@ if (args.argCount() < 1) usageAndExit();
 
 const command = args.getArg(0);
 
+console.log('start',args.getOption('start', 'none'));
+console.log("command: ", command);
+console.log("env:db1host: ", process.env.db1host)
+console.log("Current dir: ", process.cwd(), __dirname);
+
 if(command==="version"){
     console.log(bedrock.version());
 }else if(command==="checkout"){

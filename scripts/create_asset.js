@@ -1,7 +1,7 @@
 const fs = require('fs');
 const CommandLineArgs = require('./common/CommandLineArgs');
 
-function create(){
+function create_asset(){
     const args = new CommandLineArgs(process.argv.slice(2));
     if (args.argCount() < 2) usageAndExit();
     const newAsset = args.getArg(1);
@@ -74,4 +74,4 @@ function usageAndExit(){
     process.exit(1);
 }
 
-module.exports = create;
+module.exports = create_asset;

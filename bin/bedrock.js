@@ -8,7 +8,8 @@ const CommandLineArgs = require('../scripts/common/CommandLineArgs');
 const checkout = require('../scripts/checkout');
 const report = require('../scripts/report_status');
 const traverse_and_do_task = require('../scripts/traverse_and_do_task');
-const create = require('../scripts/create');
+const create_asset = require('../scripts/create_asset');
+const create_schema = require('../scripts/create_schema');
 const run_etl_jobs = require('../scripts/run_etl_jobs');
 const args = new CommandLineArgs(process.argv.slice(2));
 if (args.argCount() < 1) usageAndExit();
@@ -21,8 +22,10 @@ if(command==="version"){
     checkout().catch(e => {console.error('query error', e.message, e.stack);});
 }else if(command==="checkin" || command==="init_etl" || command==="list"){
     traverse_and_do_task();
-}else if(command==="create"){
-    create();
+}else if(command==="create-asset"){
+    create_asset();
+}else if(command==="create-schema"){
+    create_schema();
 }else if(command==="run_etl"){
     run_etl_jobs();
 }else if(command==="report"){

@@ -4,11 +4,9 @@
   "description": "System for data inventory and dependency management",
   "main": "index.js",
   "bin": {
-    "COMMENT": "echo 'This version is called from bash (bedrock checkout)'",
     "bedrock": "./bin/bedrock.js"
   },
   "scripts": {
-    "COMMENT": "echo 'This version is called from npm (npm run bedrock checkout)'",
     "bedrock": "node ./bin/bedrock.js --start=./working_directory"
   },
   "repository": {

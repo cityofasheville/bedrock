@@ -3,7 +3,11 @@ const Pool = require('pg-pool');
 
 let data = [];
 
-function init() {
+function init(config) {
+  if(!config.oneAsset){
+    console.log("Asset name is required to checkin.");
+    process.exit(1);
+  }
 }
 
 function runForEachPath(path, logger, config) { 
@@ -12,7 +16,7 @@ function runForEachPath(path, logger, config) {
       if (files.indexOf('mda.json') >= 0) {
           const mdafd = fs.openSync(`${path}/mda.json`, 'r');
           const mda = JSON.parse(fs.readFileSync(mdafd, { encoding: 'utf8' }));
-          if(!config.oneAsset || config.oneAsset === mda.name){  //if running for all assets or this asset
+          if(config.oneAsset === mda.name){  //if this asset
             if (files.indexOf('etl.json') >= 0) {
               const etlfd = fs.openSync(`${path}/etl.json`, 'r');
               const etl = JSON.parse(fs.readFileSync(etlfd, { encoding: 'utf8' }));
@@ -51,24 +55,11 @@ function finish(config) {
   };
   var pool = new Pool(dbConfig)
   pool.connect().then(client => {
-    if(!config.oneAsset){ // if we are doing all assets, clear tables first: there could be dropped assets
-      clearTables(client);
-    }
     data.forEach(asset=>{
       checkinAsset(asset, client);
     });
     client.release();
   })
-}
-
-function clearTables(client){
-        client.query('truncate table bedrock.assets')
-  .then(client.query('truncate table bedrock.asset_files'))
-  .then(client.query('truncate table bedrock.asset_depends'))
-  .then(client.query('truncate table bedrock.etl_tasks'))
-  // .then(client.query('truncate table bedrock.schemas'))
-  // .then(client.query('truncate table bedrock.schema_columns'))
-  .catch(e => {console.error('query error', e.message, e.stack); });
 }
 
 function checkinAsset(asset, client){
@@ -218,7 +209,7 @@ function checkinEtl(asset, client){
 function processing(stage, path, dest, config, logger) {
   switch (stage) {
     case 'init':
-      init();
+      init(config);
       break;
     case 'run':
       runForEachPath(path, logger, config);

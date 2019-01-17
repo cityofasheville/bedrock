@@ -22,7 +22,7 @@
   "homepage": "https://github.com/cityofasheville/bedrock",
   "dependencies": {
     "bunyan": "^1.8.12",
-    "coa-node-logging": "^2.0.4",
+    "coa-node-logging": "^3.0.0",
     "dotenv": "^2.0.0",
     "mssql": "^4.2.3",
     "nodemailer": "^4.6.8",

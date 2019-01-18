@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 function normalizeName(name, useSpaces = false) {
-  let newName = name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  let newName = name.replace(/_/g, ' ').replace(/\b\w/g, l => {return l.toUpperCase()});
   if (!useSpaces) newName = newName.replace(/ /g, '');
   return newName;
 }
@@ -9,7 +9,7 @@ function normalizeName(name, useSpaces = false) {
 function dataSetName(dataDef, graphQlConfig) {
   let name;
   if ('name' in graphQlConfig) {
-    name = graphQlConfig.name;
+    ({ name } = graphQlConfig);
   } else {
     name = normalizeName(dataDef.name);
   }
@@ -53,12 +53,12 @@ function appendGraphQlType(dataDef, config, graphQlConfig) {
   let typeDef = '';
 
   typeDef = `${indent}type ${name} {\n`;
-  dataDef.columns.forEach((column) => {
+  dataDef.columns.forEach(column => {
     const cName = column.column;
     let type = translateType(column.type);
     if (column.column in graphQlConfig.columns) {
       if ('type' in graphQlConfig.columns[column.column]) {
-        type = graphQlConfig.columns[column.column].type;
+        ({ type } = graphQlConfig.columns[column.column]);
       }
     }
     let desc = `${indent}  # ${column.name ? column.name : normalizeName(cName, true)}`;

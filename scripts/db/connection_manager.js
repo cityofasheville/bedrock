@@ -18,7 +18,8 @@ class ConnectionManager {
       const connection = this.connections[name];
       c = connection.connection;
       if (!c) {
-        c = connection.connection = new Connection(name, connection.config, this.logger);
+        connection.connection = new Connection(name, connection.config, this.logger);
+        c = new Connection(name, connection.config, this.logger);
       }
     } else {
       this.logger.error('unknown-db-connection', `Unknown database connection ${name}`, {});

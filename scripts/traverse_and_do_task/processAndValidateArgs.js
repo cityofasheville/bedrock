@@ -1,8 +1,9 @@
 /* eslint-disable no-console, spaced-comment, global-require */
-const usageAndExit = require('./usage');
-const CommandLineArgs = require('../common/CommandLineArgs');
 const fs = require('fs');
 const Logger = require('coa-node-logging');
+const path = require('path');
+const CommandLineArgs = require('../common/CommandLineArgs');
+const usageAndExit = require('./usage');
 const tasks = {
   validate: require('./tasks/validator'),
   graphql: require('./tasks/graphql'),
@@ -21,10 +22,10 @@ module.exports = function processAndValidateArgs(argv) {
   if (!task) usageAndExit(`traverse_and_run_task: ${command} task not found.`);
 
   const startDir = args.getOption('start', '.');
-  const destDir = args.getOption('dest', __dirname + '/../../etl_jobs_dir');
+  const destDir = args.getOption('dest', path.join(__dirname, '/../../etl_jobs_dir'));
   const schema = args.hasOption('schema');
   const metadata = args.hasOption('metadata');
-  
+
   if (!fs.existsSync(startDir)) {
     usageAndExit(`traverse_and_run_task: Start directory ${startDir} not found.`);
   }
@@ -47,4 +48,3 @@ module.exports = function processAndValidateArgs(argv) {
     },
   };
 };
-

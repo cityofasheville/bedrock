@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 const fs = require('fs');
-const fork = require('child_process').fork;
+const { fork } = require('child_process');
 const { getJobPoints, recursivelyDeletePath, countPoints } = require('./utilities');
 
 class JobRunner {
@@ -48,7 +48,9 @@ class JobRunner {
     }
     fs.mkdirSync(jobDir);
     const fd = fs.openSync(`${jobDir}/status.json`, 'w');
-    fs.writeFileSync(fd, JSON.stringify({ name: job.name, path: job.path, job: job.job, status: 'Pending' }));
+    fs.writeFileSync(fd, JSON.stringify({
+      name: job.name, path: job.path, job: job.job, status: 'Pending',
+    }));
     fs.closeSync(fd);
     if (reallyRun) {
       // Now fork a script that will run that job and write out the result at the end.
@@ -108,30 +110,28 @@ class JobRunner {
         }
       }
       if (freeLoad <= 0) {
-          jobsTodo = false;
-      } else {
-        if (!haveSequencedJobs) { // Can't run any more sequenced, get some free ones.
-          const toRun = [];
-          const holdJobs = [];
-          // console.log('In !haveSequencedJobs');
-          for (let i = 0; i < this.jTracker.freeToDo.length; i += 1) {
-            const fjob = this.jTracker.freeToDo[i];
-            if (getJobPoints(fjob) <= freeLoad) {
-              toRun.push(fjob);
-              freeLoad -= getJobPoints(fjob);
-            } else {
-              holdJobs.push(fjob);
-            }
+        jobsTodo = false;
+      } else if (!haveSequencedJobs) { // Can't run any more sequenced, get some free ones.
+        const toRun = [];
+        const holdJobs = [];
+        // console.log('In !haveSequencedJobs');
+        for (let i = 0; i < this.jTracker.freeToDo.length; i += 1) {
+          const fjob = this.jTracker.freeToDo[i];
+          if (getJobPoints(fjob) <= freeLoad) {
+            toRun.push(fjob);
+            freeLoad -= getJobPoints(fjob);
+          } else {
+            holdJobs.push(fjob);
           }
-          // console.log(`Running ${toRun.length} free jobs!`);
-          this.jTracker.freeToDo = holdJobs;
-          while (toRun.length > 0) {
-            job = toRun.shift();
-            this.startJob(job);
-          }
-          jobsTodo = false;
-          this.saveState();
         }
+        // console.log(`Running ${toRun.length} free jobs!`);
+        this.jTracker.freeToDo = holdJobs;
+        while (toRun.length > 0) {
+          job = toRun.shift();
+          this.startJob(job);
+        }
+        jobsTodo = false;
+        this.saveState();
       }
     }
   }
@@ -141,7 +141,7 @@ class JobRunner {
    ***************************************************************************
      harvestRunningJobs - called each invocation
    ***************************************************************************
-   ****************************************************************************/
+   *************************************************************************** */
 
   purgeDependents(errorJob) {
     this.jTracker.sequencedToDo = this.jTracker.sequencedToDo.filter(job => {
@@ -168,7 +168,7 @@ class JobRunner {
         this.jTracker.jobStatus[job.name] = 'Done';
         this.jTracker.completed.push(job);
         return false;
-      } else if (jobStatus.status === 'Error') {
+      } if (jobStatus.status === 'Error') {
         this.jTracker.jobStatus[job.name] = 'Error';
         this.jTracker.errored.push(job);
         this.purgeDependents(job.name); // Pull off every job that depends on this one
@@ -184,7 +184,7 @@ class JobRunner {
    ***************************************************************************
      initializeRun - called each invocation
    ***************************************************************************
-   ***************************************************************************/
+   ************************************************************************** */
 
   loadJobTracker(workDir, jobFileName, logger) {
     this.jTracker = JobRunner.emptyTracker();
@@ -208,7 +208,7 @@ class JobRunner {
    ***************************************************************************
      Called once from createRunner.js when ETL processes are initialized
    ***************************************************************************
-   ***************************************************************************/
+   ************************************************************************** */
 
   static initializeJobTracker(workDir, jobFileName, logger) {
     const jobTracker = JobRunner.emptyTracker();

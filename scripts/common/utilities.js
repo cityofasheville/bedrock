@@ -3,8 +3,7 @@ function stripPath(path) {
   let index = path.lastIndexOf('/');
   if (index >= 0) {
     filename = path.substring(index + 1);
-  }
-  else {
+  } else {
     index = path.lastIndexOf('\\');
     if (index >= 0) filename = path.substring(index + 1);
   }

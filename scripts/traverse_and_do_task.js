@@ -8,13 +8,12 @@ const processDirectory = require('./traverse_and_do_task/processDirectory');
 // (param: stage, path, dest, config, logger)
 ///////////////////////////////////////////////////////
 
-async function traverse_and_do_task(){
-    const args = processAndValidateArgs(process.argv.slice(2));
-    const task = args.task;
-    await task('init', null, args.destDir, args.config, args.logger);
-    await processDirectory(args.config.startDir, args.destDir, task, args.config, args.logger);
-    await task('finish', null, args.destDir, args.config, args.logger);
+async function traverseAndDoTask() {
+  const args = processAndValidateArgs(process.argv.slice(2));
+  const { task } = args;
+  await task('init', null, args.destDir, args.config, args.logger);
+  await processDirectory(args.config.startDir, args.destDir, task, args.config, args.logger);
+  await task('finish', null, args.destDir, args.config, args.logger);
 }
 
-module.exports = traverse_and_do_task;
-
+module.exports = traverseAndDoTask;

@@ -1,6 +1,7 @@
+/* eslint-disable no-console */
+const os = require('os');
 const pgConnection = require('./pg_connection');
 
-const os = require('os');
 const ssConnection = (os.platform() === 'win32') ? require('./ss_connection') : null;
 
 class Connection {
@@ -74,15 +75,16 @@ class Connection {
       return this.connection.connect().then(() => {
         return new sql.Request(this.connection).query(sql);
       });
-    } else if (this.info.type === 'pg') {
+    } 
+    if (this.info.type === 'pg') {
       return this.connection.connect().then(client => {
         return client.query(sql).then(result => {
           client.release();
           return Promise.resolve(result);
         })
-        .catch(err => {
-          return Promise.reject(new Error(JSON.stringify(err.message)));
-        });
+          .catch(err => {
+            return Promise.reject(new Error(JSON.stringify(err.message)));
+          });
       });
     }
     return Promise.reject(new Error(`Unknown connection type ${this.info.type}`));
@@ -148,11 +150,11 @@ class Connection {
         FROM information_schema.columns
         WHERE table_name='${table}'
       `;
-    //  new sql.Request().query('select * from mytable').then(function(recordset) {
-    //     console.dir(recordset);
-    // }).catch(function(err) {
-    //     // ... query error checks
-    // });
+      //  new sql.Request().query('select * from mytable').then(function(recordset) {
+      //     console.dir(recordset);
+      // }).catch(function(err) {
+      //     // ... query error checks
+      // });
       return this.connection.connect().then(client => {
         return client.query(sql).then(result => {
           client.release();
@@ -179,11 +181,12 @@ class Connection {
           }
           return Promise.resolve(tableMeta);
         })
-        .catch(err => {
-          console.log(`Query exception with err = ${JSON.stringify(err)}`);
-        });
+          .catch(err => {
+            console.log(`Query exception with err = ${JSON.stringify(err)}`);
+          });
       });
-    } else if (this.info.type === 'sqlserver') {
+    }
+    if (this.info.type === 'sqlserver') {
       console.log('Type is sqlserver');
       if (this.connected) {
         console.log('ALREADY CONNECTED');

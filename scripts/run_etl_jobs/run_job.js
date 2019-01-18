@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-const spawnSync = require('child_process').spawnSync;
+const { spawnSync } = require('child_process');
 const fs = require('fs');
 const Logger = require('coa-node-logging');
 const ConnectionManager = require('../db/connection_manager');
@@ -19,7 +19,7 @@ fd = fs.openSync(`${process.argv[2]}/status.json`, 'w');
 fs.writeFileSync(fd, JSON.stringify(job), { encoding: 'utf8' });
 fs.closeSync(fd);
 
-async function runSql(task) {
+function runSql(task) {
   const filePath = (task.file[0] === '/') ? task.file : `${job.path}/${task.file}`;
   console.log(` Doing a SQL query from file ${filePath}`);
   const fdSql = fs.openSync(filePath, 'r');
@@ -27,13 +27,13 @@ async function runSql(task) {
   const cn = connectionManager.getConnection(task.db);
 
   return cn.query(sql)
-  .then(res => {
-    console.log(`Query done - result: ${JSON.stringify(res)}`);
-    return res;
-  })
-  .catch(err => {
-    return Promise.reject(`Query error: ${err.message}`);
-  });
+    .then(res => {
+      console.log(`Query done - result: ${JSON.stringify(res)}`);
+      return res;
+    })
+    .catch(err => {
+      return Promise.reject(new Error(`Query error: ${err.message}`));
+    });
 }
 
 function runFme(task) {
@@ -67,12 +67,12 @@ function runBash(task) {
 }
 
 function runExe(task) {
-    const filePath = (task.file[0] === '/') ? task.file : `${job.path}/${task.file}`;
-    console.log(` Doing an Exe job from file ${filePath}`);
-    const jobStatus = spawnSync(filePath, { detached: false, shell: true, cwd: job.path });
-    if (jobStatus.status !== 0) {
-      throw new Error(jobStatus.error);
-    }  
+  const filePath = (task.file[0] === '/') ? task.file : `${job.path}/${task.file}`;
+  console.log(` Doing an Exe job from file ${filePath}`);
+  const jobStatus = spawnSync(filePath, { detached: false, shell: true, cwd: job.path });
+  if (jobStatus.status !== 0) {
+    throw new Error(jobStatus.error);
+  }
 }
 
 async function runTaskSequence(seqName, tasks, endStatus = 'Done') {
@@ -83,15 +83,15 @@ async function runTaskSequence(seqName, tasks, endStatus = 'Done') {
     const task = tasks[i];
     console.log(`${seqName}:${jobName}: Task ${i}, type ${task.type} - ${task.active ? 'Active' : 'Inactive'}`);
     if (task.active) {
-      if (task.type === 'sql') { 
+      if (task.type === 'sql') {
         try {
-          await runSql(task);
+          runSql(task);
         } catch (err) {
           hasError = true;
           errMessage = err;
           logger.error(`Error running ${seqName}:${jobName} SQL job, file ${task.file}: ${err}`);
         }
-      } else if (task.type === 'fme') { 
+      } else if (task.type === 'fme') {
         try {
           runFme(task);
         } catch (err) {
@@ -137,7 +137,7 @@ async function runTaskSequence(seqName, tasks, endStatus = 'Done') {
     fd = fs.openSync(`${process.argv[2]}/status.json`, 'w');
     fs.writeFileSync(fd, JSON.stringify(job), { encoding: 'utf8' });
     fs.closeSync(fd);
-    return Promise.reject(`Error running the job ${seqName}:${job.name}. ${errMessage}`);
+    return Promise.reject(new Error(`Error running the job ${seqName}:${job.name}. ${errMessage}`));
   }
   return Promise.resolve(endStatus);
 }
@@ -150,23 +150,23 @@ function recordJobStatus(jobStatus) {
 
 console.log(`Here is the job: ${JSON.stringify(job.job)}`);
 runTaskSequence('Create', job.job.create, 'Created')
-.then(status => {
-  job.status = status;
-  recordJobStatus(job);
-  return runTaskSequence('Distribute', job.job.distribute, 'Distributed');
-})
-.then(status => {
-  job.status = status;
-  recordJobStatus(job);
-  return runTaskSequence('Tasks', job.job.tasks, 'Done');
-})
-.then(status => {
-  job.status = status;
-  recordJobStatus(job);
-})
-.catch(err => {
-  console.log(`Error running ${jobName}: ${err}`);
-  logger.error(`Error running ${jobName}: ${JSON.stringify(err)}`);
-  job.status = 'Error';
-  recordJobStatus(job);
-});
+  .then(status => {
+    job.status = status;
+    recordJobStatus(job);
+    return runTaskSequence('Distribute', job.job.distribute, 'Distributed');
+  })
+  .then(status => {
+    job.status = status;
+    recordJobStatus(job);
+    return runTaskSequence('Tasks', job.job.tasks, 'Done');
+  })
+  .then(status => {
+    job.status = status;
+    recordJobStatus(job);
+  })
+  .catch(err => {
+    console.log(`Error running ${jobName}: ${err}`);
+    logger.error(`Error running ${jobName}: ${JSON.stringify(err)}`);
+    job.status = 'Error';
+    recordJobStatus(job);
+  });

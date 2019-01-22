@@ -41,7 +41,6 @@ async function checkout() {
       //write mda.json
       const dependArray = [];
       const sqlDepends = 'SELECT depends FROM bedrock.asset_depends where asset_id = $1';
-      // eslint-disable-next-line no-await-in-loop
       const depends = await client.query(sqlDepends, [asset.id]);
       for (let j = 0; j < depends.rows.length; j += 1) { // (const depend of depends.rows) {
         const depend = depends.rows[j];
@@ -94,7 +93,6 @@ async function checkout() {
 
       const sqlEtl = 'SELECT asset_id, category, type, file, file_content, db, active, task_order '
     + 'FROM bedrock.etl_tasks WHERE asset_id = $1 ORDER BY category, task_order';
-      // eslint-disable-next-line no-await-in-loop
       const etlData = await client.query(sqlEtl, [asset.id]);
       if (etlData.rows[0]) {
         for (let k = 0; k < etlData.rows.length; k += 1) { // (const row of etlData.rows) {

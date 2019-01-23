@@ -6,7 +6,7 @@ const connections = {
     database: process.env.db1database,
     user: process.env.db1user,
     password: process.env.db1password,
-  },  
+  },
   warehouse1: {
     type: 'pg',
     authMethod: 'password',

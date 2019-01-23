@@ -2,7 +2,6 @@ const fs = require('fs');
 const JobRunner = require('./JobRunner');
 
 module.exports = function createRunner(args) {
-
   // Test that we have what we need
   const files = fs.readdirSync(args.workingDirectory);
   if (files.indexOf(args.jobFileName) < 0 || files.indexOf(args.jobFileDate) < 0) {

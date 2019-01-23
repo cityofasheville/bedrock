@@ -85,7 +85,8 @@ async function runTaskSequence(seqName, tasks, endStatus = 'Done') {
     if (task.active) {
       if (task.type === 'sql') {
         try {
-          runSql(task);
+          // eslint-disable-next-line no-await-in-loop
+          await runSql(task);
         } catch (err) {
           hasError = true;
           errMessage = err;

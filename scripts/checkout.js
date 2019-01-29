@@ -25,14 +25,18 @@ async function checkout() {
   + 'ast.responsible_party_role, ast.url, ast.abstract, ast.status, ast.update_frequency, ast.keywords, '
   + 'ast.use_constraints, ast.metadata_constraints, ast.resource_constraints, ast.topic_category,  '
   + 'ast.geo_extent_east, ast.geo_extent_west, ast.geo_extent_north, ast.geo_extent_south, ast.feature_catalog,  '
-  + 'ast.process_description, ast.spatial_reference, ast.metadata_creation_date, ast.contact_role_code, $1 AS foo '
+  + 'ast.process_description, ast.spatial_reference, ast.metadata_creation_date, ast.contact_role_code '
   + 'FROM bedrock.assets ast '
   + 'INNER JOIN bedrock.asset_locations loc '
   + 'ON ast.location = loc.id ';
-  if (oneAsset) { sqlAsset += 'WHERE ast.name = $1 '; }
-  const assets = await client.query(sqlAsset, [oneAsset]);
+  let queryArgs = [];
+  if (oneAsset) {
+    sqlAsset += 'WHERE ast.name = $1 ';
+    queryArgs = [oneAsset];
+  }
+  const assets = await client.query(sqlAsset, queryArgs);
   if (!assets.rows[0]) {
-    console.log('No data');
+    console.log('No assets found');
   } else {
     for (let i = 0; i < assets.rows.length; i += 1) { // const asset of assets.rows) {
       const asset = assets.rows[i];

@@ -14,6 +14,12 @@ class ConnectionManager {
     });
   }
 
+  addConnection(name, config) {
+    if (name in this.connections) throw new Error(`Connection ${name} already exists`);
+    this.connections[name] = { config, connection: null };
+    return this.getConnection(name);
+  }
+
   getConnection(name) {
     let c = null;
     if (name in this.connections) {

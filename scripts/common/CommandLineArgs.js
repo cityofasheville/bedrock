@@ -31,6 +31,10 @@ class CommandLineArgs {
     return (this.args.length > argNum) ? this.args[argNum] : null;
   }
 
+  popArg() {
+    return (this.args.length > 0) ? this.args.shift() : null;
+  }
+
   argCount() {
     return this.args.length;
   }

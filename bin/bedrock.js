@@ -18,10 +18,11 @@ const traverseAndDoTask = require('../scripts/traverse_and_do_task');
 const createAsset = require('../scripts/create_asset');
 const createSchema = require('../scripts/create_schema');
 const runEtlJobs = require('../scripts/run_etl_jobs');
+const initDb = require('../scripts/init_db');
 const args = new CommandLineArgs(process.argv.slice(2));
 if (args.argCount() < 1) usageAndExit();
 
-const command = args.getArg(0);
+const command = args.popArg();
 
 // console.log('start',args.getOption('start', 'none'));
 // console.log('command: ', command);
@@ -43,6 +44,8 @@ if (command === 'version') {
   runEtlJobs();
 } else if (command === 'report') {
   report();
+} else if (command === 'initdb') {
+  initDb(args);
 }
 
 function usageAndExit() {

@@ -29,10 +29,10 @@ async function checkout() {
   + 'FROM bedrock.assets ast '
   + 'INNER JOIN bedrock.asset_locations loc '
   + 'ON ast.location = loc.id ';
-  let queryArgs = [];
+  const queryArgs = [];
   if (oneAsset) {
     sqlAsset += 'WHERE ast.name = $1 ';
-    queryArgs = [oneAsset];
+    queryArgs.push(oneAsset);
   }
   const assets = await client.query(sqlAsset, queryArgs);
   if (!assets.rows[0]) {

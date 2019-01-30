@@ -20,11 +20,11 @@ async function dbInit(args) {
   const dbConfigFile = args.getArg(0);
   console.log(`Options ${JSON.stringify(args.options)}`);
   if (dbConfigFile === null) {
-    console.log('Usage: bedrock [--postgis] initdb db-config-file-name');
+    console.log('Usage: bedrock [--postgis] initdb db-connection-file-name');
     process.exit();
   }
   if (!fs.existsSync(dbConfigFile)) {
-    console.log(`Database configuration file ${dbConfigFile} not found`);
+    console.log(`Database connection file ${dbConfigFile} not found`);
     process.exit();
   }
 
@@ -33,9 +33,7 @@ async function dbInit(args) {
   fs.closeSync(fd);
 
   const client = connectionManager.addConnection('New Bedrock Database', dbConfig);
-
-  console.log(`Here is the db config: ${JSON.stringify(dbConfig)}`);
-
+  
   const runPostgis = (args.hasOption('postgis')) ? client.query(initPostgis) : Promise.resolve(null);
 
   await runPostgis

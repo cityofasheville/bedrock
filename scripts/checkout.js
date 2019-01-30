@@ -1,7 +1,7 @@
 /* eslint-disable no-console, spaced-comment */
 const fs = require('fs');
-const Pool = require('pg-pool');
 const CommandLineArgs = require('./common/CommandLineArgs');
+const connectionManager = require('./db/connection_manager');
 
 async function checkout() {
   const args = new CommandLineArgs(process.argv.slice(2));
@@ -9,16 +9,7 @@ async function checkout() {
   const oneAsset = args.getArg(1);
   const startDir = args.getOption('start', '.');
 
-  const dbConfig = {
-    host: process.env.db1host,
-    user: process.env.db1user,
-    password: process.env.db1password,
-    database: process.env.db1database,
-    max: 10,
-    idleTimeoutMillis: 10000,
-  };
-  const pool = new Pool(dbConfig);
-  const client = await pool.connect();
+  const client = connectionManager.getConnection('datastore1');
 
   let sqlAsset = 'SELECT ast.id, ast.name, loc.short_name AS location, ast.active, ast.type, ast.description, ast.category,  '
   + 'ast.tags, array_length(ast.tags, 1) tag_len, ast.schema, ast.title, ast.publication_date, ast.responsible_party, '
@@ -135,7 +126,6 @@ async function checkout() {
       }
     }
   }
-  client.release();
 }
 
 function arrToStr(arr) {

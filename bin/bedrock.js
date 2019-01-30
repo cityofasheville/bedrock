@@ -1,8 +1,15 @@
 #!/usr/bin/env node
 /* eslint-disable no-console */
 
-const fs = require('fs');
 const dotenv = require('dotenv');
+const fs = require('fs');
+
+// We must read the environment variables *before* we include any of the commands.
+if (fs.existsSync('./.env')) {
+  dotenv.config({ path: './.env' });
+} else {
+  dotenv.config({ path: 'c:/coa/bedrock/.env' });
+}
 const bedrock = require('../index.js');
 const CommandLineArgs = require('../scripts/common/CommandLineArgs');
 const checkout = require('../scripts/checkout');
@@ -14,11 +21,6 @@ const runEtlJobs = require('../scripts/run_etl_jobs');
 const args = new CommandLineArgs(process.argv.slice(2));
 if (args.argCount() < 1) usageAndExit();
 
-if (fs.existsSync('./.env')) {
-  dotenv.config({ path: './.env' });
-} else {
-  dotenv.config({ path: 'c:/coa/bedrock/.env' });
-}
 const command = args.getArg(0);
 
 // console.log('start',args.getOption('start', 'none'));

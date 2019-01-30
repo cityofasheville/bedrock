@@ -49,6 +49,6 @@ if (command === 'version') {
 }
 
 function usageAndExit() {
-  console.log('Usage:\tbedrock [checkin|checkout|init_etl|run_etl|report|create-asset|version]');
+  console.log('Usage:\tbedrock [checkin|checkout|init_etl|run_etl|report|initdb|create-asset|version]');
   process.exit(1);
 }

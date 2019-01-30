@@ -2,6 +2,7 @@
 const processAndValidateArgs = require('./traverse_and_do_task/processAndValidateArgs');
 const processDirectory = require('./traverse_and_do_task/processDirectory');
 
+
 ///////////////////////////////////////////////////////
 // Each task potentially has an initialization phase,
 // a main phase for each folder, and a finalization phase.

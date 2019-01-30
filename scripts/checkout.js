@@ -9,7 +9,7 @@ async function checkout() {
   const oneAsset = args.getArg(1);
   const startDir = args.getOption('start', '.');
 
-  const client = connectionManager.getConnection('datastore1');
+  const client = connectionManager.getConnection('bedrock');
 
   let sqlAsset = 'SELECT ast.id, ast.name, loc.short_name AS location, ast.active, ast.type, ast.description, ast.category,  '
   + 'ast.tags, array_length(ast.tags, 1) tag_len, ast.schema, ast.title, ast.publication_date, ast.responsible_party, '

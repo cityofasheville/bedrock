@@ -1,4 +1,12 @@
 const connections = {
+  bedrock: {
+    type: 'pg',
+    authMethod: 'password',
+    host: process.env.bedrockhost,
+    database: process.env.bedrockdatabase,
+    user: process.env.bedrockuser,
+    password: process.env.bedrockpassword,
+  },
   datastore1: {
     type: 'pg',
     authMethod: 'password',

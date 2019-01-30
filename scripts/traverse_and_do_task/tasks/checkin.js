@@ -5,9 +5,11 @@ const Pool = require('pg-pool');
 const data = [];
 
 function init(config) {
-  if (!config.oneAsset) {
+  if (!config.oneAsset && !config.allAssets) {
     console.log('Asset name is required to checkin.');
     process.exit(1);
+  } else if (config.allAssets) {
+    console.log('Checking in all assets');
   }
 }
 

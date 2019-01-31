@@ -14,7 +14,11 @@ CREATE TABLE bedrock.asset_objects
   schema character varying(255) COLLATE pg_catalog."default",
   type character varying(20) COLLATE pg_catalog."default" NOT NULL,
   asset_id integer,
-  definition_id integer
+  blueprint character varying COLLATE pg_catalog."default",
+  CONSTRAINT "PK_asset_object" PRIMARY KEY (id),
+  CONSTRAINT "UK_asset_objects_assetid_depends" UNIQUE (asset_id, name)
+
+
 )
 WITH (
     OIDS = FALSE

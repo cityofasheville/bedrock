@@ -34,6 +34,19 @@ async function checkout() {
       const fullpath = `${startDir}/${asset.name}`;
       if (!fs.existsSync(fullpath)) { fs.mkdirSync(fullpath); }
       //write mda.json
+      const sqlObjects = 'SELECT name, schema, type, blueprint FROM bedrock.asset_objects WHERE asset_id = $1';
+      const objs = await client.query(sqlObjects, [asset.id]);
+      const nObj = objs.rows.length;
+      const objString = objs.rows.reduce((accum, row, idx) => {
+        const item = `    {
+      "name": "${row.name}",
+      "type": "${row.type}",
+      "schema": "${row.schema}",
+      "blueprint": "${row.blueprint}"
+    }${(idx === nObj - 1) ? '\n' : ',\n'}`;
+        return accum + item;
+      }, '');
+
       const dependArray = [];
       const sqlDepends = 'SELECT depends FROM bedrock.asset_depends where asset_id = $1';
       const depends = await client.query(sqlDepends, [asset.id]);
@@ -52,6 +65,9 @@ async function checkout() {
     + `  "depends": ${dependList},\n`
     + `  "category": "${asset.category}",\n`
     + `  "tags": ${arrToStr(asset.tags)},\n`
+    + `  "objects": [\n`
+    + objString
+    + `  ],\n`
     + `  "schema": "${asset.schema}",\n`
     + `  "title": "${asset.title}",\n`
     + `  "publication_date": "${dateToStr(asset.publication_date)}",\n`

@@ -12,6 +12,7 @@ CREATE TABLE bedrock.assets
     id integer NOT NULL DEFAULT nextval('bedrock.asset_id_seq'::regclass),
     name character varying(255) COLLATE pg_catalog."default" NOT NULL,
     location integer NOT NULL,
+    etl_group integer NOT NULL DEFAULT 1 references bedrock.etl_groups(id),
     active boolean NOT NULL,
     type character varying(20) COLLATE pg_catalog."default" NOT NULL,
     description character varying(1000) COLLATE pg_catalog."default",

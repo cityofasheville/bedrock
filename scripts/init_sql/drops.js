@@ -12,6 +12,8 @@ DROP TABLE IF EXISTS bedrock.asset_depends;
 DROP SEQUENCE IF EXISTS bedrock.asset_depend_id_seq;
 DROP TABLE IF EXISTS bedrock.assets;
 DROP SEQUENCE IF EXISTS bedrock.asset_id_seq;
+DROP TABLE IF EXISTS bedrock.etl_groups;
+DROP SEQUENCE IF EXISTS bedrock.etl_group_id_seq;
 DROP TABLE IF EXISTS bedrock.asset_locations;
 DROP SEQUENCE IF EXISTS bedrock.asset_location_id_seq;
 DROP SCHEMA IF EXISTS bedrock; 

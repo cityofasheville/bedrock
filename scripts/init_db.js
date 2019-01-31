@@ -4,6 +4,7 @@ const connectionManager = require('./db/connection_manager');
 
 const drops = require('./init_sql/drops');
 const initPostgis = require('./init_sql/init_postgis');
+const initEtlGroups = require('./init_sql/etl_groups');
 const initAssets = require('./init_sql/assets');
 const initLocations = require('./init_sql/locations');
 const initDepends = require('./init_sql/depends');
@@ -61,6 +62,10 @@ async function dbInit(args) {
     })
     .then(() => {
       console.log('Initialized the locations');
+      return client.query(initEtlGroups);
+    })
+    .then(() => {
+      console.log('Initialized the ETL groups');
       return client.query(initAssets);
     })
     .then(() => {

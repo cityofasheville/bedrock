@@ -19,6 +19,8 @@ const createAsset = require('../scripts/create_asset');
 const createSchema = require('../scripts/create_schema');
 const runEtlJobs = require('../scripts/run_etl_jobs');
 const initDb = require('../scripts/init_db');
+const blueprint = require('../scripts/blueprint');
+
 const args = new CommandLineArgs(process.argv.slice(2));
 if (args.argCount() < 1) usageAndExit();
 
@@ -46,6 +48,8 @@ if (command === 'version') {
   report();
 } else if (command === 'initdb') {
   initDb(args);
+} else if (command === 'blueprint') {
+  blueprint(args);
 }
 
 function usageAndExit() {

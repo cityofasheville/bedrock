@@ -8,9 +8,9 @@ async function checkout() {
   //TODO if (args.argCount() < 1) usageAndExit();
   const oneAsset = args.getArg(1);
   const startDir = args.getOption('start', '.');
+  const blueprintMap = {};
 
   const client = connectionManager.getConnection('bedrock');
-
   let sqlAsset = 'SELECT ast.id, ast.name, loc.short_name AS location, ast.active, ast.type, ast.description, ast.category,  '
   + 'ast.tags, array_length(ast.tags, 1) tag_len, ast.schema, ast.title, ast.publication_date, ast.responsible_party, '
   + 'ast.responsible_party_role, ast.url, ast.abstract, ast.status, ast.update_frequency, ast.keywords, '
@@ -26,6 +26,7 @@ async function checkout() {
     queryArgs.push(oneAsset);
   }
   const assets = await client.query(sqlAsset, queryArgs);
+
   if (!assets.rows[0]) {
     console.log('No assets found');
   } else {
@@ -37,6 +38,10 @@ async function checkout() {
       const sqlObjects = 'SELECT name, schema, type, blueprint FROM bedrock.asset_objects WHERE asset_id = $1';
       const objs = await client.query(sqlObjects, [asset.id]);
       const nObj = objs.rows.length;
+
+      objs.rows.forEach(obj => {
+        if (obj.blueprint && obj.blueprint.length > 0) blueprintMap[obj.blueprint] = true;
+      });
       const objString = objs.rows.reduce((accum, row, idx) => {
         const item = `    {
       "name": "${row.name}",
@@ -139,6 +144,56 @@ async function checkout() {
         // console.log("File etl.json written: ", asset.name);
         // console.log("File etl.json written: ", asset.name);
         // console.log("File etl.json written: ", asset.name);
+      }
+    }
+
+    // Now let's download any blueprints that are referenced
+
+    const bdir = `${startDir}/blueprints`;
+    if (!fs.existsSync(bdir)) fs.mkdirSync(bdir);
+
+    const blueprints = Object.keys(blueprintMap);
+    for (let j = 0; j < blueprints.length; j += 1) {
+      const sql = `SELECT b.name, b.description, b.update_date, c.blueprint_name, 
+        c.column_name, c.ordinal_position, c.is_nullable, c.data_type, c.character_maximum_length,
+        c.numeric_precision, c.numeric_precision_radix, c.numeric_scale, c.datetime_precision,
+        c.interval_type, c.interval_precision FROM bedrock.object_blueprints b LEFT OUTER JOIN
+        bedrock.object_blueprint_columns c ON b.name = c.blueprint_name
+        WHERE b.name = $1`;
+        /* eslint-disable no-loop-func, spaced-comment */
+
+      const bp = await client.query(sql, [blueprints[j]]);
+
+      if (bp.rows && bp.rows.length > 0) {
+        const bpColString = bp.rows.reduce((accum, row, idx) => {
+          const item = `    {
+        "column_name": "${row.column_name}",
+        "data_type": "${row.data_type}",
+        "ordinal_position": "${row.ordinal_position}",
+        "is_nullable": "${row.is_nullable}",
+        "character_maximum_length": "${row.character_maximum_length}",
+        "numeric_precision": "${row.numeric_precision}",
+        "numeric_precision_radix": "${row.numeric_precision_radix}",
+        "numeric_scale": "${row.numeric_scale}",
+        "datetime_precision": "${row.datetime_precision}",
+        "interval_type": "${row.interval_type}",
+        "interval_precision": "${row.interval_precision}"
+      }${(idx === bp.rows.length - 1) ? '\n' : ',\n'}`;
+          return accum + item;
+        }, '');
+
+
+        const bpStr = `{
+         "name": "${bp.rows[0].blueprint_name}",
+         "description": "${bp.rows[0].description}",
+         "update_date": "${bp.rows[0].update_date}",
+         "columns": [
+           ${bpColString}
+         ]
+        }`;
+
+        const fileDataBp = new Uint8Array(Buffer.from(bpStr));
+        fs.writeFileSync(`${bdir}/${bp.rows[0].name}.json`, fileDataBp, 'utf8');
       }
     }
   }

@@ -4,7 +4,8 @@
   "description": "System for data inventory and dependency management",
   "main": "index.js",
   "bin": {
-    "bedrock": "./bin/bedrock.js"
+    "bedrock": "./bin/bedrock.js",
+    "blueprint": "./bin/blueprint.js"
   },
   "scripts": {
     "bedrock": "node ./bin/bedrock.js --start=./working_directory",

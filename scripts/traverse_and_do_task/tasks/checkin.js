@@ -1,13 +1,15 @@
 /* eslint-disable no-console */
 const fs = require('fs');
-const Pool = require('pg-pool');
+const connectionManager = require('../../db/connection_manager');
 
 const data = [];
 
 function init(config) {
-  if (!config.oneAsset) {
+  if (!config.oneAsset && !config.allAssets) {
     console.log('Asset name is required to checkin.');
     process.exit(1);
+  } else if (config.allAssets) {
+    console.log('Checking in all assets');
   }
 }
 
@@ -17,7 +19,7 @@ function runForEachPath(path, logger, config) {
     if (files.indexOf('mda.json') >= 0) {
       const mdafd = fs.openSync(`${path}/mda.json`, 'r');
       const mda = JSON.parse(fs.readFileSync(mdafd, { encoding: 'utf8' }));
-      if (config.oneAsset === mda.name) { // if this asset
+      if (config.allAssets || config.oneAsset === mda.name) { // if this asset
         if (files.indexOf('etl.json') >= 0) {
           const etlfd = fs.openSync(`${path}/etl.json`, 'r');
           const etl = JSON.parse(fs.readFileSync(etlfd, { encoding: 'utf8' }));
@@ -46,21 +48,9 @@ function runForEachPath(path, logger, config) {
 
 // //////////////////////////////////////////////////////////////////////
 function finish() {
-  const dbConfig = {
-    host: process.env.db1host,
-    user: process.env.db1user,
-    password: process.env.db1password,
-    database: process.env.db1database,
-    max: 10,
-    idleTimeoutMillis: 10000,
-    //  ssl: true,
-  };
-  const pool = new Pool(dbConfig);
-  pool.connect().then(client => {
-    data.forEach(asset => {
-      checkinAsset(asset, client);
-    });
-    client.release();
+  const client = connectionManager.getConnection('bedrock');
+  data.forEach(asset => {
+    checkinAsset(asset, client);
   });
 }
 
@@ -124,6 +114,7 @@ function checkinAsset(asset, client) {
       ])
         .then(res2 => {
           const assetID = res2.rows[0].id;
+          checkinObjects(assetID, asset, client);
           checkinDep(assetID, asset, client);
           checkinEtl(assetID, asset, client);
         // loadSchemas(asset, client);
@@ -147,6 +138,18 @@ function strToDate(str) {
 
 function floatOrNull(fl) {
   return fl || null;
+}
+
+function checkinObjects(assetID, asset, client) {
+  if (asset.objects) {
+    asset.objects.forEach(obj => {
+      client.query('INSERT INTO bedrock.asset_objects("asset_id", "name", "schema", "type", "blueprint") VALUES ($1, $2, $3, $4, $5) '
+      + 'ON CONFLICT ("asset_id", "name") DO UPDATE SET '
+      + 'schema = excluded.schema, type = excluded.type, blueprint = excluded.blueprint ',
+      [assetID, obj.name, obj.schema, obj.type, obj.blueprint])
+        .catch(e => { console.error('query error', e.message, e.stack); });
+    });
+  }
 }
 
 function checkinDep(assetID, asset, client) {

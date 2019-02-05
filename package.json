@@ -4,10 +4,12 @@
   "description": "System for data inventory and dependency management",
   "main": "index.js",
   "bin": {
-    "bedrock": "./bin/bedrock.js"
+    "bedrock": "./bin/bedrock.js",
+    "blueprint": "./bin/blueprint.js"
   },
   "scripts": {
-    "bedrock": "node ./bin/bedrock.js --start=./working_directory"
+    "bedrock": "node ./bin/bedrock.js --start=./working_directory",
+    "blueprint": "node ./bin/blueprint.js --start=./working_directory"
   },
   "repository": {
     "type": "git",
@@ -18,7 +20,7 @@
     "open data"
   ],
   "author": "Eric Jackson <ejackson@ashevillenc.gov>",
-  "license": "MIT",
+  "license": "gpl-3.0",
   "homepage": "https://github.com/cityofasheville/bedrock",
   "dependencies": {
     "bunyan": "^1.8.12",

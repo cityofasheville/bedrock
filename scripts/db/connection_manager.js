@@ -1,7 +1,9 @@
 const Connection = require('./connection');
+const connectionDefinitions = require('../db_connection_definitions');
+const logger = require('../common/logger');
 
 class ConnectionManager {
-  constructor(config, logger) {
+  constructor(config) {
     this.connections = {};
     this.logger = logger;
     Object.getOwnPropertyNames(config).forEach(cname => {
@@ -10,6 +12,12 @@ class ConnectionManager {
         connection: null,
       };
     });
+  }
+
+  addConnection(name, config) {
+    if (name in this.connections) throw new Error(`Connection ${name} already exists`);
+    this.connections[name] = { config, connection: null };
+    return this.getConnection(name);
   }
 
   getConnection(name) {
@@ -28,4 +36,4 @@ class ConnectionManager {
   }
 }
 
-module.exports = ConnectionManager;
+module.exports = new ConnectionManager(connectionDefinitions);

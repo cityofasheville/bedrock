@@ -70,15 +70,15 @@ class Connection {
     }
   }
 
-  async query(sql) { // Returns a recordset
+  async query(sql, args = []) { // Returns a recordset
     if (this.info.type === 'sqlserver') {
       return this.connection.connect().then(() => {
         return new sql.Request(this.connection).query(sql);
       });
-    } 
+    }
     if (this.info.type === 'pg') {
       return this.connection.connect().then(client => {
-        return client.query(sql).then(result => {
+        return client.query(sql, args).then(result => {
           client.release();
           return Promise.resolve(result);
         })

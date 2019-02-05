@@ -22,6 +22,13 @@ Designed to be called from a scheduler like ```cron```. Each time it is called, 
 
 node ./etl_run.js ../jobs
 
+## License
+
+This project is licensed under the GPL V3 license. For more information see the [license file](./license.md).
+
+## Code of Conduct
+
+We have adopted the Contributor Covenant.  See our [code of conduct file](./CODE_OF_CONDUCT.md) for more information.
 
 ### Notes
 

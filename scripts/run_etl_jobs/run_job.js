@@ -1,13 +1,8 @@
 /* eslint-disable no-console */
 const { spawnSync } = require('child_process');
 const fs = require('fs');
-const Logger = require('coa-node-logging');
-const ConnectionManager = require('../db/connection_manager');
-const connectionDefinitions = require('./connection_definitions');
-
-const logger = new Logger('MDA', './mda.log');
-
-const connectionManager = new ConnectionManager(connectionDefinitions, logger);
+const logger = require('../common/logger');
+const connectionManager = require('../db/connection_manager');
 
 let fd = fs.openSync(`${process.argv[2]}/status.json`, 'r');
 const job = JSON.parse(fs.readFileSync(fd, { encoding: 'utf8' }));

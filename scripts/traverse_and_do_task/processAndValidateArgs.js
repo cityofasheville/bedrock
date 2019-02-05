@@ -25,6 +25,7 @@ module.exports = function processAndValidateArgs(argv) {
   const destDir = args.getOption('dest', path.join(__dirname, '/../../etl_jobs_dir'));
   const schema = args.hasOption('schema');
   const metadata = args.hasOption('metadata');
+  const allAssets = args.hasOption('all');
 
   if (!fs.existsSync(startDir)) {
     usageAndExit(`traverse_and_run_task: Start directory ${startDir} not found.`);
@@ -44,6 +45,7 @@ module.exports = function processAndValidateArgs(argv) {
       schema,
       metadata,
       oneAsset,
+      allAssets,
       startDir,
     },
   };

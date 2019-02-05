@@ -1,8 +1,15 @@
 #!/usr/bin/env node
 /* eslint-disable no-console */
 
-const fs = require('fs');
 const dotenv = require('dotenv');
+const fs = require('fs');
+
+// We must read the environment variables *before* we include any of the commands.
+if (fs.existsSync('./.env')) {
+  dotenv.config({ path: './.env' });
+} else {
+  dotenv.config({ path: 'c:/coa/bedrock/.env' });
+}
 const bedrock = require('../index.js');
 const CommandLineArgs = require('../scripts/common/CommandLineArgs');
 const checkout = require('../scripts/checkout');
@@ -11,15 +18,13 @@ const traverseAndDoTask = require('../scripts/traverse_and_do_task');
 const createAsset = require('../scripts/create_asset');
 const createSchema = require('../scripts/create_schema');
 const runEtlJobs = require('../scripts/run_etl_jobs');
+const initDb = require('../scripts/init_db');
+const blueprint = require('../scripts/blueprint');
+
 const args = new CommandLineArgs(process.argv.slice(2));
 if (args.argCount() < 1) usageAndExit();
 
-if (fs.existsSync('./.env')) {
-  dotenv.config({ path: './.env' });
-} else {
-  dotenv.config({ path: 'c:/coa/bedrock/.env' });
-}
-const command = args.getArg(0);
+const command = args.popArg();
 
 // console.log('start',args.getOption('start', 'none'));
 // console.log('command: ', command);
@@ -41,9 +46,13 @@ if (command === 'version') {
   runEtlJobs();
 } else if (command === 'report') {
   report();
+} else if (command === 'initdb') {
+  initDb(args);
+} else if (command === 'blueprint') {
+  blueprint(args);
 }
 
 function usageAndExit() {
-  console.log('Usage:\tbedrock [checkin|checkout|init_etl|run_etl|report|create-asset|version]');
+  console.log('Usage:\tbedrock [checkin|checkout|init_etl|run_etl|report|initdb|create-asset|version]');
   process.exit(1);
 }

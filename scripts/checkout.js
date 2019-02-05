@@ -2,6 +2,7 @@
 const fs = require('fs');
 const CommandLineArgs = require('./common/CommandLineArgs');
 const connectionManager = require('./db/connection_manager');
+const prettyJson = require('./common/pretty_json');
 
 async function checkout() {
   const args = new CommandLineArgs(process.argv.slice(2));
@@ -55,13 +56,16 @@ async function checkout() {
       const dependArray = [];
       const sqlDepends = 'SELECT depends FROM bedrock.asset_depends where asset_id = $1';
       const depends = await client.query(sqlDepends, [asset.id]);
+      const dep = depends.rows.map(itm => { return itm.depends; });
+      console.log(JSON.stringify(depends.rows));
       for (let j = 0; j < depends.rows.length; j += 1) { // (const depend of depends.rows) {
         const depend = depends.rows[j];
         dependArray.push(`\n    "${depend.depends}"`);
       }
       const dependList = dependArray.length > 0 ? `[${dependArray.join(',')}\n  ]` : '[]';
-
-      let mdaStr = '{\n'
+      const finalAsset = Object.assign({}, asset, { objects: objs.rows, depends: dep });
+      let mdaStr = prettyJson(finalAsset, ['name', 'location', 'active', 'type', 'description', 'depends']);
+      let xmdaStr = '{\n'
     + `  "name": "${asset.name}",\n`
     + `  "location": "${asset.location}",\n`
     + `  "active": ${asset.active},\n`
@@ -183,14 +187,15 @@ async function checkout() {
         }, '');
 
 
-        const bpStr = `{
-         "name": "${bp.rows[0].blueprint_name}",
-         "description": "${bp.rows[0].description}",
-         "update_date": "${bp.rows[0].update_date}",
-         "columns": [
-           ${bpColString}
-         ]
-        }`;
+        // const bpStr = `{
+        //  "name": "${bp.rows[0].blueprint_name}",
+        //  "description": "${bp.rows[0].description}",
+        //  "update_date": "${bp.rows[0].update_date}",
+        //  "columns": [
+        //    ${bpColString}
+        //  ]
+        // }`;
+        const bpStr = prettyJson(bp.rows[0], ['name', 'description', 'update_date', 'columns']);
 
         const fileDataBp = new Uint8Array(Buffer.from(bpStr));
         fs.writeFileSync(`${bdir}/${bp.rows[0].name}.json`, fileDataBp, 'utf8');

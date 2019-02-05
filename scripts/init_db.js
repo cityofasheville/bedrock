@@ -34,9 +34,8 @@ async function dbInit(args) {
   fs.closeSync(fd);
 
   const client = connectionManager.addConnection('New Bedrock Database', dbConfig);
-  
-  const runPostgis = (args.hasOption('postgis')) ? client.query(initPostgis) : Promise.resolve(null);
 
+  const runPostgis = (args.hasOption('postgis')) ? client.query(initPostgis) : Promise.resolve(null);
   await runPostgis
     .then(r => {
       if (r !== null) console.log('Installed postgis');

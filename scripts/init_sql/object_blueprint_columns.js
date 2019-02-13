@@ -6,6 +6,7 @@ CREATE TABLE bedrock.object_blueprint_columns
   ordinal_position information_schema.cardinal_number,
   is_nullable information_schema.yes_or_no COLLATE pg_catalog."default",
   data_type information_schema.character_data COLLATE pg_catalog."default",
+  data_subtype information_schema.character_data COLLATE pg_catalog."default",
   character_maximum_length information_schema.cardinal_number,
   numeric_precision information_schema.cardinal_number,
   numeric_precision_radix information_schema.cardinal_number,

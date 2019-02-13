@@ -3,14 +3,13 @@ const fs = require('fs');
 const connectionManager = require('./db/connection_manager');
 
 async function blueprint(args) {
-
   if (args.argCount() < 2) {
     console.log('Usage: blueprint [snapshot|install|checkout] [assetName|blueprintName]');
     return;
   }
   const command = args.popArg();
   const name = args.popArg();
-
+  console.log(`blueprint ${command} with name ${name}`);
   if (command === 'snapshot') {
     const path = `${args.getOption('start', '.')}/${name}`;
     console.log(`The path: ${path}`);
@@ -36,12 +35,13 @@ async function blueprint(args) {
               };
               bp.columns = res.rows.map(col => {
                 let dataType = col.data_type;
-                if (dataType === 'USER DEFINED' && col.udt_name === 'geometry') dataType = 'geometry';
-                return {
+                if (dataType === 'USER-DEFINED' && col.udt_name === 'geometry') dataType = 'geometry';
+                const colDef = {
                   column_name: col.column_name,
                   ordinal_position: col.ordinal_position,
                   is_nullable: col.is_nullable,
                   data_type: dataType,
+                  data_subtype: null,
                   character_maximum_length: col.character_maximum_length,
                   numeric_precision: col.numeric_precision,
                   numeric_precision_radix: col.numeric_precision_radix,
@@ -50,6 +50,7 @@ async function blueprint(args) {
                   interval_type: col.interval_type,
                   interval_precision: col.interval_precision,
                 };
+                return colDef;
               });
               fs.writeFileSync(bpfd, JSON.stringify(bp, null, 2), { encoding: 'utf8' });
               fs.closeSync(bpfd);
@@ -79,7 +80,7 @@ async function blueprint(args) {
     + ' update_date = excluded.update_date;';
     await bedrockClient.query(sqlInsert, [bp.name, bp.description, currentDate])
       .then(res => {
-        if (res.rowCount !== 1) throw new Error(`Error installing blueprint for ${obj.name}`);
+        if (res.rowCount !== 1) throw new Error(`Error installing blueprint for ${bp.name}`);
         return bedrockClient.query(`DELETE from bedrock.object_blueprint_columns WHERE blueprint_name = '${bp.name}'`);
       });
     for (let k = 0; k < bp.columns.length; k += 1) {

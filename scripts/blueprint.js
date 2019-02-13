@@ -1,9 +1,9 @@
 /* eslint-disable no-console, spaced-comment, no-await-in-loop */
 const fs = require('fs');
 const connectionManager = require('./db/connection_manager');
+const prettyJson = require('./common/pretty_json');
 
 async function blueprint(args) {
-
   if (args.argCount() < 2) {
     console.log('Usage: blueprint [snapshot|install|checkout] [assetName|blueprintName]');
     return;
@@ -138,15 +138,7 @@ async function blueprint(args) {
       });
     if (bpResult) {
       const bpfd = fs.openSync(path, 'w');
-      fs.writeFileSync(bpfd,
-        `
-{
-  "name": "${bp.name}",
-  "description": "${bp.description}",
-  "update_date": "${bp.update_date}",
-  "columns": ${JSON.stringify(bp.columns, null, 2)}
-}
-`, { encoding: 'utf8' });
+      fs.writeFileSync(bpfd, prettyJson(bp, ['name', 'description', 'update_date']));
       fs.closeSync(bpfd);
     }
   } else {

@@ -20,7 +20,6 @@ const createSchema = require('../scripts/create_schema');
 const runEtlJobs = require('../scripts/run_etl_jobs');
 const initDb = require('../scripts/init_db');
 const blueprint = require('../scripts/blueprint');
-
 const args = new CommandLineArgs(process.argv.slice(2));
 if (args.argCount() < 1) usageAndExit();
 
@@ -50,6 +49,8 @@ if (command === 'version') {
   initDb(args);
 } else if (command === 'blueprint') {
   blueprint(args);
+} else {
+  console.error(`Unknown command ${command}`);
 }
 
 function usageAndExit() {

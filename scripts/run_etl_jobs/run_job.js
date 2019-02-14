@@ -74,7 +74,7 @@ async function runTaskSequence(seqName, tasks, endStatus = 'Done') {
   let hasError = false;
   let errMessage = '';
   console.log(`Running tasks ${seqName}: ${JSON.stringify(tasks)}`);
-  for (let i = 0; i < tasks.length && !hasError; i += 1) {
+  for (let i = 0; tasks && i < tasks.length && !hasError; i += 1) {
     const task = tasks[i];
     console.log(`${seqName}:${jobName}: Task ${i}, type ${task.type} - ${task.active ? 'Active' : 'Inactive'}`);
     if (task.active) {

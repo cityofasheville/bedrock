@@ -88,14 +88,14 @@ async function blueprint(args) {
       const col = bp.columns[k];
       sqlInsert = 'INSERT INTO bedrock.object_blueprint_columns( '
         + 'blueprint_name, column_name, ordinal_position, is_nullable, '
-        + 'data_type, character_maximum_length, numeric_precision, numeric_precision_radix, '
+        + 'data_type, data_subtype, character_maximum_length, numeric_precision, numeric_precision_radix, '
         + 'numeric_scale, datetime_precision, interval_type, interval_precision'
         + ') '
-        + 'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);';
+        + 'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);';
       await bedrockClient.query(sqlInsert,
         [
           bp.name, col.column_name, col.ordinal_position, col.is_nullable,
-          col.data_type, col.character_maximum_length, col.numeric_precision,
+          col.data_type, col.data_subtype, col.character_maximum_length, col.numeric_precision,
           col.numeric_precision_radix, col.numeric_scale, col.datetime_precision,
           col.interval_type, col.interval_precision,
         ]);

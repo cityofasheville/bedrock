@@ -78,7 +78,6 @@ async function checkout() {
       const sqlEtl = 'SELECT asset_id, category, type, file, file_content, db, active, task_order '
     + 'FROM bedrock.etl_tasks WHERE asset_id = $1 ORDER BY category, task_order';
       const etlData = await client.query(sqlEtl, [asset.id]);
-      console.log('hi there');
       if (etlData.rows[0]) {
         for (let k = 0; k < etlData.rows.length; k += 1) { // (const row of etlData.rows) {
           const row = etlData.rows[k];

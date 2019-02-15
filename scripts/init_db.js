@@ -14,6 +14,7 @@ const initObjects = require('./init_sql/objects');
 const initObjectCreateScripts = require('./init_sql/object_create_scripts');
 const initObjectBlueprints = require('./init_sql/object_blueprints');
 const initObjectBlueprintColumns = require('./init_sql/object_blueprint_columns');
+const initObjectBlueprintAuxInfo = require('./init_sql/object_blueprint_aux_info');
 
 const locations = require('./init_sql/table_locations');
 
@@ -97,6 +98,10 @@ async function dbInit(args) {
     })
     .then(() => {
       console.log('Initialized asset object definition columns');
+      return client.query(initObjectBlueprintAuxInfo);
+    })
+    .then(() => {
+      console.log('Initialized asset object definition aux info');
       console.log('Now done');
       return Promise.resolve(null);
     })

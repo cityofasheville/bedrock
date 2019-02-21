@@ -100,6 +100,14 @@ async function blueprint(args) {
           col.interval_type, col.interval_precision,
         ]);
     }
+    for (let k = 0; bp.aux && k < bp.aux.length; k += 1) {
+      const aux = bp.aux[k];
+      sqlInsert = 'INSERT INTO bedrock.object_blueprint_aux_info'
+      + ' (blueprint_name, name, description, type, value) '
+      + 'VALUES ($1, $2, $3, $4, $5);';
+      await bedrockClient.query(sqlInsert,
+        [bp.name, aux.name, aux.description, aux.type, JSON.stringify(aux.value)]);
+    }
   } else if (command === 'checkout') {
     const path = `${args.getOption('start', '.')}/blueprints/${name}.json`;
     const bedrockClient = connectionManager.getConnection('bedrock');

@@ -2,11 +2,6 @@
 const fs = require('fs');
 const connectionManager = require('./db/connection_manager');
 
-/*
-
-Looking up indices: 
-https://stackoverflow.com/questions/45983169/checking-for-existence-of-index-in-postgresql
-*/
 async function createObjects(args) {
   if (args.argCount() < 1) {
     console.log(`argcount is ${args.argCount()}`);

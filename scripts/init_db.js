@@ -11,7 +11,7 @@ const initDepends = require('./init_sql/depends');
 const initFiles = require('./init_sql/files');
 const initEtlTasks = require('./init_sql/etl_tasks');
 const initObjects = require('./init_sql/objects');
-const initObjectCreateScripts = require('./init_sql/object_create_scripts');
+const initObjectAuxInfo = require('./init_sql/object_aux_info');
 const initObjectBlueprints = require('./init_sql/object_blueprints');
 const initObjectBlueprintColumns = require('./init_sql/object_blueprint_columns');
 const initObjectBlueprintAuxInfo = require('./init_sql/object_blueprint_aux_info');
@@ -86,10 +86,10 @@ async function dbInit(args) {
     })
     .then(() => {
       console.log('Initialized asset objects');
-      return client.query(initObjectCreateScripts);
+      return client.query(initObjectAuxInfo);
     })
     .then(() => {
-      console.log('Initialized asset object scripts');
+      console.log('Initialized asset object aux info');
       return client.query(initObjectBlueprints);
     })
     .then(() => {

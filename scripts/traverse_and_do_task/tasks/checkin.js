@@ -55,6 +55,7 @@ function finish() {
 }
 
 function checkinAsset(asset, client) {
+  let assetID = null;
   const sqllookup = 'SELECT id FROM bedrock.asset_locations WHERE short_name = $1;';
   client.query(sqllookup, [asset.location]).then(res => {
     if (!res.rows[0]) {
@@ -113,11 +114,14 @@ function checkinAsset(asset, client) {
         asset.feature_catalog, asset.process_description, asset.spatial_reference, strToDate(asset.metadata_creation_date), asset.contact_role_code,
       ])
         .then(res2 => {
-          const assetID = res2.rows[0].id;
-          checkinObjects(assetID, asset, client);
-          checkinDep(assetID, asset, client);
-          checkinEtl(assetID, asset, client);
-        // loadSchemas(asset, client);
+          assetID = res2.rows[0].id;
+          return checkinObjects(assetID, asset, client);
+        })
+        .then(() => {
+          if (assetID !== null) {
+            checkinDep(assetID, asset, client);
+            checkinEtl(assetID, asset, client);
+          }
         })
         .catch(e => { console.error('query error', e.message, e.stack); });
     }
@@ -141,16 +145,34 @@ function floatOrNull(fl) {
   return fl || null;
 }
 
-function checkinObjects(assetID, asset, client) {
+async function checkinObjects(assetID, asset, client) {
   if (asset.objects) {
-    asset.objects.forEach(obj => {
-      client.query('INSERT INTO bedrock.asset_objects("asset_id", "name", "schema", "type", "blueprint") VALUES ($1, $2, $3, $4, $5) '
+    await Promise.all(asset.objects.map(obj => {
+      console.log(`Dealing with asset object ${JSON.stringify(obj.asset_id)}`);
+      return client.query('INSERT INTO bedrock.asset_objects("asset_id", "name", "schema", "type", "blueprint") VALUES ($1, $2, $3, $4, $5) '
       + 'ON CONFLICT ("asset_id", "name") DO UPDATE SET '
-      + 'schema = excluded.schema, type = excluded.type, blueprint = excluded.blueprint ',
+      + 'schema = excluded.schema, type = excluded.type, blueprint = excluded.blueprint '
+      + 'RETURNING id',
       [assetID, obj.name, obj.schema, obj.type, obj.blueprint])
+        .then(result => {
+          const objectId = result.rows[0].id;
+          console.log(`Got the objectID ${objectId}`);
+          if (obj.aux && obj.aux.length > 0) {
+            console.log(`We have ${obj.aux.length} aux things`);
+            return Promise.all(obj.aux.map(auxItem => {
+              console.log(`I am here with auxItem ${JSON.stringify(auxItem)}`);
+              /*
+                Here is where we insert the script!
+              */
+              return Promise.resolve(null);
+            }));
+          }
+          return Promise.resolve(null);
+        })
         .catch(e => { console.error('query error', e.message, e.stack); });
-    });
+    }));
   }
+  return Promise.resolve(assetID);
 }
 
 function checkinDep(assetID, asset, client) {

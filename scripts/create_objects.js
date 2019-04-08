@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable no-console */
 const fs = require('fs');
 const connectionManager = require('./db/connection_manager');
@@ -43,45 +44,8 @@ async function createObjects(args) {
           process.exit(0);
         }
         console.log('Ready to create');
-        let createQuery = `create table ${objName} (\n`;
-        const bClient = connectionManager.getConnection('bedrock');
-        const blueprintQuery = `SELECT * FROM bedrock.object_blueprint_columns
-          WHERE blueprint_name = '${obj.blueprint}'`;
-        const colResult = await bClient.query(blueprintQuery);
-        if (!result.rows || result.rows.length <= 0) {
-          throw new Error(`Error querying columns for blueprint ${obj.blueprint}`);
-        }
-        const columns = colResult.rows;
-        const ncolumns = columns.length;
-        columns.forEach((col, idx) => {
-          const columnDef = columnDefinition(col);
-          createQuery += columnDef + ((idx < ncolumns - 1) ? ',\n' : '\n');
-        });
-        createQuery += ') WITH ( OIDS = FALSE ) TABLESPACE pg_default;';
-        console.log('Got the base query done');
-        const auxQuery = `SELECT * from bedrock.object_blueprint_aux_info where blueprint_name = '${obj.blueprint}'`;
-        const auxResult = await bClient.query(auxQuery);
-        const aux = auxResult.rows.map(row => {
-          return {
-            name: row.name,
-            description: row.description,
-            type: row.type,
-            value: JSON.parse(row.value),
-          };
-        });
-        const indices = [];
-        if (aux.length > 0) {
-          aux.forEach(itm => {
-            if (itm.type === 'index') {
-              indices.push(itm);
-            }
-          });
-        }
-        console.log(JSON.stringify(indices, null, 2));
-        indices.forEach(index => {
-          createQuery += indexDefinition(index, obj);
-        });
-        console.log(createQuery);
+        const createQuery = await tableDefinition(obj.schema, obj.name, obj.blueprint);
+        console.log('Back from tableDefinition - let\'s do it!');
         tClient.query(createQuery)
           .then(res => {
             console.log(JSON.stringify(res));
@@ -91,6 +55,51 @@ async function createObjects(args) {
       }
     }
   }
+}
+
+async function tableDefinition(objectSchema, objectName, blueprint) {
+  let createQuery = `create table ${objectSchema}.${objectName} (\n`;
+  const bClient = connectionManager.getConnection('bedrock');
+  const blueprintQuery = `SELECT * FROM bedrock.object_blueprint_columns
+    WHERE blueprint_name = '${blueprint}'`;
+  console.log('Do the blueprint query ' + blueprintQuery);
+  const colResult = await bClient.query(blueprintQuery);
+  console.log('Back from that');
+  if (!colResult.rows || colResult.rows.length <= 0) {
+    throw new Error(`Error querying columns for blueprint ${blueprint}`);
+  }
+  const columns = colResult.rows;
+  const ncolumns = columns.length;
+  columns.forEach((col, idx) => {
+    const columnDef = columnDefinition(col);
+    createQuery += columnDef + ((idx < ncolumns - 1) ? ',\n' : '\n');
+  });
+  createQuery += ') WITH ( OIDS = FALSE ) TABLESPACE pg_default;';
+  const auxQuery = `SELECT * from bedrock.object_blueprint_aux_info where blueprint_name = '${blueprint}'`;
+  console.log('Do the aux query');
+  const auxResult = await bClient.query(auxQuery);
+  console.log('Did aux - now map');
+  const aux = auxResult.rows.map(row => {
+    return {
+      name: row.name,
+      description: row.description,
+      type: row.type,
+      value: JSON.parse(row.value),
+    };
+  });
+  const indices = [];
+  if (aux.length > 0) {
+    aux.forEach(itm => {
+      if (itm.type === 'index') {
+        indices.push(itm);
+      }
+    });
+  }
+  indices.forEach(index => {
+    createQuery += indexDefinition(index, objectSchema, objectName);
+  });
+  console.log(createQuery);
+  return createQuery;
 }
 
 function columnDefinition(col) {
@@ -113,13 +122,13 @@ function columnDefinition(col) {
   return def;
 }
 
-function indexDefinition(index, obj) {
-  const nm = `${index.name}_${obj.name}`;
+function indexDefinition(index, objectSchema, objectName) {
+  const nm = `${index.name}_${objectName}`;
   const cols = index.value.columns.reduce((accum, cur, idx) => {
     const end = (idx < index.value.columns.length - 1) ? ',' : ')';
     return `${accum} ${cur}${end}`;
   }, '(');
-  const q = `CREATE INDEX ${nm} ON ${obj.schema}.${obj.name} USING ${index.value.using} ${cols};`;
+  const q = `CREATE INDEX ${nm} ON ${objectSchema}.${objectName} USING ${index.value.using} ${cols};`;
   console.log(q);
   return q;
 }

@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable no-console, spaced-comment */
 const fs = require('fs');
 const CommandLineArgs = require('./common/CommandLineArgs');
@@ -54,18 +55,29 @@ async function checkout() {
       const fullpath = `${startDir}/${asset.name}`;
       if (!fs.existsSync(fullpath)) fs.mkdirSync(fullpath);
 
-      const objectsQuery = 'SELECT name, schema, type, blueprint FROM bedrock.asset_objects WHERE asset_id = $1';
+      const objectsQuery = 'SELECT id, name, schema, type, blueprint FROM bedrock.asset_objects WHERE asset_id = $1';
       const objs = await client.query(objectsQuery, [asset.id]);
       asset.objects = objs.rows;
 
-      objs.rows.forEach(obj => {
+      for (let j = 0; j < objs.rows.length; j += 1) {
+        const obj = objs.rows[j];
         if (obj.blueprint && obj.blueprint.length > 0) blueprintMap[obj.blueprint] = true;
-      });
+        const auxQuery = 'SELECT name, description, type, subtype, value as content FROM bedrock.asset_object_aux_info WHERE asset_object_id = $1';
+        const auxList = await client.query(auxQuery, [obj.id]);
+        obj.aux = [];
+        for (let k = 0; k < auxList.rows.length; k += 1) {
+          const aux = auxList.rows[k];
+          if (aux.type === 'script') {
+            fs.writeFileSync(`${fullpath}/create-script.sql`, aux.content, 'utf8');
+            aux.content = 'create-script.sql';
+          }
+          obj.aux.push(auxList.rows[k]);
+        }
+      }
 
       const dependsQuery = 'SELECT depends FROM bedrock.asset_depends where asset_id = $1';
       const depends = await client.query(dependsQuery, [asset.id]);
       asset.depends = depends.rows.map(itm => { return itm.depends; });
-
       const orderedFields = ['name', 'location', 'active', 'type', 'description', 'depends', 'objects'];
       const mdaStr = prettyJson(asset, orderedFields);
 

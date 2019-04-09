@@ -36,6 +36,20 @@ function runForEachPath(path, logger, config) {
               });
             }
           });
+          /* Get object scripts and other files */
+          if (mda.objects) {
+            mda.objects.forEach((object, oIndex) => {
+              if (object.aux) {
+                object.aux.forEach((aux, aIndex) => {
+                  if (aux.type === 'script' && aux.content && files.indexOf(aux.content) >= 0) {
+                    const auxFd = fs.openSync(`${path}/${aux.content}`, 'r');
+                    mda.objects[oIndex].aux[aIndex].content = fs.readFileSync(auxFd, { encoding: 'utf8' });
+                    fs.closeSync(auxFd);
+                  }
+                });
+              }
+            });
+          }
           mda.etl = etl;
         }
         data.push(mda);
@@ -47,14 +61,14 @@ function runForEachPath(path, logger, config) {
 }
 
 // //////////////////////////////////////////////////////////////////////
-function finish() {
+function finish(path) {
   const client = connectionManager.getConnection('bedrock');
   data.forEach(asset => {
-    checkinAsset(asset, client);
+    checkinAsset(asset, client, path);
   });
 }
 
-function checkinAsset(asset, client) {
+function checkinAsset(asset, client, path) {
   let assetID = null;
   const sqllookup = 'SELECT id FROM bedrock.asset_locations WHERE short_name = $1;';
   client.query(sqllookup, [asset.location]).then(res => {
@@ -115,7 +129,7 @@ function checkinAsset(asset, client) {
       ])
         .then(res2 => {
           assetID = res2.rows[0].id;
-          return checkinObjects(assetID, asset, client);
+          return checkinObjects(assetID, asset, client, path);
         })
         .then(() => {
           if (assetID !== null) {
@@ -145,10 +159,9 @@ function floatOrNull(fl) {
   return fl || null;
 }
 
-async function checkinObjects(assetID, asset, client) {
+async function checkinObjects(assetID, asset, client, path) {
   if (asset.objects) {
     await Promise.all(asset.objects.map(obj => {
-      console.log(`Dealing with asset object ${JSON.stringify(obj.asset_id)}`);
       return client.query('INSERT INTO bedrock.asset_objects("asset_id", "name", "schema", "type", "blueprint") VALUES ($1, $2, $3, $4, $5) '
       + 'ON CONFLICT ("asset_id", "name") DO UPDATE SET '
       + 'schema = excluded.schema, type = excluded.type, blueprint = excluded.blueprint '
@@ -156,15 +169,19 @@ async function checkinObjects(assetID, asset, client) {
       [assetID, obj.name, obj.schema, obj.type, obj.blueprint])
         .then(result => {
           const objectId = result.rows[0].id;
-          console.log(`Got the objectID ${objectId}`);
           if (obj.aux && obj.aux.length > 0) {
-            console.log(`We have ${obj.aux.length} aux things`);
             return Promise.all(obj.aux.map(auxItem => {
-              console.log(`I am here with auxItem ${JSON.stringify(auxItem)}`);
-              /*
-                Here is where we insert the script!
-              */
-              return Promise.resolve(null);
+              return client.query('INSERT INTO bedrock.asset_object_aux_info("asset_object_id", "name", "description", "type", "subtype", "value") VALUES ($1, $2, $3, $4, $5, $6) '
+              + 'ON CONFLICT("asset_object_id", "name") DO UPDATE SET '
+              + 'description = excluded.description, type = excluded.type, subtype = excluded.subtype, value = excluded.value '
+              + 'RETURNING asset_object_id',
+              [objectId, auxItem.name, auxItem.description, auxItem.type, auxItem.subtype, auxItem.content])
+                .then(auxResult => {
+                  if (!auxResult.rows || auxResult.rows.length <= 0) {
+                    throw new Error(`Failed to update asset object ${objectId} aux information.`);
+                  }
+                  return Promise.resolve(null);
+                });
             }));
           }
           return Promise.resolve(null);
@@ -206,32 +223,6 @@ function checkinEtl(assetID, asset, client) {
   }
 }
 
-// function loadSchemas(asset, client){
-//   if (asset.name === "Load_All_Asset_Schemas"){
-//     let sqlInsertSchemaCol_All = 'INSERT INTO bedrock.schema_columns(' +
-//       'table_catalog, table_schema, table_name, column_name, ordinal_position, column_default, is_nullable, data_type, character_maximum_length, numeric_precision, numeric_precision_radix, numeric_scale, datetime_precision, interval_type, interval_precision) ' +
-//       'SELECT table_catalog, table_schema, table_name, column_name, ordinal_position, column_default, is_nullable, ' +
-//       'data_type, character_maximum_length, numeric_precision, numeric_precision_radix, ' +
-//       'numeric_scale, datetime_precision, interval_type, interval_precision ' +
-//       'FROM information_schema.columns where table_schema = $1;';
-//     client.query('DELETE FROM bedrock.schema_columns;')
-//     .then(client.query(sqlInsertSchemaCol_All, [ 'internal' ]))
-//     .catch(e => {console.error('query error', e.message, e.stack); });
-//   }else{
-//       let sqlInsertSchemaCol = 'INSERT INTO bedrock.schema_columns(' +
-//       'table_catalog, table_schema, table_name, column_name, ordinal_position, column_default, is_nullable, data_type, character_maximum_length, numeric_precision, numeric_precision_radix, numeric_scale, datetime_precision, interval_type, interval_precision) ' +
-//       'SELECT table_catalog, table_schema, table_name, column_name, ordinal_position, column_default, is_nullable, ' +
-//       'data_type, character_maximum_length, numeric_precision, numeric_precision_radix, ' +
-//       'numeric_scale, datetime_precision, interval_type, interval_precision ' +
-//       'FROM information_schema.columns WHERE table_schema = $1 AND table_name = $2;';
-//     client.query('DELETE FROM bedrock.schema_columns WHERE table_name = $1;', [ asset.name ])
-//     .then(client.query('DELETE FROM bedrock.schemas WHERE table_name = $1;', [ asset.name ]))
-//     .then(client.query(sqlInsertSchemaCol, [ 'internal', asset.name ]))
-//     .then(client.query('INSERT INTO bedrock.schemas VALUES ($1, $2, NOW());', [ asset.name, asset.description ]))
-//     .catch(e => {console.error('query error', e.message, e.stack); });
-//   }
-// }
-
 function processing(stage, path, dest, config, logger) {
   switch (stage) {
     case 'init':
@@ -241,7 +232,7 @@ function processing(stage, path, dest, config, logger) {
       runForEachPath(path, logger, config);
       break;
     case 'finish':
-      finish();
+      finish(path);
       break;
     default:
       break;

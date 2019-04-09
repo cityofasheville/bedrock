@@ -28,7 +28,13 @@ async function createObjects(args) {
   for (let i = 0; i < mda.objects.length; i += 1) {
     const obj = mda.objects[i];
     console.log(`Do object ${JSON.stringify(obj, null, 2)}`);
+
     if (obj.type === 'table') {
+      /*
+      ************************
+      * Table
+      ***********************
+      */
       const objName = `${obj.schema}.${obj.name}`;
       const existsQuery = `SELECT EXISTS (
         SELECT * FROM information_schema.tables
@@ -53,8 +59,48 @@ async function createObjects(args) {
       } else {
         console.log(`No blueprint specified for object ${objName}`);
       }
+    } else if (obj.type === 'view') {
+      /*
+      ************************
+      * View
+      ***********************
+      */
+      const objName = `${obj.schema}.${obj.name}`;
+      const existsQuery = `SELECT EXISTS (
+       SELECT * FROM information_schema.tables
+       WHERE table_schema = '${obj.schema}' AND table_name = '${obj.name}'
+       )`;
+      const result = await tClient.query(existsQuery);
+      if (!result.rows || result.rows.length <= 0) {
+        throw new Error(`Error querying whether view ${objName} exists`);
+      }
+      if (result.rows[0].exists) {
+        console.log(`View ${objName} already exists - aborting`);
+        process.exit(0);
+      }
+
+      if (obj.aux && obj.aux.length > 0) {
+        let createQuery = null;
+        obj.aux.forEach(aux => {
+          const apath = `${startDir}/${assetName}`;
+          if (aux.name === 'create-script' && aux.type === 'script' && aux.subtype === 'sql') {
+            const auxFd = fs.openSync(`${apath}/${aux.content}`, 'r');
+            createQuery = fs.readFileSync(auxFd, { encoding: 'utf8' });
+            fs.closeSync(auxFd);
+
+            tClient.query(createQuery)
+              .then(res => {
+                console.log(JSON.stringify(res));
+              });
+          }
+        });
+      }
     }
   }
+}
+
+async function viewDefinition(obj) {
+  console.log(`Trying to create a view ${JSON.stringify(obj)}`);
 }
 
 async function tableDefinition(objectSchema, objectName, blueprint) {

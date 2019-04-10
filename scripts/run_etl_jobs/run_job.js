@@ -145,11 +145,10 @@ function recordJobStatus(jobStatus) {
 }
 
 console.log(`Here is the job: ${JSON.stringify(job.job)}`);
-runTaskSequence('Tasks', job.job.create, 'Created')
+runTaskSequence('Tasks', job.job.create, 'Done')
   .then(status => {
     job.status = status;
     recordJobStatus(job);
-    return Promise.resolve(null);
   })
   .catch(err => {
     console.log(`Error running ${jobName}: ${err}`);

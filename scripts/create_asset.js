@@ -52,8 +52,6 @@ function createAsset() {
 
   // write etl.json
   const etlStr = '{\n'
-    + '  "create": [],\n'
-    + '  "distribute": [],\n'
     + '  "tasks": [\n'
     + '    {\n'
     + '      "type": "",\n'

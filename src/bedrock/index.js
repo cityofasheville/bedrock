@@ -1,9 +1,9 @@
+/* eslint-disable no-console */
 const initDb = require('./init_db');
 
 function bedrock(command, args) {
   if (command !== 'init') usageAndExit();
   initDb(args);
-  console.log(`Command for target bedrock is ${command}`);
 }
 
 function usageAndExit() {

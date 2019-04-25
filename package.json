@@ -8,7 +8,7 @@
     "blueprint": "./bin/blueprint.js"
   },
   "scripts": {
-    "bedrock": "node ./bin/bedrock.js --start=./working_directory",
+    "bedrock": "node ./src/bedrock.js --start=./working_directory",
     "blueprint": "node ./bin/blueprint.js --start=./working_directory"
   },
   "repository": {

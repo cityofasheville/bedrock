@@ -16,6 +16,7 @@ const checkout = require('../scripts/checkout');
 const report = require('../scripts/report_status');
 const traverseAndDoTask = require('../scripts/traverse_and_do_task');
 const createAsset = require('../scripts/create_asset');
+const createObjects = require('../scripts/create_objects');
 const runEtlJobs = require('../scripts/run_etl_jobs');
 const initDb = require('../scripts/init_db');
 const blueprint = require('../scripts/blueprint');
@@ -38,6 +39,8 @@ if (command === 'version') {
   traverseAndDoTask();
 } else if (command === 'create-asset') {
   createAsset();
+} else if (command === 'create-objects') {
+  createObjects(args);
 } else if (command === 'run_etl') {
   runEtlJobs();
 } else if (command === 'report') {

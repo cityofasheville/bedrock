@@ -145,17 +145,7 @@ function recordJobStatus(jobStatus) {
 }
 
 console.log(`Here is the job: ${JSON.stringify(job.job)}`);
-runTaskSequence('Create', job.job.create, 'Created')
-  .then(status => {
-    job.status = status;
-    recordJobStatus(job);
-    return runTaskSequence('Distribute', job.job.distribute, 'Distributed');
-  })
-  .then(status => {
-    job.status = status;
-    recordJobStatus(job);
-    return runTaskSequence('Tasks', job.job.tasks, 'Done');
-  })
+runTaskSequence('Tasks', job.job.create, 'Done')
   .then(status => {
     job.status = status;
     recordJobStatus(job);

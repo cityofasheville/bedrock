@@ -1,6 +1,6 @@
 /* eslint-disable no-console, spaced-comment */
 const fs = require('fs');
-const connectionManager = require('./db/connection_manager');
+const connectionManager = require('../common/db/connection_manager');
 
 const drops = require('./init_sql/drops');
 const initPostgis = require('./init_sql/init_postgis');

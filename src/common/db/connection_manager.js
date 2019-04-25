@@ -1,6 +1,6 @@
 const Connection = require('./connection');
 const connectionDefinitions = require('../db_connection_definitions');
-const logger = require('../common/logger');
+const logger = require('../logger');
 
 class ConnectionManager {
   constructor(config) {

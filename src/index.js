@@ -4,6 +4,7 @@
 const dotenv = require('dotenv');
 const fs = require('fs');
 const asset = require('./asset');
+const bedrock = require('./bedrock');
 
 // We must read the environment variables *before* we include any of the commands.
 if (fs.existsSync('./.env')) {
@@ -12,7 +13,7 @@ if (fs.existsSync('./.env')) {
   dotenv.config({ path: 'c:/coa/bedrock/.env' });
 }
 
-const CommandLineArgs = require('../scripts/common/CommandLineArgs');
+const CommandLineArgs = require('./common/CommandLineArgs');
 const args = new CommandLineArgs(process.argv.slice(2));
 if (args.argCount() < 2) usageAndExit();
 
@@ -20,26 +21,27 @@ const target = args.popArg();
 const command = args.popArg();
 
 switch (target) {
-  case 'asset':
+  case 'asset': // Manage data assets
     asset(command, args);
     break;
-  case 'blueprint':
+  case 'blueprint': // Manage blueprints
     console.log('Blueprint target');
     break;
-  case 'etl':
+  case 'etl': // Manage ETL jobs
     console.log('ETL target');
     break;
-  case 'lib':
+  case 'lib': // Manage library version of Bedrock
     console.log('Lib target');
     break;
-  case 'bedrock':
+  case 'bedrock': // Initialize a new Bedrock database
     console.log('Bedrock target');
+    bedrock(command, args);
     break;
   default:
     usageAndExit();
 }
 
 function usageAndExit() {
-  console.log('Usage:\tbedrock [checkin|checkout|init_etl|run_etl|report|initdb|create-asset|version]');
+  console.log('Usage:\tbedrock [asset|blueprint|etl|lib|bedrock] command [args]');
   process.exit(1);
 }

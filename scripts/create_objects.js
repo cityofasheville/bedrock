@@ -99,16 +99,11 @@ async function createObjects(args) {
   }
 }
 
-async function viewDefinition(obj) {
-  console.log(`Trying to create a view ${JSON.stringify(obj)}`);
-}
-
 async function tableDefinition(objectSchema, objectName, blueprint) {
   let createQuery = `create table ${objectSchema}.${objectName} (\n`;
   const bClient = connectionManager.getConnection('bedrock');
   const blueprintQuery = `SELECT * FROM bedrock.object_blueprint_columns
     WHERE blueprint_name = '${blueprint}'`;
-  console.log('Do the blueprint query ' + blueprintQuery);
   const colResult = await bClient.query(blueprintQuery);
   console.log('Back from that');
   if (!colResult.rows || colResult.rows.length <= 0) {

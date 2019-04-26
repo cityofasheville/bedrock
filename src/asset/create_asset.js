@@ -66,9 +66,4 @@ function createAsset(args) {
   console.log('New asset files created in folder ');
 }
 
-function usageAndExit() {
-  console.log('Usage:\tbedrock create <new_asset_name>\n\n');
-  process.exit(1);
-}
-
 module.exports = createAsset;

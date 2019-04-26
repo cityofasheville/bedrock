@@ -1,13 +1,14 @@
 /* eslint-disable no-console */
 const fs = require('fs');
-const CommandLineArgs = require('./common/CommandLineArgs');
+// const CommandLineArgs = require('./common/CommandLineArgs');
 
-function createAsset() {
-  const args = new CommandLineArgs(process.argv.slice(2));
-  if (args.argCount() < 2) usageAndExit();
-  const newAsset = args.getArg(1);
+function createAsset(args) {
+  // const args = new CommandLineArgs(process.argv.slice(2));
+  // if (args.argCount() < 2) usageAndExit();
+  const newAsset = args.popArg();
   const startDir = args.getOption('start', '.');
 
+  console.log(`Asset name is ${newAsset} and startDir = ${startDir}`);
   const fullpath = `${startDir}/${newAsset}`;
   if (!fs.existsSync(fullpath)) { fs.mkdirSync(fullpath); }
   // write mda.json

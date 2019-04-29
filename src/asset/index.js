@@ -1,9 +1,10 @@
 /* eslint-disable no-console */
 const createAsset = require('./create_asset');
 const { checkinOneAsset, checkinAllAssets } = require('./checkin_asset');
+const { checkoutOneAsset, checkoutAllAssets } = require('./checkout_asset');
 
 function asset(command, args) {
-  console.log(JSON.stringify(args));
+  let startPath = './working_directory';
   switch (command) {
     case 'init':
       console.log('Command init not yet implemented');
@@ -12,11 +13,16 @@ function asset(command, args) {
       createAsset(args);
       break;
     case 'checkout':
-      console.log('Command checkout not yet implemented');
+      startPath = args.getOption('start', './working_directory');
+      if (args.argCount() === 1) {
+        checkoutOneAsset(args.popArg(), startPath);
+      } else if (args.getOption('all', false)) {
+        checkoutAllAssets(startPath);
+      } else {
+        usageAndExit();
+      }
       break;
     case 'checkin':
-      console.log(`Checkin arg count = ${args.argCount()}`);
-      console.log(`Value of option all is ${args.getOption('all')}`);
       if (args.argCount() === 1) {
         checkinOneAsset(args.popArg(), args);
       } else if (args.getOption('all', false)) {

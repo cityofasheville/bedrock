@@ -1,14 +1,10 @@
 /* eslint-disable no-console */
 const fs = require('fs');
-// const CommandLineArgs = require('./common/CommandLineArgs');
 
 function createAsset(args) {
-  // const args = new CommandLineArgs(process.argv.slice(2));
-  // if (args.argCount() < 2) usageAndExit();
   const newAsset = args.popArg();
   const startDir = args.getOption('start', '.');
 
-  console.log(`Asset name is ${newAsset} and startDir = ${startDir}`);
   const fullpath = `${startDir}/${newAsset}`;
   if (!fs.existsSync(fullpath)) { fs.mkdirSync(fullpath); }
   // write mda.json
@@ -62,7 +58,7 @@ function createAsset(args) {
     + '  ]\n'
     + '}\n';
   const fileDataEtl = new Uint8Array(Buffer.from(etlStr));
-  fs.writeFileSync(`${fullpath }/etl.json`, fileDataEtl, 'utf8');
+  fs.writeFileSync(`${fullpath}/etl.json`, fileDataEtl, 'utf8');
   console.log('New asset files created in folder ');
 }
 

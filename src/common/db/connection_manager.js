@@ -23,12 +23,14 @@ class ConnectionManager {
   getConnection(name) {
     let c = null;
     if (name in this.connections) {
+      console.log(`Getting connection ${name}`);
       const connection = this.connections[name];
       c = connection.connection;
       if (!c) {
         connection.connection = new Connection(name, connection.config, this.logger);
         c = new Connection(name, connection.config, this.logger);
       }
+      console.log(`Connection: ${JSON.stringify(connection.config)}`);
     } else {
       this.logger.error('unknown-db-connection', `Unknown database connection ${name}`, {});
     }

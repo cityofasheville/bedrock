@@ -21,6 +21,7 @@ const runEtlJobs = require('../scripts/run_etl_jobs');
 const initDb = require('../scripts/init_db');
 const blueprint = require('../scripts/blueprint');
 const args = new CommandLineArgs(process.argv.slice(2));
+console.log(JSON.stringify(args));
 if (args.argCount() < 1) usageAndExit();
 
 const command = args.popArg();

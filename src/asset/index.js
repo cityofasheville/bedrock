@@ -1,7 +1,9 @@
 /* eslint-disable no-console */
 const createAsset = require('./create_asset');
+const { checkinOneAsset, checkinAllAssets } = require('./checkin_asset');
 
 function asset(command, args) {
+  console.log(JSON.stringify(args));
   switch (command) {
     case 'init':
       console.log('Command init not yet implemented');
@@ -13,7 +15,15 @@ function asset(command, args) {
       console.log('Command checkout not yet implemented');
       break;
     case 'checkin':
-      console.log('Command checkin not yet implemented');
+      console.log(`Checkin arg count = ${args.argCount()}`);
+      console.log(`Value of option all is ${args.getOption('all')}`);
+      if (args.argCount() === 1) {
+        checkinOneAsset(args.popArg(), args);
+      } else if (args.getOption('all', false)) {
+        checkinAllAssets(args);
+      } else {
+        usageAndExit();
+      }
       break;
     case 'delete':
       console.log('Command delete not yet implemented');
@@ -26,7 +36,7 @@ function asset(command, args) {
 
 
 function usageAndExit() {
-  console.log('Usage:\tbedrock asset command args');
+  console.log('Usage:\tbedrock asset command [--all --start=directory]');
   process.exit(1);
 }
 

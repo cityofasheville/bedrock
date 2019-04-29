@@ -3,8 +3,7 @@
 
 const dotenv = require('dotenv');
 const fs = require('fs');
-const asset = require('./asset');
-const bedrock = require('./bedrock');
+
 
 // We must read the environment variables *before* we include any of the commands.
 if (fs.existsSync('./.env')) {
@@ -12,6 +11,9 @@ if (fs.existsSync('./.env')) {
 } else {
   dotenv.config({ path: 'c:/coa/bedrock/.env' });
 }
+
+const asset = require('./asset');
+const bedrock = require('./bedrock');
 
 const CommandLineArgs = require('./common/CommandLineArgs');
 const args = new CommandLineArgs(process.argv.slice(2));

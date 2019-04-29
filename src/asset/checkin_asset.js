@@ -1,77 +1,72 @@
 /* eslint-disable no-console */
+/* eslint-disable no-await-in-loop */
 const fs = require('fs');
-const connectionManager = require('../../db/connection_manager');
+const connectionManager = require('../common/db/connection_manager');
 
-const data = [];
+async function checkinOneAsset(assetName, args) {
+  console.log(`checking in asset ${assetName}`);
+  const startPath = args.getOption('start', './working_directory');
+  const asset = readAsset(`${startPath}/${assetName}`);
+  const client = connectionManager.getConnection('bedrock');
+  await checkinAsset(asset, client);
+}
 
-function init(config) {
-  if (!config.oneAsset && !config.allAssets) {
-    console.log('Asset name is required to checkin.');
-    process.exit(1);
-  } else if (config.allAssets) {
-    console.log('Checking in all assets');
+async function checkinAllAssets(args) {
+  // Process all the entries in the directory
+  const startPath = args.getOption('start', './working_directory');
+  const assets = fs.readdirSync(startPath);
+  const client = connectionManager.getConnection('bedrock');
+  for (let i = 0; i < assets.length; i += 1) {
+    const name = assets[i];
+    console.log(`Check ${name}`);
+    const asset = readAsset(`${startPath}/${name}`);
+    await checkinAsset(asset, client);
   }
 }
 
-function runForEachPath(path, logger, config) {
-  try {
-    const files = fs.readdirSync(path);
-    if (files.indexOf('mda.json') >= 0) {
-      const mdafd = fs.openSync(`${path}/mda.json`, 'r');
-      const mda = JSON.parse(fs.readFileSync(mdafd, { encoding: 'utf8' }));
-      if (config.allAssets || config.oneAsset === mda.name) { // if this asset
-        if (files.indexOf('etl.json') >= 0) {
-          const etlfd = fs.openSync(`${path}/etl.json`, 'r');
-          const etl = JSON.parse(fs.readFileSync(etlfd, { encoding: 'utf8' }));
-          // get file content (eg. *fmw or *sql)
-          const categories = ['tasks', 'distribute', 'create'];
-          categories.forEach(category => {
-            if (etl[category]) {
-              etl[category].forEach((task, ix) => {
-                if (files.indexOf(task.file) >= 0) {
-                  const filefd = fs.openSync(`${path}/${task.file}`, 'r');
-                  const fileContent = fs.readFileSync(filefd, { encoding: 'utf8' });
-                  etl[category][ix].fileContent = fileContent;
-                }
-              });
-            }
-          });
-          /* Get object scripts and other files */
-          if (mda.objects) {
-            mda.objects.forEach((object, oIndex) => {
-              if (object.aux) {
-                object.aux.forEach((aux, aIndex) => {
-                  if (aux.type === 'script' && aux.content && files.indexOf(aux.content) >= 0) {
-                    const auxFd = fs.openSync(`${path}/${aux.content}`, 'r');
-                    mda.objects[oIndex].aux[aIndex].content = fs.readFileSync(auxFd, { encoding: 'utf8' });
-                    fs.closeSync(auxFd);
-                  }
-                });
+function readAsset(path) {
+  let mda = {};
+  const files = fs.readdirSync(path);
+  if (files.indexOf('mda.json') >= 0) {
+    const mdafd = fs.openSync(`${path}/mda.json`, 'r');
+    mda = JSON.parse(fs.readFileSync(mdafd, { encoding: 'utf8' }));
+    if (files.indexOf('etl.json') >= 0) {
+      const etlfd = fs.openSync(`${path}/etl.json`, 'r');
+      const etl = JSON.parse(fs.readFileSync(etlfd, { encoding: 'utf8' }));
+      // get file content (eg. *fmw or *sql)
+      if (etl.tasks) {
+        etl.tasks.forEach((task, ix) => {
+          if (files.indexOf(task.file) >= 0) {
+            const filefd = fs.openSync(`${path}/${task.file}`, 'r');
+            const fileContent = fs.readFileSync(filefd, { encoding: 'utf8' });
+            etl.tasks[ix].fileContent = fileContent;
+          }
+        });
+      }
+      /* Get object scripts and other files */
+      if (mda.objects) {
+        mda.objects.forEach((object, oIndex) => {
+          if (object.aux) {
+            object.aux.forEach((aux, aIndex) => {
+              if (aux.type === 'script' && aux.content && files.indexOf(aux.content) >= 0) {
+                const auxFd = fs.openSync(`${path}/${aux.content}`, 'r');
+                mda.objects[oIndex].aux[aIndex].content = fs.readFileSync(auxFd, { encoding: 'utf8' });
+                fs.closeSync(auxFd);
               }
             });
           }
-          mda.etl = etl;
-        }
-        data.push(mda);
+        });
       }
+      mda.etl = etl;
     }
-  } catch (err) {
-    logger.error({ err }, `Error reading ${path}/mda.json`);
   }
+  return mda;
 }
 
-// //////////////////////////////////////////////////////////////////////
-function finish(path) {
-  const client = connectionManager.getConnection('bedrock');
-  data.forEach(asset => {
-    checkinAsset(asset, client, path);
-  });
-}
-
-function checkinAsset(asset, client, path) {
+function checkinAsset(asset, client) {
   let assetID = null;
   const sqllookup = 'SELECT id FROM bedrock.asset_locations WHERE short_name = $1;';
-  client.query(sqllookup, [asset.location]).then(res => {
+  return client.query(sqllookup, [asset.location]).then(res => {
     if (!res.rows[0]) {
       console.error('Invalid location "', asset.location, '" for asset ', asset.name);
     } else {
@@ -129,7 +124,7 @@ function checkinAsset(asset, client, path) {
       ])
         .then(res2 => {
           assetID = res2.rows[0].id;
-          return checkinObjects(assetID, asset, client, path);
+          return checkinObjects(assetID, asset, client);
         })
         .then(() => {
           if (assetID !== null) {
@@ -159,7 +154,8 @@ function floatOrNull(fl) {
   return fl || null;
 }
 
-async function checkinObjects(assetID, asset, client, path) {
+
+async function checkinObjects(assetID, asset, client) {
   if (asset.objects) {
     await Promise.all(asset.objects.map(obj => {
       return client.query('INSERT INTO bedrock.asset_objects("asset_id", "name", "schema", "type", "blueprint") VALUES ($1, $2, $3, $4, $5) '
@@ -223,19 +219,7 @@ function checkinEtl(assetID, asset, client) {
   }
 }
 
-function processing(stage, path, dest, config, logger) {
-  switch (stage) {
-    case 'init':
-      init(config);
-      break;
-    case 'run':
-      runForEachPath(path, logger, config);
-      break;
-    case 'finish':
-      finish(path);
-      break;
-    default:
-      break;
-  }
-}
-module.exports = processing;
+module.exports = {
+  checkinOneAsset,
+  checkinAllAssets,
+};

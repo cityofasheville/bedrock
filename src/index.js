@@ -14,6 +14,7 @@ if (fs.existsSync('./.env')) {
 
 const asset = require('./asset');
 const bedrock = require('./bedrock');
+const etl = require('./etl');
 
 const CommandLineArgs = require('./common/CommandLineArgs');
 const args = new CommandLineArgs(process.argv.slice(2));
@@ -30,7 +31,7 @@ switch (target) {
     console.log('Blueprint target');
     break;
   case 'etl': // Manage ETL jobs
-    console.log('ETL target');
+    etl(command, args);
     break;
   case 'lib': // Manage library version of Bedrock
     console.log('Lib target');

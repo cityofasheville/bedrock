@@ -64,7 +64,7 @@ function report() {
 
   const mailOptions = {
     from: 'dataserviceaccount@ashevillenc.gov',
-    to: 'gisadmins@ashevillenc.gov;jtwilson@ashevillenc.gov',
+    to: 'gisadmins@ashevillenc.gov;jtwilson@ashevillenc.gov;ejackson@ashevillenc.gov',
     subject: `ETL Jobs Status: ${status}`,
     text: emailText,
   };

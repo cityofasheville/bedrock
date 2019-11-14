@@ -64,7 +64,8 @@ async function process(stage, path, dest, mainConfig, logger) {
   let resolvedPath;
   switch (stage) {
     case 'init':
-      await checkout().catch(e => console.error("checkout error: " + e));
+      // eslint-disable-next-line no-console
+      await checkout().catch(e => { console.error(`checkout error: ${e}`); });
       graph = { nodes: {}, edges: [] };
       break;
 

@@ -1,0 +1,10 @@
+{
+  "tasks": [
+    {
+      "type": "sql",
+      "file": "loadtoday.sql",
+      "db": "bedrock",
+      "active": true
+    }
+  ]
+}

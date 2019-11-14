@@ -217,7 +217,9 @@ class Connection {
         tableMeta = {};
         recordSet.forEach(r => {
           tableMeta[r[0]] = Connection.normalizeColumn(r[0],
-            { type: r[1], length: r[2], precision: r[3], scale: r[4], is_nullable: r[5] },
+            {
+              type: r[1], length: r[2], precision: r[3], scale: r[4], is_nullable: r[5],
+            },
             'sqlserver');
         });
       }

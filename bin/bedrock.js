@@ -10,7 +10,7 @@ if (fs.existsSync('./.env')) {
 } else {
   dotenv.config({ path: 'c:/coa/bedrock/.env' });
 }
-const bedrock = require('../index.js');
+const version = require('../scripts/common/version.js');
 const CommandLineArgs = require('../scripts/common/CommandLineArgs');
 const checkout = require('../scripts/checkout');
 const report = require('../scripts/report_status');
@@ -31,7 +31,7 @@ const command = args.popArg();
 
 
 if (command === 'version') {
-  console.log(bedrock.version());
+  console.log(version());
 } else if (command === 'checkout') {
   checkout().catch(e => { console.error('query error', e.message, e.stack); });
 } else if (command === 'checkin' || command === 'init_etl' || command === 'list') {

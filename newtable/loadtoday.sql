@@ -1,0 +1,1 @@
+insert into internal.newtable(ts) values (NOW());

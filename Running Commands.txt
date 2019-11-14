@@ -26,6 +26,7 @@ Defaults:
 --logfile=./etl_jobs_dir/etl.log    (run_etl)
 
 
-
+Install globally without publishing it to npm with this command from inside root dir:
+npm install -g ./
 
 

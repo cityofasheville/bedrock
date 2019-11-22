@@ -10,3 +10,4 @@ mda_types.js
 .vscode/
 etl_jobs_dir/
 working_directory/
+.DS_Store

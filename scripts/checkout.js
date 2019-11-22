@@ -30,15 +30,16 @@ async function checkout() {
   const blueprintMap = {};
 
   const client = connectionManager.getConnection('bedrock');
-  let sqlAsset = 'SELECT ast.id, ast.name, loc.short_name AS location, ast.active, ast.type, ast.description, ast.category,  '
-  + 'ast.tags, ast.schema, ast.title, ast.publication_date, ast.responsible_party, '
-  + 'ast.responsible_party_role, ast.url, ast.abstract, ast.status, ast.update_frequency, ast.keywords, '
-  + 'ast.use_constraints, ast.metadata_constraints, ast.resource_constraints, ast.topic_category,  '
-  + 'ast.geo_extent_east, ast.geo_extent_west, ast.geo_extent_north, ast.geo_extent_south, ast.feature_catalog,  '
-  + 'ast.process_description, ast.spatial_reference, ast.metadata_creation_date, ast.contact_role_code '
-  + 'FROM bedrock.assets ast '
-  + 'INNER JOIN bedrock.asset_locations loc '
-  + 'ON ast.location = loc.id ';
+  let sqlAsset = `SELECT ast.id, ast.name, loc.short_name AS location, 
+  ast.active, ast.type, ast.description, ast.category, ast.tags, ast.schema, ast.title, 
+  ast.publication_date, ast.responsible_party,ast.responsible_party_role, ast.url, 
+  ast.abstract, ast.status, ast.update_frequency, ast.keywords,ast.use_constraints, 
+  ast.metadata_constraints, ast.resource_constraints, ast.topic_category, 
+  ast.geo_extent_east, ast.geo_extent_west, ast.geo_extent_north, ast.geo_extent_south, 
+  ast.feature_catalog, ast.process_description, ast.spatial_reference, 
+  ast.metadata_creation_date, ast.contact_role_code FROM bedrock.assets ast
+  INNER JOIN bedrock.asset_locations loc
+  ON ast.location = loc.id; `;
   const queryArgs = [];
   if (oneAsset) {
     sqlAsset += 'WHERE ast.name = $1 ';
@@ -75,23 +76,15 @@ async function checkout() {
       //write etl.json
       const etl = { tasks: [] };
 
-      const sqlEtl = 'SELECT asset_id, category, type, file, file_content, db, active, task_order '
-    + 'FROM bedrock.etl_tasks WHERE asset_id = $1 ORDER BY category, task_order';
+      const sqlEtl = 'SELECT asset_id, active, task_order '
+    + 'FROM bedrock.etl_tasks WHERE asset_id = $1 ORDER BY task_order';
       const etlData = await client.query(sqlEtl, [asset.id]);
       if (etlData.rows[0]) {
         for (let k = 0; k < etlData.rows.length; k += 1) { // (const row of etlData.rows) {
           const row = etlData.rows[k];
           etl.tasks.push({
-            type: row.type,
-            file: row.file,
-            db: row.db,
             active: row.active,
           });
-          // write working files(fmw, sql)
-          if (row.file && row.file_content) {
-            const fileDataWorking = new Uint8Array(Buffer.from(row.file_content));
-            fs.writeFileSync(`${fullpath}/${row.file}`, fileDataWorking, 'utf8');
-          }
         }
         const etlString = prettyJson(etl);
         const fileDataEtl = new Uint8Array(Buffer.from(etlString));

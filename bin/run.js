@@ -6,7 +6,8 @@ const checkout_data = require('./checkout_data');
 
 (async run => {
   const data = await checkout_data();
-  console.log(prettyJson(data));
+  console.log((data));
+  console.log((data.mda));
   graph = { nodes: {}, edges: [] };
 
 })();

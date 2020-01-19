@@ -23,7 +23,13 @@ function processAsset(obj) {
     } else {
       nobj[mbr] = obj[mbr];
     }
-    if (mbr === 'tags') nobj.tag_len = nobj[mbr].length;
+    if(mbr === 'tags') {
+      if (nobj[mbr]) {
+        nobj.tag_len = nobj[mbr].length;
+      }else{
+        nobj.tag_len = 0;
+      }
+    }
   });
   return nobj;
 }

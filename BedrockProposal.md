@@ -19,13 +19,13 @@ New core of program will not use FME, so will have different db structure for th
   * Some SFTP jobs are just moving files, others are interpreting the data files, so this is just the read/write part.
 
 ## Type of location
-SQL Server
-Postgres
-CSV File
-Fixed-width file (eg APC data)
-Google Sheet
-Spawn Node script?
-email?
+- SQL Server
+- Postgres
+- CSV File
+- Fixed-width file (eg APC data)
+- Google Sheet
+- Spawn Node script?
+- email?
 
 ## Schedules
 Run at different times: daily/weekly 

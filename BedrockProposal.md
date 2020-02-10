@@ -1,7 +1,7 @@
 # Bedrock
 
 Gut current program, retaining dependency graph, metadata, blueprints, and result emails.
-New core of program will not use FME, so will have different db for each step. 
+New core of program will not use FME, so will have different db structure for the steps. 
 
 ## Type of Task
 

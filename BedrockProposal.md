@@ -6,17 +6,17 @@ New core of program will not use FME, so will have different db structure for th
 ## Type of Task
 
 - **COPY**
-Data: source_location, target_location, tablename.
-Straight copy to identical table. If table does not exist, create it. (You can also create a view at source and use that.)
+ - Data: source_location, target_location, tablename.
+ - Straight copy to identical table. If table does not exist, create it. (You can also create a view at source and use that.)
 - **COPY SINCE**
-Data: source_location, target_location, tablename, date or key field, last success.
-Copies the latest data to identical table.
+ - Data: source_location, target_location, tablename, date or key field, last success.
+ - Copies the latest data to identical table.
 - **SQL**
-Data: location, SQL
-Used for transformations after copy.
+ - Data: location, SQL
+ - Used for transformations after copy.
 - **SFTP**
-Data: host, user, password, keyfile, source_filepath, target_filepath
-Some SFTP jobs are just moving files, others are interpreting the data files, so this is just the read/write part.
+ - Data: host, user, password, keyfile, source_filepath, target_filepath
+ - Some SFTP jobs are just moving files, others are interpreting the data files, so this is just the read/write part.
 
 ## Type of location
 SQL Server

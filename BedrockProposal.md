@@ -1,7 +1,12 @@
-# Bedrock
+# Bedrock proposed changes
 
-Replace core of program, retaining dependency graph, metadata, blueprints, and result emails.
-New version will not use FME, so will have different db structure for the steps. 
+- Replace core of program, retaining dependency graph, metadata, blueprints, and result emails.
+- New version will not use FME.
+- New config interface?
+
+## Assets
+An asset is the final location of data after running one or more related tasks. Metadata applies to this version.
+A typical series of tasks would be to copy a table from a source to an identical staging table on the target, and then running sql to transform it into a canonical form.
 
 ## Type of Task
 
@@ -13,7 +18,7 @@ New version will not use FME, so will have different db structure for the steps.
   * Copies the latest data to identical table.
 - **SQL**
   * Data: location, SQL
-  * Used for transformations after copy.
+  * Used for transformations after copy. DELETE FROM ... INSERT INTO ... SELECT FROM ...
 - **SFTP**
   * Data: host, user, password, keyfile, source_filepath, target_filepath
   * Some SFTP jobs are just moving files, others are interpreting the data files, so this is just the read/write part.

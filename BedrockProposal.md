@@ -28,6 +28,7 @@ A typical series of tasks would be to copy a table from a source to an identical
 - Postgres
 - CSV File
 - Fixed-width file (eg APC data)
+- API (eg Swiftly)
 - Google Sheet
 - Spawn Node script?
 - email?
@@ -40,3 +41,11 @@ Old table should remain intact if copy fails.
 
 ## Rerun
 Need to be able to rerun a single failed job.
+
+## Snapshots
+## Providence
+## Copy since by year...
+
+## TODO
+Move job status out of files and into db
+

@@ -1,4 +1,4 @@
-# OLD VERSION: see (Bedrock 2)[https://github.com/cityofasheville/bedrock2]
+# OLD VERSION: see [Bedrock 2](https://github.com/cityofasheville/bedrock2)
 # Bedrock
 
 System for data inventory and dependency management
